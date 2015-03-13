@@ -210,8 +210,9 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
   <ItemGroup>
     <ClCompile Include="asyn-ares.c" />
     <ClCompile Include="asyn-thread.c" />
-    <ClCompile Include="axtls.c" />
     <ClCompile Include="base64.c" />
+    <ClCompile Include="bundles.c" />
+    <ClCompile Include="conncache.c" />
     <ClCompile Include="connect.c" />
     <ClCompile Include="content_encoding.c" />
     <ClCompile Include="cookie.c" />
@@ -224,12 +225,13 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="curl_ntlm_core.c" />
     <ClCompile Include="curl_ntlm_msgs.c" />
     <ClCompile Include="curl_ntlm_wb.c" />
-    <ClCompile Include="curl_rand.c" />
     <ClCompile Include="curl_rtmp.c" />
+    <ClCompile Include="curl_sasl.c" />
+    <ClCompile Include="curl_sasl_sspi.c" />
     <ClCompile Include="curl_sspi.c" />
     <ClCompile Include="curl_threads.c" />
-    <ClCompile Include="cyassl.c" />
     <ClCompile Include="dict.c" />
+    <ClCompile Include="dotdot.c" />
     <ClCompile Include="easy.c" />
     <ClCompile Include="escape.c" />
     <ClCompile Include="file.c" />
@@ -240,10 +242,10 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="getenv.c" />
     <ClCompile Include="getinfo.c" />
     <ClCompile Include="gopher.c" />
-    <ClCompile Include="gtls.c" />
     <ClCompile Include="hash.c" />
     <ClCompile Include="hmac.c" />
     <ClCompile Include="hostasyn.c" />
+    <ClCompile Include="hostcheck.c" />
     <ClCompile Include="hostip.c" />
     <ClCompile Include="hostip4.c" />
     <ClCompile Include="hostip6.c" />
@@ -259,7 +261,6 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="imap.c" />
     <ClCompile Include="inet_ntop.c" />
     <ClCompile Include="inet_pton.c" />
-    <ClCompile Include="krb4.c" />
     <ClCompile Include="krb5.c" />
     <ClCompile Include="ldap.c" />
     <ClCompile Include="llist.c" />
@@ -271,14 +272,12 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="netrc.c" />
     <ClCompile Include="non-ascii.c" />
     <ClCompile Include="nonblock.c" />
-    <ClCompile Include="nss.c" />
     <ClCompile Include="openldap.c" />
     <ClCompile Include="parsedate.c" />
     <ClCompile Include="pingpong.c" />
-    <ClCompile Include="polarssl.c" />
+    <ClCompile Include="pipeline.c" />
     <ClCompile Include="pop3.c" />
     <ClCompile Include="progress.c" />
-    <ClCompile Include="qssl.c" />
     <ClCompile Include="rawstr.c" />
     <ClCompile Include="rtsp.c" />
     <ClCompile Include="security.c" />
@@ -293,8 +292,6 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="speedcheck.c" />
     <ClCompile Include="splay.c" />
     <ClCompile Include="ssh.c" />
-    <ClCompile Include="sslgen.c" />
-    <ClCompile Include="ssluse.c" />
     <ClCompile Include="strdup.c" />
     <ClCompile Include="strequal.c" />
     <ClCompile Include="strerror.c" />
@@ -306,6 +303,13 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="transfer.c" />
     <ClCompile Include="url.c" />
     <ClCompile Include="version.c" />
+    <ClCompile Include="vtls\axtls.c" />
+    <ClCompile Include="vtls\cyassl.c" />
+    <ClCompile Include="vtls\gtls.c" />
+    <ClCompile Include="vtls\nss.c" />
+    <ClCompile Include="vtls\openssl.c" />
+    <ClCompile Include="vtls\polarssl.c" />
+    <ClCompile Include="vtls\vtls.c" />
     <ClCompile Include="warnless.c" />
     <ClCompile Include="wildcard.c" />
   </ItemGroup>
