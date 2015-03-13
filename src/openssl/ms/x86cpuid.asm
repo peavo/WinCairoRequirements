@@ -66,6 +66,7 @@ L$_OPENSSL_ia32_cpuid_begin:
 	movzx	esi,cl
 	inc	esi
 	mov	eax,1
+	xor	ecx,ecx
 	cpuid
 	bt	edx,28
 	jnc	NEAR L$002generic
@@ -87,6 +88,7 @@ L$001intel:
 	and	edi,4095
 L$003nocacheinfo:
 	mov	eax,1
+	xor	ecx,ecx
 	cpuid
 	and	edx,3220176895
 	cmp	ebp,0

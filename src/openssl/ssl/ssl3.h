@@ -128,8 +128,13 @@
 extern "C" {
 #endif
 
-/* Signalling cipher suite value: from draft-ietf-tls-renegotiation-03.txt */
+/* Signalling cipher suite value from RFC 5746
+ * (TLS_EMPTY_RENEGOTIATION_INFO_SCSV) */
 #define SSL3_CK_SCSV				0x030000FF
+
+/* Signalling cipher suite value from draft-ietf-tls-downgrade-scsv-00
+ * (TLS_FALLBACK_SCSV) */
+#define SSL3_CK_FALLBACK_SCSV			0x03005600
 
 #define SSL3_CK_RSA_NULL_MD5			0x03000001
 #define SSL3_CK_RSA_NULL_SHA			0x03000002
@@ -388,7 +393,12 @@ typedef struct ssl3_buffer_st
 #define TLS1_FLAGS_TLS_PADDING_BUG		0x0008
 #define TLS1_FLAGS_SKIP_CERT_VERIFY		0x0010
 #define TLS1_FLAGS_KEEP_HANDSHAKE		0x0020
- 
+/*
+ * Set when the handshake is ready to process peer's ChangeCipherSpec message.
+ * Cleared after the message has been processed.
+ */
+#define SSL3_FLAGS_CCS_OK			0x0080
+
 /* SSL3_FLAGS_SGC_RESTART_DONE is set when we
  * restart a handshake because of MS SGC and so prevents us
  * from restarting the handshake in a loop. It's reset on a
@@ -450,8 +460,11 @@ typedef struct ssl3_state_st
 	 * and freed and MD_CTX-es for all required digests are stored in
 	 * this array */
 	EVP_MD_CTX **handshake_dgst;
-	/* this is set whenerver we see a change_cipher_spec message
-	 * come in when we are not looking for one */
+	/*
+	 * Set whenever an expected ChangeCipherSpec message is processed.
+	 * Unset when the peer's Finished message is received.
+	 * Unexpected ChangeCipherSpec messages trigger a fatal alert.
+	 */
 	int change_cipher_spec;
 
 	int warn_alert;
@@ -539,6 +552,15 @@ typedef struct ssl3_state_st
 	/* Set if we saw the Next Protocol Negotiation extension from our peer. */
 	int next_proto_neg_seen;
 #endif
+
+#ifndef OPENSSL_NO_TLSEXT
+#ifndef OPENSSL_NO_EC
+	/* This is set to true if we believe that this is a version of Safari
+	 * running on OS X 10.6 or newer. We wish to know this because Safari
+	 * on 10.8 .. 10.8.3 has broken ECDHE-ECDSA support. */
+	char is_probably_safari;
+#endif /* !OPENSSL_NO_EC */
+#endif /* !OPENSSL_NO_TLSEXT */
 	} SSL3_STATE;
 
 #endif
@@ -578,8 +600,10 @@ typedef struct ssl3_state_st
 #define SSL3_ST_CW_CERT_VRFY_B		(0x191|SSL_ST_CONNECT)
 #define SSL3_ST_CW_CHANGE_A		(0x1A0|SSL_ST_CONNECT)
 #define SSL3_ST_CW_CHANGE_B		(0x1A1|SSL_ST_CONNECT)
+#ifndef OPENSSL_NO_NEXTPROTONEG
 #define SSL3_ST_CW_NEXT_PROTO_A		(0x200|SSL_ST_CONNECT)
 #define SSL3_ST_CW_NEXT_PROTO_B		(0x201|SSL_ST_CONNECT)
+#endif
 #define SSL3_ST_CW_FINISHED_A		(0x1B0|SSL_ST_CONNECT)
 #define SSL3_ST_CW_FINISHED_B		(0x1B1|SSL_ST_CONNECT)
 /* read from server */
@@ -629,8 +653,10 @@ typedef struct ssl3_state_st
 #define SSL3_ST_SR_CERT_VRFY_B		(0x1A1|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_CHANGE_A		(0x1B0|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_CHANGE_B		(0x1B1|SSL_ST_ACCEPT)
+#ifndef OPENSSL_NO_NEXTPROTONEG
 #define SSL3_ST_SR_NEXT_PROTO_A		(0x210|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_NEXT_PROTO_B		(0x211|SSL_ST_ACCEPT)
+#endif
 #define SSL3_ST_SR_FINISHED_A		(0x1C0|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_FINISHED_B		(0x1C1|SSL_ST_ACCEPT)
 /* write to client */
@@ -655,7 +681,9 @@ typedef struct ssl3_state_st
 #define SSL3_MT_CLIENT_KEY_EXCHANGE		16
 #define SSL3_MT_FINISHED			20
 #define SSL3_MT_CERTIFICATE_STATUS		22
+#ifndef OPENSSL_NO_NEXTPROTONEG
 #define SSL3_MT_NEXT_PROTO			67
+#endif
 #define DTLS1_MT_HELLO_VERIFY_REQUEST    3
 
 

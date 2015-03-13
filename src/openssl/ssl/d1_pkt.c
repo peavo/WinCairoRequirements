@@ -212,7 +212,7 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
 	/* Limit the size of the queue to prevent DOS attacks */
 	if (pqueue_size(queue->q) >= 100)
 		return 0;
-		
+
 	rdata = OPENSSL_malloc(sizeof(DTLS1_RECORD_DATA));
 	item = pitem_new(priority, rdata);
 	if (rdata == NULL || item == NULL)
@@ -239,14 +239,6 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
 	}
 #endif
 
-	/* insert should not fail, since duplicates are dropped */
-	if (pqueue_insert(queue->q, item) == NULL)
-		{
-		OPENSSL_free(rdata);
-		pitem_free(item);
-		return(0);
-		}
-
 	s->packet = NULL;
 	s->packet_length = 0;
 	memset(&(s->s3->rbuf), 0, sizeof(SSL3_BUFFER));
@@ -255,11 +247,24 @@ dtls1_buffer_record(SSL *s, record_pqueue *queue, unsigned char *priority)
 	if (!ssl3_setup_buffers(s))
 		{
 		SSLerr(SSL_F_DTLS1_BUFFER_RECORD, ERR_R_INTERNAL_ERROR);
+		if (rdata->rbuf.buf != NULL)
+			OPENSSL_free(rdata->rbuf.buf);
 		OPENSSL_free(rdata);
 		pitem_free(item);
-		return(0);
+		return(-1);
 		}
-	
+
+	/* insert should not fail, since duplicates are dropped */
+	if (pqueue_insert(queue->q, item) == NULL)
+		{
+		SSLerr(SSL_F_DTLS1_BUFFER_RECORD, ERR_R_INTERNAL_ERROR);
+		if (rdata->rbuf.buf != NULL)
+			OPENSSL_free(rdata->rbuf.buf);
+		OPENSSL_free(rdata);
+		pitem_free(item);
+		return(-1);
+		}
+
 	return(1);
 	}
 
@@ -313,8 +318,9 @@ dtls1_process_buffered_records(SSL *s)
             dtls1_get_unprocessed_record(s);
             if ( ! dtls1_process_record(s))
                 return(0);
-            dtls1_buffer_record(s, &(s->d1->processed_rcds), 
-                s->s3->rrec.seq_num);
+            if(dtls1_buffer_record(s, &(s->d1->processed_rcds),
+                s->s3->rrec.seq_num)<0)
+                return -1;
             }
         }
 
@@ -376,15 +382,11 @@ static int
 dtls1_process_record(SSL *s)
 {
 	int i,al;
-	int clear=0;
 	int enc_err;
 	SSL_SESSION *sess;
 	SSL3_RECORD *rr;
-	unsigned int mac_size;
+	unsigned int mac_size, orig_len;
 	unsigned char md[EVP_MAX_MD_SIZE];
-	int decryption_failed_or_bad_record_mac = 0;
-	unsigned char *mac = NULL;
-
 
 	rr= &(s->s3->rrec);
 	sess = s->session;
@@ -416,12 +418,16 @@ dtls1_process_record(SSL *s)
 	rr->data=rr->input;
 
 	enc_err = s->method->ssl3_enc->enc(s,0);
-	if (enc_err <= 0)
+	/* enc_err is:
+	 *    0: (in non-constant time) if the record is publically invalid.
+	 *    1: if the padding is valid
+	 *    -1: if the padding is invalid */
+	if (enc_err == 0)
 		{
-		/* To minimize information leaked via timing, we will always
-		 * perform all computations before discarding the message.
-		 */
-		decryption_failed_or_bad_record_mac = 1;
+		/* For DTLS we simply ignore bad packets. */
+		rr->length = 0;
+		s->packet_length = 0;
+		goto err;
 		}
 
 #ifdef TLS_DEBUG
@@ -431,45 +437,62 @@ printf("\n");
 #endif
 
 	/* r->length is now the compressed data plus mac */
-	if (	(sess == NULL) ||
-		(s->enc_read_ctx == NULL) ||
-		(s->read_hash == NULL))
-		clear=1;
-
-	if (!clear)
+	if ((sess != NULL) &&
+	    (s->enc_read_ctx != NULL) &&
+	    (EVP_MD_CTX_md(s->read_hash) != NULL))
 		{
-		/* !clear => s->read_hash != NULL => mac_size != -1 */
-		int t;
-		t=EVP_MD_CTX_size(s->read_hash);
-		OPENSSL_assert(t >= 0);
-		mac_size=t;
+		/* s->read_hash != NULL => mac_size != -1 */
+		unsigned char *mac = NULL;
+		unsigned char mac_tmp[EVP_MAX_MD_SIZE];
+		mac_size=EVP_MD_CTX_size(s->read_hash);
+		OPENSSL_assert(mac_size <= EVP_MAX_MD_SIZE);
 
-		if (rr->length > SSL3_RT_MAX_COMPRESSED_LENGTH+mac_size)
+		/* kludge: *_cbc_remove_padding passes padding length in rr->type */
+		orig_len = rr->length+((unsigned int)rr->type>>8);
+
+		/* orig_len is the length of the record before any padding was
+		 * removed. This is public information, as is the MAC in use,
+		 * therefore we can safely process the record in a different
+		 * amount of time if it's too short to possibly contain a MAC.
+		 */
+		if (orig_len < mac_size ||
+		    /* CBC records must have a padding length byte too. */
+		    (EVP_CIPHER_CTX_mode(s->enc_read_ctx) == EVP_CIPH_CBC_MODE &&
+		     orig_len < mac_size+1))
 			{
-#if 0 /* OK only for stream ciphers (then rr->length is visible from ciphertext anyway) */
-			al=SSL_AD_RECORD_OVERFLOW;
-			SSLerr(SSL_F_DTLS1_PROCESS_RECORD,SSL_R_PRE_MAC_LENGTH_TOO_LONG);
+			al=SSL_AD_DECODE_ERROR;
+			SSLerr(SSL_F_DTLS1_PROCESS_RECORD,SSL_R_LENGTH_TOO_SHORT);
 			goto f_err;
-#else
-			decryption_failed_or_bad_record_mac = 1;
-#endif			
 			}
-		/* check the MAC for rr->input (it's in mac_size bytes at the tail) */
-		if (rr->length >= mac_size)
+
+		if (EVP_CIPHER_CTX_mode(s->enc_read_ctx) == EVP_CIPH_CBC_MODE)
 			{
+			/* We update the length so that the TLS header bytes
+			 * can be constructed correctly but we need to extract
+			 * the MAC in constant time from within the record,
+			 * without leaking the contents of the padding bytes.
+			 * */
+			mac = mac_tmp;
+			ssl3_cbc_copy_mac(mac_tmp, rr, mac_size, orig_len);
+			rr->length -= mac_size;
+			}
+		else
+			{
+			/* In this case there's no padding, so |orig_len|
+			 * equals |rec->length| and we checked that there's
+			 * enough bytes for |mac_size| above. */
 			rr->length -= mac_size;
 			mac = &rr->data[rr->length];
 			}
-		else
-			rr->length = 0;
-		i=s->method->ssl3_enc->mac(s,md,0);
-		if (i < 0 || mac == NULL || memcmp(md, mac, mac_size) != 0)
-			{
-			decryption_failed_or_bad_record_mac = 1;
-			}
+
+		i=s->method->ssl3_enc->mac(s,md,0 /* not send */);
+		if (i < 0 || mac == NULL || CRYPTO_memcmp(md, mac, (size_t)mac_size) != 0)
+			enc_err = -1;
+		if (rr->length > SSL3_RT_MAX_COMPRESSED_LENGTH+mac_size)
+			enc_err = -1;
 		}
 
-	if (decryption_failed_or_bad_record_mac)
+	if (enc_err < 0)
 		{
 		/* decryption failed, silently discard message */
 		rr->length = 0;
@@ -512,7 +535,6 @@ printf("\n");
 
 	/* we have pulled in a full packet so zero things */
 	s->packet_length=0;
-	dtls1_record_bitmap_update(s, &(s->d1->bitmap));/* Mark receipt of record. */
 	return(1);
 
 f_err:
@@ -545,7 +567,8 @@ int dtls1_get_record(SSL *s)
 
 	/* The epoch may have changed.  If so, process all the
 	 * pending records.  This is a non-blocking operation. */
-	dtls1_process_buffered_records(s);
+	if(dtls1_process_buffered_records(s)<0)
+		return -1;
 
 	/* if we're renegotiating, then there may be buffered records */
 	if (dtls1_get_processed_record(s))
@@ -624,8 +647,6 @@ again:
 		/* now s->packet_length == DTLS1_RT_HEADER_LENGTH */
 		i=rr->length;
 		n=ssl3_read_n(s,i,i,1);
-		if (n <= 0) return(n); /* error or non-blocking io */
-
 		/* this packet contained a partial record, dump it */
 		if ( n != i)
 			{
@@ -660,7 +681,8 @@ again:
 		 * would be dropped unnecessarily.
 		 */
 		if (!(s->d1->listen && rr->type == SSL3_RT_HANDSHAKE &&
-		    *p == SSL3_MT_CLIENT_HELLO) &&
+		    s->packet_length > DTLS1_RT_HEADER_LENGTH &&
+		    s->packet[DTLS1_RT_HEADER_LENGTH] == SSL3_MT_CLIENT_HELLO) &&
 		    !dtls1_record_replay_check(s, bitmap))
 			{
 			rr->length = 0;
@@ -683,7 +705,9 @@ again:
 		{
 		if ((SSL_in_init(s) || s->in_handshake) && !s->d1->listen)
 			{
-			dtls1_buffer_record(s, &(s->d1->unprocessed_rcds), rr->seq_num);
+			if(dtls1_buffer_record(s, &(s->d1->unprocessed_rcds), rr->seq_num)<0)
+				return -1;
+			dtls1_record_bitmap_update(s, bitmap);/* Mark receipt of record. */
 			}
 		rr->length = 0;
 		s->packet_length = 0;
@@ -696,6 +720,7 @@ again:
 		s->packet_length = 0;  /* dump this record */
 		goto again;   /* get another record */
 		}
+	dtls1_record_bitmap_update(s, bitmap);/* Mark receipt of record. */
 
 	return(1);
 
@@ -830,6 +855,12 @@ start:
 			}
 		}
 
+	if (s->d1->listen && rr->type != SSL3_RT_HANDSHAKE)
+		{
+		rr->length = 0;
+		goto start;
+		}
+
 	/* we now have a packet which can be read and processed */
 
 	if (s->s3->change_cipher_spec /* set when we receive ChangeCipherSpec,
@@ -841,7 +872,11 @@ start:
 		 * buffer the application data for later processing rather
 		 * than dropping the connection.
 		 */
-		dtls1_buffer_record(s, &(s->d1->buffered_app_data), rr->seq_num);
+		if(dtls1_buffer_record(s, &(s->d1->buffered_app_data), rr->seq_num)<0)
+			{
+			SSLerr(SSL_F_DTLS1_READ_BYTES, ERR_R_INTERNAL_ERROR);
+			return -1;
+			}
 		rr->length = 0;
 		goto start;
 		}
@@ -1034,6 +1069,7 @@ start:
 			!(s->s3->flags & SSL3_FLAGS_NO_RENEGOTIATE_CIPHERS) &&
 			!s->s3->renegotiate)
 			{
+			s->d1->handshake_read_seq++;
 			s->new_session = 1;
 			ssl3_renegotiate(s);
 			if (ssl3_renegotiate_check(s))
@@ -1594,7 +1630,7 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
 		wr->length += bs;
 		}
 
-	s->method->ssl3_enc->enc(s,1);
+	if(s->method->ssl3_enc->enc(s,1) < 1) goto err;
 
 	/* record length after mac and block padding */
 /*	if (type == SSL3_RT_APPLICATION_DATA ||

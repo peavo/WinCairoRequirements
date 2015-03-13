@@ -225,7 +225,7 @@
 
 #undef BUFSIZE
 #define BUFSIZE	((long)1024*8+1)
-int run=0;
+static volatile int run=0;
 
 static int mr=0;
 static int usertime=1;
@@ -254,7 +254,7 @@ static const char *names[ALGOR_NUM]={
   "aes-128 cbc","aes-192 cbc","aes-256 cbc",
   "camellia-128 cbc","camellia-192 cbc","camellia-256 cbc",
   "evp","sha256","sha512","whirlpool",
-  "aes-128 ige","aes-192 ige","aes-256 ige","ghash"};
+  "aes-128 ige","aes-192 ige","aes-256 ige","ghash" };
 static double results[ALGOR_NUM][SIZE_NUM];
 static int lengths[SIZE_NUM]={16,64,256,1024,8*1024};
 #ifndef OPENSSL_NO_RSA
@@ -299,7 +299,7 @@ static SIGRETTYPE sig_done(int sig)
 #if defined(_WIN32)
 
 #if !defined(SIGALRM)
-#define SIGALRM
+# define SIGALRM
 #endif
 static unsigned int lapse,schlock;
 static void alarm_win32(unsigned int secs) { lapse = secs*1000; }
@@ -2717,27 +2717,6 @@ static int do_multi(int multi)
 				sstrsep(&p,sep);
 				for(j=0 ; j < SIZE_NUM ; ++j)
 					results[alg][j]+=atof(sstrsep(&p,sep));
-				}
-			else if(!strncmp(buf,"+F2:",4))
-				{
-				int k;
-				double d;
-				
-				p=buf+4;
-				k=atoi(sstrsep(&p,sep));
-				sstrsep(&p,sep);
-
-				d=atof(sstrsep(&p,sep));
-				if(n)
-					rsa_results[k][0]=1/(1/rsa_results[k][0]+1/d);
-				else
-					rsa_results[k][0]=d;
-
-				d=atof(sstrsep(&p,sep));
-				if(n)
-					rsa_results[k][1]=1/(1/rsa_results[k][1]+1/d);
-				else
-					rsa_results[k][1]=d;
 				}
 			else if(!strncmp(buf,"+F2:",4))
 				{

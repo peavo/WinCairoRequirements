@@ -57,8 +57,8 @@
  *
  */
 
-#ifndef HEADER_DTLS1_H 
-#define HEADER_DTLS1_H 
+#ifndef HEADER_DTLS1_H
+#define HEADER_DTLS1_H
 
 #include <openssl/buffer.h>
 #include <openssl/pqueue.h>
@@ -72,7 +72,11 @@
 #elif defined(OPENSSL_SYS_NETWARE) && !defined(_WINSOCK2API_)
 #include <sys/timeval.h>
 #else
+#if defined(OPENSSL_SYS_VXWORKS)
+#include <sys/times.h>
+#else
 #include <sys/time.h>
+#endif
 #endif
 
 #ifdef  __cplusplus
@@ -80,6 +84,8 @@ extern "C" {
 #endif
 
 #define DTLS1_VERSION			0xFEFF
+#define DTLS_MAX_VERSION		DTLS1_VERSION
+
 #define DTLS1_BAD_VER			0x0100
 
 #if 0
@@ -110,6 +116,9 @@ extern "C" {
 #ifndef OPENSSL_NO_SCTP
 #define DTLS1_SCTP_AUTH_LABEL	"EXPORTER_DTLS_OVER_SCTP"
 #endif
+
+/* Max MTU overhead we know about so far is 40 for IPv6 + 8 for UDP */
+#define DTLS1_MAX_MTU_OVERHEAD                   48
 
 typedef struct dtls1_bitmap_st
 	{
@@ -225,6 +234,7 @@ typedef struct dtls1_state_st
 	/* Is set when listening for new connections with dtls1_listen() */
 	unsigned int listen;
 
+	unsigned int link_mtu; /* max on-the-wire DTLS packet size */
 	unsigned int mtu; /* max DTLS packet size */
 
 	struct hm_header_st w_msg_hdr;
@@ -246,6 +256,10 @@ typedef struct dtls1_state_st
 	unsigned int handshake_fragment_len;
 
 	unsigned int retransmitting;
+	/*
+	 * Set when the handshake is ready to process peer's ChangeCipherSpec message.
+	 * Cleared after the message has been processed.
+	 */
 	unsigned int change_cipher_spec_ok;
 
 #ifndef OPENSSL_NO_SCTP
@@ -280,4 +294,3 @@ typedef struct dtls1_record_data_st
 }
 #endif
 #endif
-

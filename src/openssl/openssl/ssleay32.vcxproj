@@ -26,6 +26,7 @@
     <ClCompile Include="..\ssl\s2_lib.c" />
     <ClCompile Include="..\ssl\s2_enc.c" />
     <ClCompile Include="..\ssl\s2_pkt.c" />
+    <ClCompile Include="..\ssl\s3_cbc.c" />
     <ClCompile Include="..\ssl\s3_meth.c" />
     <ClCompile Include="..\ssl\s3_srvr.c" />
     <ClCompile Include="..\ssl\s3_clnt.c" />

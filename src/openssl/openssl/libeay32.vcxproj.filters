@@ -2000,6 +2000,9 @@
     <ClCompile Include="..\crypto\o_time.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\crypto\evp\evp_cnf.c">
+      <Filter>Source Files\evp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\crypto\aes\aes.h">
@@ -2274,9 +2277,6 @@
     <MASM Include="..\crypto\aes\asm\aesni-x86_64.asm">
       <Filter>Source Files\aes</Filter>
     </MASM>
-    <MASM Include="..\crypto\aes\asm\aes-x86_64.asm">
-      <Filter>Source Files\aes</Filter>
-    </MASM>
     <MASM Include="..\crypto\aes\asm\bsaes-x86_64.asm">
       <Filter>Source Files\aes</Filter>
     </MASM>
@@ -2391,6 +2391,9 @@
       <Filter>Source Files\whrlpool</Filter>
     </NASM>
     <NASM Include="..\crypto\aes\asm\aes-586.asm">
+      <Filter>Source Files\aes</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aes-x86_64.asm">
       <Filter>Source Files\aes</Filter>
     </NASM>
   </ItemGroup>

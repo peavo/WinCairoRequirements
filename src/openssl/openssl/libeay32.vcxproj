@@ -356,6 +356,7 @@
     <ClCompile Include="..\crypto\evp\digest.c" />
     <ClCompile Include="..\crypto\evp\encode.c" />
     <ClCompile Include="..\crypto\evp\evp_acnf.c" />
+    <ClCompile Include="..\crypto\evp\evp_cnf.c" />
     <ClCompile Include="..\crypto\evp\evp_enc.c" />
     <ClCompile Include="..\crypto\evp\evp_err.c" />
     <ClCompile Include="..\crypto\evp\evp_fips.c" />
@@ -742,10 +743,12 @@
     <ClInclude Include="..\ms\uplink.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="..\crypto\aes\asm\aes-x86_64.asm">
+    <NASM Include="..\crypto\aes\asm\aes-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
     <MASM Include="..\crypto\aes\asm\aesni-sha1-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

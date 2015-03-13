@@ -188,13 +188,21 @@ int ssl2_accept(SSL *s)
 			s->version=SSL2_VERSION;
 			s->type=SSL_ST_ACCEPT;
 
-			buf=s->init_buf;
-			if ((buf == NULL) && ((buf=BUF_MEM_new()) == NULL))
-				{ ret= -1; goto end; }
-			if (!BUF_MEM_grow(buf,(int)
-				SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER))
-				{ ret= -1; goto end; }
-			s->init_buf=buf;
+			if(s->init_buf == NULL)
+				{
+				if ((buf=BUF_MEM_new()) == NULL)
+					{
+					ret= -1;
+					goto end;
+					}
+				if (!BUF_MEM_grow(buf,(int) SSL2_MAX_RECORD_LENGTH_3_BYTE_HEADER))
+					{
+					BUF_MEM_free(buf);
+					ret= -1;
+					goto end;
+					}
+				s->init_buf=buf;
+				}
 			s->init_num=0;
 			s->ctx->stats.sess_accept++;
 			s->handshake_func=ssl2_accept;
@@ -1059,10 +1067,12 @@ static int request_certificate(SSL *s)
 		EVP_PKEY *pkey=NULL;
 
 		EVP_MD_CTX_init(&ctx);
-		EVP_VerifyInit_ex(&ctx,s->ctx->rsa_md5, NULL);
-		EVP_VerifyUpdate(&ctx,s->s2->key_material,
-				 s->s2->key_material_length);
-		EVP_VerifyUpdate(&ctx,ccd,SSL2_MIN_CERT_CHALLENGE_LENGTH);
+		if (!EVP_VerifyInit_ex(&ctx,s->ctx->rsa_md5, NULL)
+		    || !EVP_VerifyUpdate(&ctx,s->s2->key_material,
+					 s->s2->key_material_length)
+		    || !EVP_VerifyUpdate(&ctx,ccd,
+					 SSL2_MIN_CERT_CHALLENGE_LENGTH))
+			goto msg_end;
 
 		i=i2d_X509(s->cert->pkeys[SSL_PKEY_RSA_ENC].x509,NULL);
 		buf2=OPENSSL_malloc((unsigned int)i);
@@ -1073,7 +1083,11 @@ static int request_certificate(SSL *s)
 			}
 		p2=buf2;
 		i=i2d_X509(s->cert->pkeys[SSL_PKEY_RSA_ENC].x509,&p2);
-		EVP_VerifyUpdate(&ctx,buf2,(unsigned int)i);
+		if (!EVP_VerifyUpdate(&ctx,buf2,(unsigned int)i))
+			{
+			OPENSSL_free(buf2);
+			goto msg_end;
+			}
 		OPENSSL_free(buf2);
 
 		pkey=X509_get_pubkey(x509);

@@ -77,8 +77,18 @@
 #define OPENSSL_SCTP_FORWARD_CUM_TSN_CHUNK_TYPE 0xc0
 #endif
 
-#ifdef OPENSSL_SYS_LINUX
+#if defined(OPENSSL_SYS_LINUX) && !defined(IP_MTU)
 #define IP_MTU      14 /* linux is lame */
+#endif
+
+#if defined(__FreeBSD__) && defined(IN6_IS_ADDR_V4MAPPED)
+/* Standard definition causes type-punning problems. */
+#undef IN6_IS_ADDR_V4MAPPED
+#define s6_addr32 __u6_addr.__u6_addr32
+#define IN6_IS_ADDR_V4MAPPED(a)               \
+        (((a)->s6_addr32[0] == 0) &&          \
+         ((a)->s6_addr32[1] == 0) &&          \
+         ((a)->s6_addr32[2] == htonl(0x0000ffff)))
 #endif
 
 #ifdef WATT32
@@ -255,7 +265,7 @@ static void dgram_adjust_rcv_timeout(BIO *b)
 	{
 #if defined(SO_RCVTIMEO)
 	bio_dgram_data *data = (bio_dgram_data *)b->ptr;
-	int sz = sizeof(int);
+	union { size_t s; int i; } sz = {0};
 
 	/* Is a timer active? */
 	if (data->next_timeout.tv_sec > 0 || data->next_timeout.tv_usec > 0)
@@ -265,8 +275,10 @@ static void dgram_adjust_rcv_timeout(BIO *b)
 		/* Read current socket timeout */
 #ifdef OPENSSL_SYS_WINDOWS
 		int timeout;
+
+		sz.i = sizeof(timeout);
 		if (getsockopt(b->num, SOL_SOCKET, SO_RCVTIMEO,
-					   (void*)&timeout, &sz) < 0)
+					   (void*)&timeout, &sz.i) < 0)
 			{ perror("getsockopt"); }
 		else
 			{
@@ -274,9 +286,12 @@ static void dgram_adjust_rcv_timeout(BIO *b)
 			data->socket_timeout.tv_usec = (timeout % 1000) * 1000;
 			}
 #else
+		sz.i = sizeof(data->socket_timeout);
 		if ( getsockopt(b->num, SOL_SOCKET, SO_RCVTIMEO, 
 						&(data->socket_timeout), (void *)&sz) < 0)
 			{ perror("getsockopt"); }
+		else if (sizeof(sz.s)!=sizeof(sz.i) && sz.i==0)
+			OPENSSL_assert(sz.s<=sizeof(data->socket_timeout));
 #endif
 
 		/* Get current time */
@@ -439,17 +454,46 @@ static int dgram_write(BIO *b, const char *in, int inl)
 	return(ret);
 	}
 
+static long dgram_get_mtu_overhead(bio_dgram_data *data)
+	{
+	long ret;
+
+	switch (data->peer.sa.sa_family)
+		{
+		case AF_INET:
+			/* Assume this is UDP - 20 bytes for IP, 8 bytes for UDP */
+			ret = 28;
+			break;
+#if OPENSSL_USE_IPV6
+		case AF_INET6:
+#ifdef IN6_IS_ADDR_V4MAPPED
+			if (IN6_IS_ADDR_V4MAPPED(&data->peer.sa_in6.sin6_addr))
+				/* Assume this is UDP - 20 bytes for IP, 8 bytes for UDP */
+				ret = 28;
+			else
+#endif
+				/* Assume this is UDP - 40 bytes for IP, 8 bytes for UDP */
+				ret = 48;
+			break;
+#endif
+		default:
+			/* We don't know. Go with the historical default */
+			ret = 28;
+			break;
+		}
+	return ret;
+	}
+
 static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 	{
 	long ret=1;
 	int *ip;
 	struct sockaddr *to = NULL;
 	bio_dgram_data *data = NULL;
-#if defined(IP_MTU_DISCOVER) || defined(IP_MTU)
-	long sockopt_val = 0;
-	unsigned int sockopt_len = 0;
-#endif
-#ifdef OPENSSL_SYS_LINUX
+#if defined(OPENSSL_SYS_LINUX) && (defined(IP_MTU_DISCOVER) || defined(IP_MTU))
+	int sockopt_val = 0;
+	socklen_t sockopt_len;	/* assume that system supporting IP_MTU is
+				 * modern enough to define socklen_t */
 	socklen_t addr_len;
 	union	{
 		struct sockaddr	sa;
@@ -531,7 +575,7 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 		break;
 		/* (Linux)kernel sets DF bit on outgoing IP packets */
 	case BIO_CTRL_DGRAM_MTU_DISCOVER:
-#ifdef OPENSSL_SYS_LINUX
+#if defined(OPENSSL_SYS_LINUX) && defined(IP_MTU_DISCOVER) && defined(IP_PMTUDISC_DO)
 		addr_len = (socklen_t)sizeof(addr);
 		memset((void *)&addr, 0, sizeof(addr));
 		if (getsockname(b->num, &addr.sa, &addr_len) < 0)
@@ -539,7 +583,6 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 			ret = 0;
 			break;
 			}
-		sockopt_len = sizeof(sockopt_val);
 		switch (addr.sa.sa_family)
 			{
 		case AF_INET:
@@ -548,7 +591,7 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 				&sockopt_val, sizeof(sockopt_val))) < 0)
 				perror("setsockopt");
 			break;
-#if OPENSSL_USE_IPV6 && defined(IPV6_MTU_DISCOVER)
+#if OPENSSL_USE_IPV6 && defined(IPV6_MTU_DISCOVER) && defined(IPV6_PMTUDISC_DO)
 		case AF_INET6:
 			sockopt_val = IPV6_PMTUDISC_DO;
 			if ((ret = setsockopt(b->num, IPPROTO_IPV6, IPV6_MTU_DISCOVER,
@@ -565,7 +608,7 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 		break;
 #endif
 	case BIO_CTRL_DGRAM_QUERY_MTU:
-#ifdef OPENSSL_SYS_LINUX
+#if defined(OPENSSL_SYS_LINUX) && defined(IP_MTU)
 		addr_len = (socklen_t)sizeof(addr);
 		memset((void *)&addr, 0, sizeof(addr));
 		if (getsockname(b->num, &addr.sa, &addr_len) < 0)
@@ -617,23 +660,24 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 #endif
 		break;
 	case BIO_CTRL_DGRAM_GET_FALLBACK_MTU:
+		ret = -dgram_get_mtu_overhead(data);
 		switch (data->peer.sa.sa_family)
 			{
 			case AF_INET:
-				ret = 576 - 20 - 8;
+				ret += 576;
 				break;
 #if OPENSSL_USE_IPV6
 			case AF_INET6:
 #ifdef IN6_IS_ADDR_V4MAPPED
 				if (IN6_IS_ADDR_V4MAPPED(&data->peer.sa_in6.sin6_addr))
-					ret = 576 - 20 - 8;
+					ret += 576;
 				else
 #endif
-					ret = 1280 - 40 - 8;
+					ret += 1280;
 				break;
 #endif
 			default:
-				ret = 576 - 20 - 8;
+				ret += 576;
 				break;
 			}
 		break;
@@ -727,12 +771,15 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 #endif
 		break;
 	case BIO_CTRL_DGRAM_GET_RECV_TIMEOUT:
-#ifdef OPENSSL_SYS_WINDOWS
 		{
-		int timeout, sz = sizeof(timeout);
+		union { size_t s; int i; } sz = {0};
+#ifdef OPENSSL_SYS_WINDOWS
+		int timeout;
 		struct timeval *tv = (struct timeval *)ptr;
+
+		sz.i = sizeof(timeout);
 		if (getsockopt(b->num, SOL_SOCKET, SO_RCVTIMEO,
-			(void*)&timeout, &sz) < 0)
+			(void*)&timeout, &sz.i) < 0)
 			{ perror("getsockopt"); ret = -1; }
 		else
 			{
@@ -740,12 +787,20 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 			tv->tv_usec = (timeout % 1000) * 1000;
 			ret = sizeof(*tv);
 			}
-		}
 #else
+		sz.i = sizeof(struct timeval);
 		if ( getsockopt(b->num, SOL_SOCKET, SO_RCVTIMEO, 
-			ptr, (void *)&ret) < 0)
+			ptr, (void *)&sz) < 0)
 			{ perror("getsockopt"); ret = -1; }
+		else if (sizeof(sz.s)!=sizeof(sz.i) && sz.i==0)
+			{
+			OPENSSL_assert(sz.s<=sizeof(struct timeval));
+			ret = (int)sz.s;
+			}
+		else
+			ret = sz.i;
 #endif
+		}
 		break;
 #endif
 #if defined(SO_SNDTIMEO)
@@ -765,12 +820,15 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 #endif
 		break;
 	case BIO_CTRL_DGRAM_GET_SEND_TIMEOUT:
-#ifdef OPENSSL_SYS_WINDOWS
 		{
-		int timeout, sz = sizeof(timeout);
+		union { size_t s; int i; } sz = {0};
+#ifdef OPENSSL_SYS_WINDOWS
+		int timeout;
 		struct timeval *tv = (struct timeval *)ptr;
+
+		sz.i = sizeof(timeout);
 		if (getsockopt(b->num, SOL_SOCKET, SO_SNDTIMEO,
-			(void*)&timeout, &sz) < 0)
+			(void*)&timeout, &sz.i) < 0)
 			{ perror("getsockopt"); ret = -1; }
 		else
 			{
@@ -778,12 +836,20 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 			tv->tv_usec = (timeout % 1000) * 1000;
 			ret = sizeof(*tv);
 			}
-		}
 #else
+		sz.i = sizeof(struct timeval);
 		if ( getsockopt(b->num, SOL_SOCKET, SO_SNDTIMEO, 
-			ptr, (void *)&ret) < 0)
+			ptr, (void *)&sz) < 0)
 			{ perror("getsockopt"); ret = -1; }
+		else if (sizeof(sz.s)!=sizeof(sz.i) && sz.i==0)
+			{
+			OPENSSL_assert(sz.s<=sizeof(struct timeval));
+			ret = (int)sz.s;
+			}
+		else
+			ret = sz.i;
 #endif
+		}
 		break;
 #endif
 	case BIO_CTRL_DGRAM_GET_SEND_TIMER_EXP:
@@ -812,6 +878,9 @@ static long dgram_ctrl(BIO *b, int cmd, long num, void *ptr)
 			ret = 0;
 		break;
 #endif
+	case BIO_CTRL_DGRAM_GET_MTU_OVERHEAD:
+		ret = dgram_get_mtu_overhead(data);
+		break;
 	default:
 		ret=0;
 		break;
@@ -858,10 +927,18 @@ BIO *BIO_new_dgram_sctp(int fd, int close_flag)
 	/* Activate SCTP-AUTH for DATA and FORWARD-TSN chunks */
 	auth.sauth_chunk = OPENSSL_SCTP_DATA_CHUNK_TYPE;
 	ret = setsockopt(fd, IPPROTO_SCTP, SCTP_AUTH_CHUNK, &auth, sizeof(struct sctp_authchunk));
-	OPENSSL_assert(ret >= 0);
+	if (ret < 0)
+		{
+		BIO_vfree(bio);
+		return(NULL);
+		}
 	auth.sauth_chunk = OPENSSL_SCTP_FORWARD_CUM_TSN_CHUNK_TYPE;
 	ret = setsockopt(fd, IPPROTO_SCTP, SCTP_AUTH_CHUNK, &auth, sizeof(struct sctp_authchunk));
-	OPENSSL_assert(ret >= 0);
+	if (ret < 0)
+		{
+		BIO_vfree(bio);
+		return(NULL);
+		}
 
 	/* Test if activation was successful. When using accept(),
 	 * SCTP-AUTH has to be activated for the listening socket
@@ -870,9 +947,15 @@ BIO *BIO_new_dgram_sctp(int fd, int close_flag)
 	authchunks = OPENSSL_malloc(sockopt_len);
 	memset(authchunks, 0, sizeof(sockopt_len));
 	ret = getsockopt(fd, IPPROTO_SCTP, SCTP_LOCAL_AUTH_CHUNKS, authchunks, &sockopt_len);
-	OPENSSL_assert(ret >= 0);
-	
-	for (p = (unsigned char*) authchunks + sizeof(sctp_assoc_t);
+
+	if (ret < 0)
+		{
+		OPENSSL_free(authchunks);
+		BIO_vfree(bio);
+		return(NULL);
+		}
+
+	for (p = (unsigned char*) authchunks->gauth_chunks;
 	     p < (unsigned char*) authchunks + sockopt_len;
 	     p += sizeof(uint8_t))
 		{
@@ -892,16 +975,28 @@ BIO *BIO_new_dgram_sctp(int fd, int close_flag)
 	event.se_type = SCTP_AUTHENTICATION_EVENT;
 	event.se_on = 1;
 	ret = setsockopt(fd, IPPROTO_SCTP, SCTP_EVENT, &event, sizeof(struct sctp_event));
-	OPENSSL_assert(ret >= 0);
+	if (ret < 0)
+		{
+		BIO_vfree(bio);
+		return(NULL);
+		}
 #else
 	sockopt_len = (socklen_t) sizeof(struct sctp_event_subscribe);
 	ret = getsockopt(fd, IPPROTO_SCTP, SCTP_EVENTS, &event, &sockopt_len);
-	OPENSSL_assert(ret >= 0);
+	if (ret < 0)
+		{
+		BIO_vfree(bio);
+		return(NULL);
+		}
 
 	event.sctp_authentication_event = 1;
 
 	ret = setsockopt(fd, IPPROTO_SCTP, SCTP_EVENTS, &event, sizeof(struct sctp_event_subscribe));
-	OPENSSL_assert(ret >= 0);
+	if (ret < 0)
+		{
+		BIO_vfree(bio);
+		return(NULL);
+		}
 #endif
 #endif
 
@@ -909,7 +1004,11 @@ BIO *BIO_new_dgram_sctp(int fd, int close_flag)
 	 * larger than the max record size of 2^14 + 2048 + 13
 	 */
 	ret = setsockopt(fd, IPPROTO_SCTP, SCTP_PARTIAL_DELIVERY_POINT, &optval, sizeof(optval));
-	OPENSSL_assert(ret >= 0);
+	if (ret < 0)
+		{
+		BIO_vfree(bio);
+		return(NULL);
+		}
 
 	return(bio);
 	}
@@ -947,7 +1046,12 @@ static int dgram_sctp_free(BIO *a)
 		return 0;
 
 	data = (bio_dgram_sctp_data *)a->ptr;
-	if(data != NULL) OPENSSL_free(data);
+	if(data != NULL)
+		{
+		if(data->saved_message.data != NULL)
+			OPENSSL_free(data->saved_message.data);
+		OPENSSL_free(data);
+		}
 
 	return(1);
 	}
@@ -955,7 +1059,6 @@ static int dgram_sctp_free(BIO *a)
 #ifdef SCTP_AUTHENTICATION_EVENT
 void dgram_sctp_handle_auth_free_key_event(BIO *b, union sctp_notification *snp)
 	{
-	unsigned int sockopt_len = 0;
 	int ret;
 	struct sctp_authkey_event* authkeyevent = &snp->sn_auth_event;
 
@@ -965,9 +1068,8 @@ void dgram_sctp_handle_auth_free_key_event(BIO *b, union sctp_notification *snp)
 
 		/* delete key */
 		authkeyid.scact_keynumber = authkeyevent->auth_keynumber;
-		sockopt_len = sizeof(struct sctp_authkeyid);
 		ret = setsockopt(b->num, IPPROTO_SCTP, SCTP_AUTH_DELETE_KEY,
-		      &authkeyid, sockopt_len);
+		      &authkeyid, sizeof(struct sctp_authkeyid));
 		}
 	}
 #endif
@@ -1000,6 +1102,13 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 			msg.msg_controllen = 512;
 			msg.msg_flags = 0;
 			n = recvmsg(b->num, &msg, 0);
+
+			if (n <= 0)
+				{
+				if (n < 0)
+					ret = n;
+				break;
+				}
 
 			if (msg.msg_controllen > 0)
 				{
@@ -1040,13 +1149,6 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 					}
 				}
 
-			if (n <= 0)
-				{
-				if (n < 0)
-					ret = n;
-				break;
-				}
-
 			if (msg.msg_flags & MSG_NOTIFICATION)
 				{
 				snp = (union sctp_notification*) out;
@@ -1066,6 +1168,7 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 						dgram_sctp_write(data->saved_message.bio, data->saved_message.data,
 						                 data->saved_message.length);
 						OPENSSL_free(data->saved_message.data);
+						data->saved_message.data = NULL;
 						data->saved_message.length = 0;
 						}
 
@@ -1076,16 +1179,28 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 					event.se_type = SCTP_SENDER_DRY_EVENT;
 					event.se_on = 0;
 					i = setsockopt(b->num, IPPROTO_SCTP, SCTP_EVENT, &event, sizeof(struct sctp_event));
-					OPENSSL_assert(i >= 0);
+					if (i < 0)
+						{
+						ret = i;
+						break;
+						}
 #else
 					eventsize = sizeof(struct sctp_event_subscribe);
 					i = getsockopt(b->num, IPPROTO_SCTP, SCTP_EVENTS, &event, &eventsize);
-					OPENSSL_assert(i >= 0);
+					if (i < 0)
+						{
+						ret = i;
+						break;
+						}
 
 					event.sctp_sender_dry_event = 0;
 
 					i = setsockopt(b->num, IPPROTO_SCTP, SCTP_EVENTS, &event, sizeof(struct sctp_event_subscribe));
-					OPENSSL_assert(i >= 0);
+					if (i < 0)
+						{
+						ret = i;
+						break;
+						}
 #endif
 					}
 
@@ -1118,8 +1233,8 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 			 */
 			optlen = (socklen_t) sizeof(int);
 			ret = getsockopt(b->num, SOL_SOCKET, SO_RCVBUF, &optval, &optlen);
-			OPENSSL_assert(ret >= 0);
-			OPENSSL_assert(optval >= 18445);
+			if (ret >= 0)
+				OPENSSL_assert(optval >= 18445);
 
 			/* Test if SCTP doesn't partially deliver below
 			 * max record size (2^14 + 2048 + 13)
@@ -1127,8 +1242,8 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 			optlen = (socklen_t) sizeof(int);
 			ret = getsockopt(b->num, IPPROTO_SCTP, SCTP_PARTIAL_DELIVERY_POINT,
 			                 &optval, &optlen);
-			OPENSSL_assert(ret >= 0);
-			OPENSSL_assert(optval >= 18445);
+			if (ret >= 0)
+				OPENSSL_assert(optval >= 18445);
 
 			/* Partially delivered notification??? Probably a bug.... */
 			OPENSSL_assert(!(msg.msg_flags & MSG_NOTIFICATION));
@@ -1162,15 +1277,15 @@ static int dgram_sctp_read(BIO *b, char *out, int outl)
 			authchunks = OPENSSL_malloc(optlen);
 			memset(authchunks, 0, sizeof(optlen));
 			ii = getsockopt(b->num, IPPROTO_SCTP, SCTP_PEER_AUTH_CHUNKS, authchunks, &optlen);
-			OPENSSL_assert(ii >= 0);
 
-			for (p = (unsigned char*) authchunks + sizeof(sctp_assoc_t);
-				 p < (unsigned char*) authchunks + optlen;
-				 p += sizeof(uint8_t))
-				{
-				if (*p == OPENSSL_SCTP_DATA_CHUNK_TYPE) auth_data = 1;
-				if (*p == OPENSSL_SCTP_FORWARD_CUM_TSN_CHUNK_TYPE) auth_forward = 1;
-				}
+			if (ii >= 0)
+				for (p = (unsigned char*) authchunks->gauth_chunks;
+				     p < (unsigned char*) authchunks + optlen;
+				     p += sizeof(uint8_t))
+					{
+					if (*p == OPENSSL_SCTP_DATA_CHUNK_TYPE) auth_data = 1;
+					if (*p == OPENSSL_SCTP_FORWARD_CUM_TSN_CHUNK_TYPE) auth_forward = 1;
+					}
 
 			OPENSSL_free(authchunks);
 
@@ -1225,9 +1340,11 @@ static int dgram_sctp_write(BIO *b, const char *in, int inl)
 	if (data->save_shutdown && !BIO_dgram_sctp_wait_for_dry(b))
 	{
 		data->saved_message.bio = b;
-		data->saved_message.length = inl;
+		if (data->saved_message.data)
+			OPENSSL_free(data->saved_message.data);
 		data->saved_message.data = OPENSSL_malloc(inl);
 		memcpy(data->saved_message.data, in, inl);
+		data->saved_message.length = inl;
 		return inl;
 	}
 
@@ -1298,9 +1415,9 @@ static long dgram_sctp_ctrl(BIO *b, int cmd, long num, void *ptr)
 	{
 	long ret=1;
 	bio_dgram_sctp_data *data = NULL;
-	unsigned int sockopt_len = 0;
+	socklen_t sockopt_len = 0;
 	struct sctp_authkeyid authkeyid;
-	struct sctp_authkey *authkey;
+	struct sctp_authkey *authkey = NULL;
 
 	data = (bio_dgram_sctp_data *)b->ptr;
 
@@ -1334,6 +1451,10 @@ static long dgram_sctp_ctrl(BIO *b, int cmd, long num, void *ptr)
 		 * Returns always 1.
 		 */
 		break;
+	case BIO_CTRL_DGRAM_GET_MTU_OVERHEAD:
+		/* We allow transport protocol fragmentation so this is irrelevant */
+		ret = 0;
+		break;
 	case BIO_CTRL_DGRAM_SCTP_SET_IN_HANDSHAKE:
 		if (num > 0)
 			data->in_handshake = 1;
@@ -1355,6 +1476,11 @@ static long dgram_sctp_ctrl(BIO *b, int cmd, long num, void *ptr)
 		/* Add new key */
 		sockopt_len = sizeof(struct sctp_authkey) + 64 * sizeof(uint8_t);
 		authkey = OPENSSL_malloc(sockopt_len);
+		if (authkey == NULL)
+			{
+			ret = -1;
+			break;
+			}
 		memset(authkey, 0x00, sockopt_len);
 		authkey->sca_keynumber = authkeyid.scact_keynumber + 1;
 #ifndef __FreeBSD__
@@ -1366,6 +1492,8 @@ static long dgram_sctp_ctrl(BIO *b, int cmd, long num, void *ptr)
 		memcpy(&authkey->sca_key[0], ptr, 64 * sizeof(uint8_t));
 
 		ret = setsockopt(b->num, IPPROTO_SCTP, SCTP_AUTH_KEY, authkey, sockopt_len);
+		OPENSSL_free(authkey);
+		authkey = NULL;
 		if (ret < 0) break;
 
 		/* Reset active key */
