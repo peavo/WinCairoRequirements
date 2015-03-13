@@ -749,78 +749,125 @@
       <FileType>Document</FileType>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
-    <MASM Include="..\crypto\aes\asm\aesni-sha1-x86_64.asm">
+    <NASM Include="..\crypto\aes\asm\aesni-sha1-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\aes\asm\aesni-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Object File (-f x64)</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\aes\asm\bsaes-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\bsaes-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\aes\asm\vpaes-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\vpaes-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\modexp512-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\modexp512-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\x86_64-gf2m.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\x86_64-gf2m.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\x86_64-mont.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\x86_64-mont.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\x86_64-mont5.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\x86_64-mont5.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\camellia\asm\cmll-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\camellia\asm\cmll-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\md5\asm\md5-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\md5\asm\md5-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\modes\asm\ghash-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\modes\asm\ghash-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\rc4\asm\rc4-md5-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\rc4\asm\rc4-md5-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\rc4\asm\rc4-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\rc4\asm\rc4-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\sha\asm\sha1-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha1-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\sha\asm\sha256-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha256-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\sha\asm\sha512-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha512-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\crypto\whrlpool\asm\wp-x86_64.asm">
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\whrlpool\asm\wp-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
-    <MASM Include="..\ms\uptable_x86_64.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
     <NASM Include="..\crypto\aes\asm\aes-586.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -904,15 +951,24 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </NASM>
+    <NASM Include="..\ms\uptable.asm">
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </NASM>
     <NASM Include="..\ms\x86cpuid.asm">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </NASM>
-    <MASM Include="..\ms\x86_64cpuid.asm">
+    <NASM Include="..\ms\x86_64cpuid.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </MASM>
+      <FileType>Document</FileType>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\zlib\contrib\vstudio\vc10\zlibvc.vcxproj">

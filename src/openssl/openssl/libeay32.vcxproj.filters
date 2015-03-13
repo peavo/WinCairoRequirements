@@ -2322,9 +2322,6 @@
     <MASM Include="..\crypto\camellia\asm\cmll-x86_64.asm">
       <Filter>Source Files\camellia</Filter>
     </MASM>
-    <MASM Include="..\ms\uptable_x86_64.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="..\ms\x86_64cpuid.asm">
       <Filter>Source Files</Filter>
     </MASM>
@@ -2395,6 +2392,9 @@
     </NASM>
     <NASM Include="..\crypto\aes\asm\aes-x86_64.asm">
       <Filter>Source Files\aes</Filter>
+    </NASM>
+    <NASM Include="..\ms\uptable.asm">
+      <Filter>Source Files</Filter>
     </NASM>
   </ItemGroup>
 </Project>
