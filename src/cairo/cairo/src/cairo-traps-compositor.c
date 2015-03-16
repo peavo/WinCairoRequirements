@@ -928,10 +928,18 @@ need_bounded_clip (cairo_composite_rectangles_t *extents)
 {
     unsigned int flags = 0;
 
-    if (extents->unbounded.width < extents->destination.width ||
-	extents->unbounded.height < extents->destination.height)
+    if (extents->clip->num_boxes > 1 ||
+	extents->mask.width > extents->unbounded.width ||
+	extents->mask.height > extents->unbounded.height)
     {
 	flags |= NEED_CLIP_REGION;
+    }
+
+    if (extents->clip->num_boxes > 1 ||
+	extents->mask.width > extents->bounded.width ||
+	extents->mask.height > extents->bounded.height)
+    {
+	flags |= FORCE_CLIP_REGION;
     }
 
     if (! _cairo_clip_is_region (extents->clip))
@@ -1373,7 +1381,7 @@ boxes_for_traps (cairo_boxes_t *boxes,
 		 cairo_traps_t *traps,
 		 cairo_antialias_t antialias)
 {
-    int i;
+    int i, j;
 
     /* first check that the traps are rectilinear */
     if (antialias == CAIRO_ANTIALIAS_NONE) {
@@ -1397,23 +1405,25 @@ boxes_for_traps (cairo_boxes_t *boxes,
 
     _cairo_boxes_init (boxes);
 
-    boxes->num_boxes    = traps->num_traps;
     boxes->chunks.base  = (cairo_box_t *) traps->traps;
-    boxes->chunks.count = traps->num_traps;
     boxes->chunks.size  = traps->num_traps;
 
     if (antialias != CAIRO_ANTIALIAS_NONE) {
-	for (i = 0; i < traps->num_traps; i++) {
+	for (i = j = 0; i < traps->num_traps; i++) {
 	    /* Note the traps and boxes alias so we need to take the local copies first. */
 	    cairo_fixed_t x1 = traps->traps[i].left.p1.x;
 	    cairo_fixed_t x2 = traps->traps[i].right.p1.x;
 	    cairo_fixed_t y1 = traps->traps[i].top;
 	    cairo_fixed_t y2 = traps->traps[i].bottom;
 
-	    boxes->chunks.base[i].p1.x = x1;
-	    boxes->chunks.base[i].p1.y = y1;
-	    boxes->chunks.base[i].p2.x = x2;
-	    boxes->chunks.base[i].p2.y = y2;
+	    if (x1 == x2 || y1 == y2)
+		    continue;
+
+	    boxes->chunks.base[j].p1.x = x1;
+	    boxes->chunks.base[j].p1.y = y1;
+	    boxes->chunks.base[j].p2.x = x2;
+	    boxes->chunks.base[j].p2.y = y2;
+	    j++;
 
 	    if (boxes->is_pixel_aligned) {
 		boxes->is_pixel_aligned =
@@ -1424,7 +1434,7 @@ boxes_for_traps (cairo_boxes_t *boxes,
     } else {
 	boxes->is_pixel_aligned = TRUE;
 
-	for (i = 0; i < traps->num_traps; i++) {
+	for (i = j = 0; i < traps->num_traps; i++) {
 	    /* Note the traps and boxes alias so we need to take the local copies first. */
 	    cairo_fixed_t x1 = traps->traps[i].left.p1.x;
 	    cairo_fixed_t x2 = traps->traps[i].right.p1.x;
@@ -1432,12 +1442,16 @@ boxes_for_traps (cairo_boxes_t *boxes,
 	    cairo_fixed_t y2 = traps->traps[i].bottom;
 
 	    /* round down here to match Pixman's behavior when using traps. */
-	    boxes->chunks.base[i].p1.x = _cairo_fixed_round_down (x1);
-	    boxes->chunks.base[i].p1.y = _cairo_fixed_round_down (y1);
-	    boxes->chunks.base[i].p2.x = _cairo_fixed_round_down (x2);
-	    boxes->chunks.base[i].p2.y = _cairo_fixed_round_down (y2);
+	    boxes->chunks.base[j].p1.x = _cairo_fixed_round_down (x1);
+	    boxes->chunks.base[j].p1.y = _cairo_fixed_round_down (y1);
+	    boxes->chunks.base[j].p2.x = _cairo_fixed_round_down (x2);
+	    boxes->chunks.base[j].p2.y = _cairo_fixed_round_down (y2);
+	    j += (boxes->chunks.base[j].p1.x != boxes->chunks.base[j].p2.x &&
+		  boxes->chunks.base[j].p1.y != boxes->chunks.base[j].p2.y);
 	}
     }
+    boxes->chunks.count = j;
+    boxes->num_boxes    = j;
 
     return CAIRO_INT_STATUS_SUCCESS;
 }
@@ -2160,18 +2174,14 @@ _cairo_traps_compositor_stroke (const cairo_compositor_t *_compositor,
 				    double			 tolerance,
 				    cairo_traps_t		*traps);
 	composite_traps_info_t info;
-	unsigned flags = 0;
+	unsigned flags;
 
 	if (antialias == CAIRO_ANTIALIAS_BEST || antialias == CAIRO_ANTIALIAS_GOOD) {
 	    func = _cairo_path_fixed_stroke_polygon_to_traps;
+	    flags = 0;
 	} else {
 	    func = _cairo_path_fixed_stroke_to_traps;
-	    if (extents->clip->num_boxes > 1 ||
-		extents->mask.width  > extents->unbounded.width ||
-		extents->mask.height > extents->unbounded.height)
-	    {
-		flags = NEED_CLIP_REGION | FORCE_CLIP_REGION;
-	    }
+	    flags = need_bounded_clip (extents) & ~NEED_CLIP_SURFACE;
 	}
 
 	info.antialias = antialias;
@@ -2299,7 +2309,6 @@ _cairo_traps_compositor_glyphs (const cairo_compositor_t	*_compositor,
 						 &num_glyphs);
     if (likely (status == CAIRO_INT_STATUS_SUCCESS)) {
 	cairo_composite_glyphs_info_t info;
-	unsigned flags = 0;
 
 	info.font = scaled_font;
 	info.glyphs = glyphs;
@@ -2307,16 +2316,9 @@ _cairo_traps_compositor_glyphs (const cairo_compositor_t	*_compositor,
 	info.use_mask = overlap || ! extents->is_bounded;
 	info.extents = extents->bounded;
 
-	if (extents->mask.width > extents->bounded.width ||
-	    extents->mask.height > extents->bounded.height)
-	{
-	    flags |= FORCE_CLIP_REGION;
-	}
-
 	status = clip_and_composite (compositor, extents,
 				     composite_glyphs, NULL, &info,
-				     need_bounded_clip (extents) |
-				     flags);
+				     need_bounded_clip (extents) | FORCE_CLIP_REGION);
     }
     _cairo_scaled_font_thaw_cache (scaled_font);
 

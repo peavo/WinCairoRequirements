@@ -42,8 +42,9 @@ test_sources = \
 	clear.c						\
 	clear-source.c					\
 	clip-all.c					\
-	clip-contexts.c					\
+	clip-complex-bug61592.c				\
 	clip-complex-shape.c				\
+	clip-contexts.c					\
 	clip-disjoint.c					\
 	clip-disjoint-hatching.c			\
 	clip-disjoint-quad.c				\
@@ -265,6 +266,7 @@ test_sources = \
 	record1414x.c					\
 	record2x.c					\
 	record90.c					\
+	recordflip.c					\
 	record-extend.c					\
 	record-mesh.c					\
 	recording-surface-pattern.c			\
@@ -392,6 +394,7 @@ ft_font_test_sources = \
 
 gl_surface_test_sources = \
 	gl-device-release.c \
+	gl-oversized-surface.c \
 	gl-surface-source.c
 
 quartz_surface_test_sources = quartz-surface-source.c

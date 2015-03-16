@@ -594,12 +594,11 @@ composite_aligned_boxes (const cairo_spans_compositor_t		*compositor,
 					     CAIRO_OPERATOR_CLEAR,
 					     CAIRO_COLOR_TRANSPARENT,
 					     boxes);
-
 	    if (unlikely (status))
-			return status;
+		return status;
 
 	    dst->is_clear = TRUE;
-   }
+	}
 
 	recording_clip = _cairo_clip_from_boxes (boxes);
 	status = _cairo_recording_surface_replay_with_clip (unwrap_source (source),

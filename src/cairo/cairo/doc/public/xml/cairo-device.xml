@@ -36,6 +36,17 @@ unsigned <link linkend="int"><returnvalue>int</returnvalue></link>        <link 
                                                          <parameter>const <link linkend="cairo-user-data-key-t"><type>cairo_user_data_key_t</type></link> *key</parameter>);
 <link linkend="cairo-status-t"><returnvalue>cairo_status_t</returnvalue></link>      <link linkend="cairo-device-acquire">cairo_device_acquire</link>                (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
 <link linkend="void"><returnvalue>void</returnvalue></link>                <link linkend="cairo-device-release">cairo_device_release</link>                (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
+<link linkend="double"><returnvalue>double</returnvalue></link>              <link linkend="cairo-device-observer-elapsed">cairo_device_observer_elapsed</link>       (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
+<link linkend="double"><returnvalue>double</returnvalue></link>              <link linkend="cairo-device-observer-fill-elapsed">cairo_device_observer_fill_elapsed</link>  (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
+<link linkend="double"><returnvalue>double</returnvalue></link>              <link linkend="cairo-device-observer-glyphs-elapsed">cairo_device_observer_glyphs_elapsed</link>
+                                                        (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
+<link linkend="double"><returnvalue>double</returnvalue></link>              <link linkend="cairo-device-observer-mask-elapsed">cairo_device_observer_mask_elapsed</link>  (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
+<link linkend="double"><returnvalue>double</returnvalue></link>              <link linkend="cairo-device-observer-paint-elapsed">cairo_device_observer_paint_elapsed</link> (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
+<link linkend="cairo-status-t"><returnvalue>cairo_status_t</returnvalue></link>      <link linkend="cairo-device-observer-print">cairo_device_observer_print</link>         (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>,
+                                                         <parameter><link linkend="cairo-write-func-t"><type>cairo_write_func_t</type></link> write_func</parameter>,
+                                                         <parameter><link linkend="void"><type>void</type></link> *closure</parameter>);
+<link linkend="double"><returnvalue>double</returnvalue></link>              <link linkend="cairo-device-observer-stroke-elapsed">cairo_device_observer_stroke_elapsed</link>
+                                                        (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);
 </synopsis>
 </refsynopsisdiv>
 
@@ -400,6 +411,52 @@ that function for details.
 <varlistentry><term><parameter>device</parameter>&#160;:</term>
 <listitem><simpara>a <link linkend="cairo-device-t"><type>cairo_device_t</type></link></simpara></listitem></varlistentry>
 </variablelist><para role="since">Since 1.10</para></refsect2>
+<refsect2 id="cairo-device-observer-elapsed" role="function">
+<title>cairo_device_observer_elapsed ()</title>
+<indexterm zone="cairo-device-observer-elapsed"><primary sortas="device_observer_elapsed">cairo_device_observer_elapsed</primary></indexterm>
+<programlisting><link linkend="double"><returnvalue>double</returnvalue></link>              cairo_device_observer_elapsed       (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);</programlisting>
+<para>
+</para></refsect2>
+<refsect2 id="cairo-device-observer-fill-elapsed" role="function">
+<title>cairo_device_observer_fill_elapsed ()</title>
+<indexterm zone="cairo-device-observer-fill-elapsed"><primary sortas="device_observer_fill_elapsed">cairo_device_observer_fill_elapsed</primary></indexterm>
+<programlisting><link linkend="double"><returnvalue>double</returnvalue></link>              cairo_device_observer_fill_elapsed  (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);</programlisting>
+<para>
+</para></refsect2>
+<refsect2 id="cairo-device-observer-glyphs-elapsed" role="function">
+<title>cairo_device_observer_glyphs_elapsed ()</title>
+<indexterm zone="cairo-device-observer-glyphs-elapsed"><primary sortas="device_observer_glyphs_elapsed">cairo_device_observer_glyphs_elapsed</primary></indexterm>
+<programlisting><link linkend="double"><returnvalue>double</returnvalue></link>              cairo_device_observer_glyphs_elapsed
+                                                        (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);</programlisting>
+<para>
+</para></refsect2>
+<refsect2 id="cairo-device-observer-mask-elapsed" role="function">
+<title>cairo_device_observer_mask_elapsed ()</title>
+<indexterm zone="cairo-device-observer-mask-elapsed"><primary sortas="device_observer_mask_elapsed">cairo_device_observer_mask_elapsed</primary></indexterm>
+<programlisting><link linkend="double"><returnvalue>double</returnvalue></link>              cairo_device_observer_mask_elapsed  (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);</programlisting>
+<para>
+</para></refsect2>
+<refsect2 id="cairo-device-observer-paint-elapsed" role="function">
+<title>cairo_device_observer_paint_elapsed ()</title>
+<indexterm zone="cairo-device-observer-paint-elapsed"><primary sortas="device_observer_paint_elapsed">cairo_device_observer_paint_elapsed</primary></indexterm>
+<programlisting><link linkend="double"><returnvalue>double</returnvalue></link>              cairo_device_observer_paint_elapsed (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);</programlisting>
+<para>
+</para></refsect2>
+<refsect2 id="cairo-device-observer-print" role="function">
+<title>cairo_device_observer_print ()</title>
+<indexterm zone="cairo-device-observer-print"><primary sortas="device_observer_print">cairo_device_observer_print</primary></indexterm>
+<programlisting><link linkend="cairo-status-t"><returnvalue>cairo_status_t</returnvalue></link>      cairo_device_observer_print         (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>,
+                                                         <parameter><link linkend="cairo-write-func-t"><type>cairo_write_func_t</type></link> write_func</parameter>,
+                                                         <parameter><link linkend="void"><type>void</type></link> *closure</parameter>);</programlisting>
+<para>
+</para></refsect2>
+<refsect2 id="cairo-device-observer-stroke-elapsed" role="function">
+<title>cairo_device_observer_stroke_elapsed ()</title>
+<indexterm zone="cairo-device-observer-stroke-elapsed"><primary sortas="device_observer_stroke_elapsed">cairo_device_observer_stroke_elapsed</primary></indexterm>
+<programlisting><link linkend="double"><returnvalue>double</returnvalue></link>              cairo_device_observer_stroke_elapsed
+                                                        (<parameter><link linkend="cairo-device-t"><type>cairo_device_t</type></link> *device</parameter>);</programlisting>
+<para>
+</para></refsect2>
 
 </refsect1>
 <refsect1 id="cairo-cairo-device-t.see-also">

@@ -316,29 +316,6 @@ _cairo_win32_display_surface_create_for_dc (HDC             original_dc,
     if (status)
 	goto FAIL;
 
-   ////
-   // Double-check memory is valid
-   ////
-   {
-   uint32_t test = 0;
-   uint32_t* start = (uint32_t*)bits;
-   uint32_t* d = 0;
-   int byteCheck = width * height * (32 / 8);
-   int totalCount = 0;
-   int yy = 0;
-
-   for (yy = 0; yy < height; ++yy)
-   {
-      d = (uint32_t *)((uint8_t*)bits + rowstride*yy);
-      if (*d)
-         test += *d;
-   }
-
-   totalCount = ((uint8_t*)d - (uint8_t*)start) + rowstride;
-   assert (totalCount == byteCheck);
-   }
-   ////
-
     _cairo_image_surface_set_parent (to_image_surface(surface->image),
 				     &surface->win32.base);
 
@@ -359,28 +336,6 @@ _cairo_win32_display_surface_create_for_dc (HDC             original_dc,
 			 device,
 			 _cairo_content_from_format (format));
 
-   ////
-   // Double-check memory is valid
-   ////
-   {
-   uint32_t test = 0;
-   uint32_t* start = (uint32_t*)bits;
-   uint32_t* d = 0;
-   int byteCheck = width * height * (32 / 8);
-   int totalCount = 0;
-   int yy = 0;
-
-   for (yy = 0; yy < height; ++yy)
-   {
-      d = (uint32_t *)((uint8_t*)bits + rowstride*yy);
-      if (*d)
-         test += *d;
-   }
-
-   totalCount = ((uint8_t*)d - (uint8_t*)start) + rowstride;
-   assert (totalCount == byteCheck);
-   }
-   ////
     cairo_device_destroy (device);
 
     return &surface->win32.base;
@@ -460,7 +415,8 @@ _cairo_win32_display_surface_finish (void *abstract_surface)
 {
     cairo_win32_display_surface_t *surface = abstract_surface;
 
-    if (surface->image) {
+    if (surface->image && to_image_surface(surface->image)->parent) {
+	assert (to_image_surface(surface->image)->parent == &surface->win32.base);
 	/* Unhook ourselves first to avoid the double-unref from the image */
 	to_image_surface(surface->image)->parent = NULL;
 	cairo_surface_finish (surface->image);
@@ -805,7 +761,7 @@ _cairo_win32_display_surface_discard_fallback (cairo_win32_display_surface_t *su
 	TRACE ((stderr, "%s (surface=%d)\n",
 		__FUNCTION__, surface->win32.base.unique_id));
 
-   cairo_surface_finish (surface->fallback);
+	cairo_surface_finish (surface->fallback);
 	cairo_surface_destroy (surface->fallback);
 	surface->fallback = NULL;
     }

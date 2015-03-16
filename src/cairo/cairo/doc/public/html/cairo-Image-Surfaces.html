@@ -165,33 +165,17 @@ within cairo. Typical usage will be of the form:
 </p>
 <p>
 </p>
-<div class="informalexample">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">int</span> stride<span class="gtkdoc opt">;</span>
-<span class="gtkdoc kwb">unsigned char</span> <span class="gtkdoc opt">*</span>data<span class="gtkdoc opt">;</span>
-<span class="gtkdoc opt">&lt;</span>a <span class="gtkdoc kwc">class</span><span class="gtkdoc opt">=</span><span class="string">&quot;link&quot;</span> href<span class="gtkdoc opt">=</span><span class="string">&quot;cairo-cairo-surface-t.html#cairo-surface-t&quot;</span> title<span class="gtkdoc opt">=</span><span class="string">&quot;cairo_surface_t&quot;</span><span class="gtkdoc opt">&gt;</span>cairo_surface_t<span class="gtkdoc opt">&lt;/</span>a<span class="gtkdoc opt">&gt; *</span>surface<span class="gtkdoc opt">;</span>
+<div class="informalexample"><pre class="programlisting">
+int stride;
+unsigned char *data;
+cairo_surface_t *surface;
 
-stride <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-Image-Surfaces.html#cairo-format-stride-for-width">cairo_format_stride_for_width</a></span> <span class="gtkdoc opt">(</span>format<span class="gtkdoc opt">,</span> width<span class="gtkdoc opt">);</span>
-data <span class="gtkdoc opt">=</span> <span class="function">malloc</span> <span class="gtkdoc opt">(</span>stride <span class="gtkdoc opt">*</span> height<span class="gtkdoc opt">);</span>
-surface <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-Image-Surfaces.html#cairo-image-surface-create-for-data">cairo_image_surface_create_for_data</a></span> <span class="gtkdoc opt">(</span>data<span class="gtkdoc opt">,</span> format<span class="gtkdoc opt">,</span>
-					  width<span class="gtkdoc opt">,</span> height<span class="gtkdoc opt">,</span>
-					  stride<span class="gtkdoc opt">);</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+stride = cairo_format_stride_for_width (format, width);
+data = malloc (stride * height);
+surface = cairo_image_surface_create_for_data (data, format,
+					  width, height,
+					  stride);
+</pre></div>
 <p>
 </p>
 <div class="variablelist"><table border="0">

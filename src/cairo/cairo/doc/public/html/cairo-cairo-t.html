@@ -425,29 +425,15 @@ under the stroke:
 </p>
 <p>
 </p>
-<div class="informalexample">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3
-4
-5
-6
-7</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-push-group">cairo_push_group</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-set-source">cairo_set_source</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">,</span> fill_pattern<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-fill-preserve">cairo_fill_preserve</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-set-source">cairo_set_source</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">,</span> stroke_pattern<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-stroke">cairo_stroke</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-pop-group-to-source">cairo_pop_group_to_source</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-paint-with-alpha">cairo_paint_with_alpha</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">,</span> alpha<span class="gtkdoc opt">);</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+<div class="informalexample"><pre class="programlisting">
+cairo_push_group (cr);
+cairo_set_source (cr, fill_pattern);
+cairo_fill_preserve (cr);
+cairo_set_source (cr, stroke_pattern);
+cairo_stroke (cr);
+cairo_pop_group_to_source (cr);
+cairo_paint_with_alpha (cr, alpha);
+</pre></div>
 <p>
 </p>
 <div class="variablelist"><table border="0">
@@ -542,21 +528,11 @@ operations:
 </p>
 <p>
 </p>
-<div class="informalexample">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3</pre></td>
-        <td class="listing_code"><pre class="programlisting">cairo_pattern_t <span class="gtkdoc opt">*</span>group <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-pop-group">cairo_pop_group</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-set-source">cairo_set_source</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">,</span> group<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-pattern-t.html#cairo-pattern-destroy">cairo_pattern_destroy</a></span> <span class="gtkdoc opt">(</span>group<span class="gtkdoc opt">);</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+<div class="informalexample"><pre class="programlisting">
+cairo_pattern_t *group = cairo_pop_group (cr);
+cairo_set_source (cr, group);
+cairo_pattern_destroy (group);
+</pre></div>
 <p>
 </p>
 <p>

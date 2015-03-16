@@ -899,6 +899,8 @@ cairo_cff_font_read_name (cairo_cff_font_t *font)
 
         memcpy (font->ps_name, p, len);
         font->ps_name[len] = 0;
+
+        status = _cairo_escape_ps_name (&font->ps_name);
     }
     cff_index_fini (&index);
 
@@ -1052,13 +1054,13 @@ cairo_cff_font_read_cid_fontdict (cairo_cff_font_t *font, unsigned char *ptr)
         goto fail;
     }
 
-    font->fd_default_width = calloc (sizeof (int), font->num_fontdicts);
+    font->fd_default_width = calloc (font->num_fontdicts, sizeof (double));
     if (unlikely (font->fd_default_width == NULL)) {
         status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
         goto fail;
     }
 
-    font->fd_nominal_width = calloc (sizeof (int), font->num_fontdicts);
+    font->fd_nominal_width = calloc (font->num_fontdicts, sizeof (double));
     if (unlikely (font->fd_nominal_width == NULL)) {
         status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
         goto fail;

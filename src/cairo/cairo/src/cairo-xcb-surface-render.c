@@ -37,6 +37,7 @@
 #include "cairo-clip-inline.h"
 #include "cairo-clip-private.h"
 #include "cairo-composite-rectangles-private.h"
+#include "cairo-image-surface-inline.h"
 #include "cairo-image-surface-private.h"
 #include "cairo-list-inline.h"
 #include "cairo-region-private.h"
@@ -1101,10 +1102,11 @@ record_to_picture (cairo_surface_t *target,
 	return _cairo_xcb_transparent_picture ((cairo_xcb_surface_t *) target);
 
     /* Now draw the recording surface to an xcb surface */
-    tmp = _cairo_surface_create_similar_scratch (target,
-						 source->content,
-						 limit.width,
-						 limit.height);
+    tmp = _cairo_surface_create_similar_solid (target,
+					       source->content,
+					       limit.width,
+					       limit.height,
+					       CAIRO_COLOR_TRANSPARENT);
     if (tmp->status != CAIRO_STATUS_SUCCESS) {
 	return (cairo_xcb_picture_t *) tmp;
     }
@@ -1951,7 +1953,7 @@ _clip_and_composite_combine (cairo_clip_t		*clip,
 {
     cairo_xcb_surface_t *tmp;
     cairo_xcb_surface_t *clip_surface;
-    int clip_x, clip_y;
+    int clip_x = 0, clip_y = 0;
     xcb_render_picture_t clip_picture;
     cairo_status_t status;
 
@@ -2247,7 +2249,7 @@ _cairo_xcb_surface_fixup_unbounded_with_mask (cairo_xcb_surface_t *dst,
 					      cairo_clip_t *clip)
 {
     cairo_xcb_surface_t *mask;
-    int mask_x, mask_y;
+    int mask_x = 0, mask_y = 0;
 
     mask = get_clip_surface (clip, dst, &mask_x, &mask_y);
     if (unlikely (mask->base.status))
@@ -2650,7 +2652,7 @@ _composite_boxes (cairo_xcb_surface_t *dst,
 
 	if (need_clip_mask) {
 	    cairo_xcb_surface_t *clip_surface;
-	    int clip_x, clip_y;
+	    int clip_x = 0, clip_y = 0;
 
 	    clip_surface = get_clip_surface (extents->clip, dst,
 					     &clip_x, &clip_y);
@@ -2788,7 +2790,7 @@ _upload_image_inplace (cairo_xcb_surface_t *surface,
 	return CAIRO_INT_STATUS_UNSUPPORTED;
 
     pattern = (const cairo_surface_pattern_t *) source;
-    if (pattern->surface->type != CAIRO_SURFACE_TYPE_IMAGE)
+    if (! _cairo_surface_is_image (pattern->surface))
 	return CAIRO_INT_STATUS_UNSUPPORTED;
 
     /* Have we already upload this image to a pixmap? */
@@ -2903,27 +2905,29 @@ _boxes_for_traps (cairo_boxes_t *boxes,
 		  cairo_traps_t *traps,
 		  cairo_antialias_t antialias)
 {
-    int i;
+    int i, j;
 
     _cairo_boxes_init (boxes);
 
-    boxes->num_boxes    = traps->num_traps;
     boxes->chunks.base  = (cairo_box_t *) traps->traps;
-    boxes->chunks.count = traps->num_traps;
     boxes->chunks.size  = traps->num_traps;
 
     if (antialias != CAIRO_ANTIALIAS_NONE) {
-	for (i = 0; i < traps->num_traps; i++) {
+	for (i = j = 0; i < traps->num_traps; i++) {
 	    /* Note the traps and boxes alias so we need to take the local copies first. */
 	    cairo_fixed_t x1 = traps->traps[i].left.p1.x;
 	    cairo_fixed_t x2 = traps->traps[i].right.p1.x;
 	    cairo_fixed_t y1 = traps->traps[i].top;
 	    cairo_fixed_t y2 = traps->traps[i].bottom;
 
-	    boxes->chunks.base[i].p1.x = x1;
-	    boxes->chunks.base[i].p1.y = y1;
-	    boxes->chunks.base[i].p2.x = x2;
-	    boxes->chunks.base[i].p2.y = y2;
+	    if (x1 == x2 || y1 == y2)
+		    continue;
+
+	    boxes->chunks.base[j].p1.x = x1;
+	    boxes->chunks.base[j].p1.y = y1;
+	    boxes->chunks.base[j].p2.x = x2;
+	    boxes->chunks.base[j].p2.y = y2;
+	    j++;
 
 	    if (boxes->is_pixel_aligned) {
 		boxes->is_pixel_aligned =
@@ -2934,7 +2938,7 @@ _boxes_for_traps (cairo_boxes_t *boxes,
     } else {
 	boxes->is_pixel_aligned = TRUE;
 
-	for (i = 0; i < traps->num_traps; i++) {
+	for (i = j = 0; i < traps->num_traps; i++) {
 	    /* Note the traps and boxes alias so we need to take the local copies first. */
 	    cairo_fixed_t x1 = traps->traps[i].left.p1.x;
 	    cairo_fixed_t x2 = traps->traps[i].right.p1.x;
@@ -2942,12 +2946,18 @@ _boxes_for_traps (cairo_boxes_t *boxes,
 	    cairo_fixed_t y2 = traps->traps[i].bottom;
 
 	    /* round down here to match Pixman's behavior when using traps. */
-	    boxes->chunks.base[i].p1.x = _cairo_fixed_round_down (x1);
-	    boxes->chunks.base[i].p1.y = _cairo_fixed_round_down (y1);
-	    boxes->chunks.base[i].p2.x = _cairo_fixed_round_down (x2);
-	    boxes->chunks.base[i].p2.y = _cairo_fixed_round_down (y2);
+	    boxes->chunks.base[j].p1.x = _cairo_fixed_round_down (x1);
+	    boxes->chunks.base[j].p1.y = _cairo_fixed_round_down (y1);
+	    boxes->chunks.base[j].p2.x = _cairo_fixed_round_down (x2);
+	    boxes->chunks.base[j].p2.y = _cairo_fixed_round_down (y2);
+
+	    j += (boxes->chunks.base[j].p1.x != boxes->chunks.base[j].p2.x &&
+		  boxes->chunks.base[j].p1.y != boxes->chunks.base[j].p2.y);
 	}
     }
+
+    boxes->num_boxes    = j;
+    boxes->chunks.count = j;
 }
 
 static cairo_status_t
@@ -3120,6 +3130,9 @@ _clip_and_composite_boxes (cairo_xcb_surface_t *dst,
 
 	clip = _cairo_clip_copy (extents->clip);
 	clip = _cairo_clip_intersect_boxes (clip, boxes);
+	if (_cairo_clip_is_all_clipped (clip))
+		return CAIRO_INT_STATUS_NOTHING_TO_DO;
+
 	status = _cairo_clip_get_polygon (clip, &polygon,
 					  &fill_rule, &antialias);
 	_cairo_clip_path_destroy (clip->path);

@@ -71,13 +71,6 @@ windows and pixmaps using the XCB library.
 <para>
 Note that the XCB surface automatically takes advantage of the X render
 extension if it is available.
-</para><para>
-The XCB surface is used to render cairo graphics to X Window System
-windows and pixmaps using the XCB library.
-</para>
-<para>
-Note that the XCB surface automatically takes advantage of the X render
-extension if it is available.
 </para>
 </refsect1>
 <refsect1 id="cairo-XCB-Surfaces.details" role="details">

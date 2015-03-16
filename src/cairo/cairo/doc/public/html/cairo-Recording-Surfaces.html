@@ -64,27 +64,14 @@ identical to the results that would have been obtained if the original
 operations applied to the recording surface had instead been applied to the
 target surface, you can use code like this:
 </p>
-<div class="informalexample">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3
-4
-5
-6</pre></td>
-        <td class="listing_code"><pre class="programlisting">cairo_t <span class="gtkdoc opt">*</span>cr<span class="gtkdoc opt">;</span>
+<div class="informalexample"><pre class="programlisting">
+cairo_t *cr;
 
-cr <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-create">cairo_create</a></span> <span class="gtkdoc opt">(</span>target<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-set-source-surface">cairo_set_source_surface</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">,</span> recording_surface<span class="gtkdoc opt">,</span> <span class="number">0.0</span><span class="gtkdoc opt">,</span> <span class="number">0.0</span><span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-paint">cairo_paint</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span>
-<span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-destroy">cairo_destroy</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">);</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+cr = cairo_create (target);
+cairo_set_source_surface (cr, recording_surface, 0.0, 0.0);
+cairo_paint (cr);
+cairo_destroy (cr);
+</pre></div>
 <p>
 </p>
 <p>

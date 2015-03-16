@@ -143,7 +143,7 @@ within cairo. Typical usage will be of the form:
 <informalexample><programlisting>
 int stride;
 unsigned char *data;
-<link linkend="cairo-surface-t">cairo_surface_t</link> *surface;
+cairo_surface_t *surface;
 
 stride = cairo_format_stride_for_width (format, width);
 data = malloc (stride * height);

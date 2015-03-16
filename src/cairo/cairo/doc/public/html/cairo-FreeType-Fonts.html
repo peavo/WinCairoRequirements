@@ -111,35 +111,18 @@ the FreeType face object to the <a class="link" href="cairo-cairo-font-face-t.ht
 </p>
 <p>
 </p>
-<div class="informalexample">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9
-10</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">static const</span> cairo_user_data_key_t key<span class="gtkdoc opt">;</span>
+<div class="informalexample"><pre class="programlisting">
+static const cairo_user_data_key_t key;
 
-font_face <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-FreeType-Fonts.html#cairo-ft-font-face-create-for-ft-face">cairo_ft_font_face_create_for_ft_face</a></span> <span class="gtkdoc opt">(</span>ft_face<span class="gtkdoc opt">,</span> <span class="number">0</span><span class="gtkdoc opt">);</span>
-status <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-cairo-font-face-t.html#cairo-font-face-set-user-data">cairo_font_face_set_user_data</a></span> <span class="gtkdoc opt">(</span>font_face<span class="gtkdoc opt">, &amp;</span>key<span class="gtkdoc opt">,</span>
-                               ft_face<span class="gtkdoc opt">, (</span>cairo_destroy_func_t<span class="gtkdoc opt">)</span> FT_Done_Face<span class="gtkdoc opt">);</span>
-<span class="keyword">if</span> <span class="gtkdoc opt">(</span>status<span class="gtkdoc opt">) {</span>
-   <span class="function"><a href="../cairo/cairo-cairo-font-face-t.html#cairo-font-face-destroy">cairo_font_face_destroy</a></span> <span class="gtkdoc opt">(</span>font_face<span class="gtkdoc opt">);</span>
-   <span class="function">FT_Done_Face</span> <span class="gtkdoc opt">(</span>ft_face<span class="gtkdoc opt">);</span>
-   <span class="keyword">return</span> ERROR<span class="gtkdoc opt">;</span>
-<span class="gtkdoc opt">}</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+font_face = cairo_ft_font_face_create_for_ft_face (ft_face, 0);
+status = cairo_font_face_set_user_data (font_face, &amp;key,
+                               ft_face, (cairo_destroy_func_t) FT_Done_Face);
+if (status) {
+   cairo_font_face_destroy (font_face);
+   FT_Done_Face (ft_face);
+   return ERROR;
+}
+</pre></div>
 <p>
 </p>
 <div class="variablelist"><table border="0">

@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="index.html" title="Cairo: A Vector Graphics Library">
 <link rel="up" href="cairo-support.html" title="Utilities">
-<link rel="prev" href="cairo-Error-handling.html" title="Error handling">
+<link rel="prev" href="cairo-Version-Information.html" title="Version Information">
 <link rel="next" href="index-all.html" title="Index">
 <meta name="generator" content="GTK-Doc V1.18 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
@@ -14,7 +14,7 @@
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="2">
 <tr valign="middle">
-<td><a accesskey="p" href="cairo-Error-handling.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
+<td><a accesskey="p" href="cairo-Version-Information.html"><img src="left.png" width="24" height="24" border="0" alt="Prev"></a></td>
 <td><a accesskey="u" href="cairo-support.html"><img src="up.png" width="24" height="24" border="0" alt="Up"></a></td>
 <td><a accesskey="h" href="index.html"><img src="home.png" width="24" height="24" border="0" alt="Home"></a></td>
 <th width="100%" align="center">Cairo: A Vector Graphics Library</th>
@@ -63,21 +63,11 @@ value as a boolean condition.
 </p>
 <p>
 </p>
-<div class="informalexample">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="keyword">if</span> <span class="gtkdoc opt">(</span><span class="function"><a href="../cairo/cairo-cairo-t.html#cairo-in-stroke">cairo_in_stroke</a></span> <span class="gtkdoc opt">(</span>cr<span class="gtkdoc opt">,</span> x<span class="gtkdoc opt">,</span> y<span class="gtkdoc opt">)) {</span>
-    <span class="comment">/* do something */</span>
-<span class="gtkdoc opt">}</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+<div class="informalexample"><pre class="programlisting">
+ if (cairo_in_stroke (cr, x, y)) {
+     /* do something */
+ }
+</pre></div>
 <p>
 </p>
 <p class="since">Since 1.0</p>

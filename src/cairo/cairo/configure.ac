@@ -11,8 +11,11 @@ AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_SRCDIR(src/cairo.h)
 AC_CONFIG_HEADERS(config.h)
 
+AC_CHECK_HEADERS([unistd.h sys/ioctl.h])
+
 AM_INIT_AUTOMAKE([1.11 foreign -Wall no-define no-dist-gzip dist-xz])
 AM_SILENT_RULES([yes])
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR]) dnl Workaround for Automake 1.12
 
 # Initialize libtool
 LT_PREREQ([2.2])
@@ -188,6 +191,7 @@ CAIRO_ENABLE_SURFACE_BACKEND(qt, Qt, no, [
 		    [qt_REQUIRES=""
 		     use_qt="no (requires Qt4 development libraries)"
 		     ])
+  qt_NONPKGCONFIG_LIBS="-lstdc++"
 ])
 
 dnl ===========================================================================
@@ -625,7 +629,7 @@ CAIRO_ENABLE_SURFACE_BACKEND(svg, SVG, yes, [
   fi
 ])
 
-LIBRSVG_VERSION_REQUIRED=2.15.0
+LIBRSVG_VERSION_REQUIRED=2.35.0
 test_svg=no
 any2ppm_svg=no
 if test "x$use_svg" = "xyes"; then
@@ -654,7 +658,7 @@ CAIRO_ENABLE(test_surfaces, test surfaces, no)
 dnl ===========================================================================
 
 CAIRO_ENABLE_SURFACE_BACKEND(image, image, always, [
-  pixman_REQUIRES="pixman-1 >= 0.22.0"
+  pixman_REQUIRES="pixman-1 >= 0.16.0"
   PKG_CHECK_MODULES(pixman, $pixman_REQUIRES, ,
     [use_image="no (requires $pixman_REQUIRES http://cairographics.org/releases/)"])
   image_REQUIRES=$pixman_REQUIRES
@@ -702,7 +706,7 @@ dnl ===========================================================================
 dnl Build gobject integration library
 
 CAIRO_ENABLE_FUNCTIONS(gobject, gobject, auto, [
-  gobject_REQUIRES="gobject-2.0 glib-2.0"
+  gobject_REQUIRES="gobject-2.0 glib-2.0 >= 2.14"
   PKG_CHECK_MODULES(GOBJECT, $gobject_REQUIRES, ,
     [use_gobject="no (requires $gobject_REQUIRES http://download.gnome.org/pub/GNOME/sources/glib/)"])
   gobject_NONPKGCONFIG_EXTRA_LIBS="-L\${libdir} -lcairo-gobject"

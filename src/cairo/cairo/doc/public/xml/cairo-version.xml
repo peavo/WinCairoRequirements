@@ -134,6 +134,7 @@ if (cairo_version() &gt;= CAIRO_VERSION_ENCODE(1, 0, 0))
 </programlisting></informalexample>
 </para>
 </refsect2>
+<para>
 </para>
 </refsect1>
 <refsect1 id="cairo-Version-Information.details" role="details">

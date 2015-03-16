@@ -136,54 +136,28 @@ functions. If you do this, keep in mind that it is mandatory that you call
 you must use <a class="link" href="cairo-cairo-surface-t.html#cairo-surface-mark-dirty" title="cairo_surface_mark_dirty ()"><code class="function">cairo_surface_mark_dirty()</code></a> after modifying it.
 </p>
 <div class="example">
-<a name="idp18359440"></a><p class="title"><b>Example 1. Directly modifying an image surface</b></p>
-<div class="example-contents">
-  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td class="listing_lines" align="right"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19</pre></td>
-        <td class="listing_code"><pre class="programlisting"><span class="gtkdoc kwb">void</span>
-<span class="function">modify_image_surface</span> <span class="gtkdoc opt">(</span>cairo_surface_t <span class="gtkdoc opt">*</span>surface<span class="gtkdoc opt">)</span>
-<span class="gtkdoc opt">{</span>
-  <span class="gtkdoc kwb">unsigned char</span> <span class="gtkdoc opt">*</span>data<span class="gtkdoc opt">;</span>
-  <span class="gtkdoc kwb">int</span> width<span class="gtkdoc opt">,</span> height<span class="gtkdoc opt">,</span> stride<span class="gtkdoc opt">;</span>
+<a name="idp17475456"></a><p class="title"><b>Example 1. Directly modifying an image surface</b></p>
+<div class="example-contents"><pre class="programlisting">
+void
+modify_image_surface (cairo_surface_t *surface)
+{
+  unsigned char *data;
+  int width, height, stride;
 
-  <span class="gtkdoc slc">// flush to ensure all writing to the image was done</span>
-  <span class="function"><a href="../cairo/cairo-cairo-surface-t.html#cairo-surface-flush">cairo_surface_flush</a></span> <span class="gtkdoc opt">(</span>surface<span class="gtkdoc opt">);</span>
+  // flush to ensure all writing to the image was done
+  cairo_surface_flush (surface);
 
-  <span class="gtkdoc slc">// modify the image</span>
-  data <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-Image-Surfaces.html#cairo-image-surface-get-data">cairo_image_surface_get_data</a></span> <span class="gtkdoc opt">(</span>surface<span class="gtkdoc opt">);</span>
-  width <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-Image-Surfaces.html#cairo-image-surface-get-width">cairo_image_surface_get_width</a></span> <span class="gtkdoc opt">(</span>surface<span class="gtkdoc opt">);</span>
-  height <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-Image-Surfaces.html#cairo-image-surface-get-height">cairo_image_surface_get_height</a></span> <span class="gtkdoc opt">(</span>surface<span class="gtkdoc opt">);</span>
-  stride <span class="gtkdoc opt">=</span> <span class="function"><a href="../cairo/cairo-Image-Surfaces.html#cairo-image-surface-get-stride">cairo_image_surface_get_stride</a></span> <span class="gtkdoc opt">(</span>surface<span class="gtkdoc opt">);</span>
-  <span class="function">modify_image_data</span> <span class="gtkdoc opt">(</span>data<span class="gtkdoc opt">,</span> width<span class="gtkdoc opt">,</span> height<span class="gtkdoc opt">,</span> stride<span class="gtkdoc opt">);</span>
+  // modify the image
+  data = cairo_image_surface_get_data (surface);
+  width = cairo_image_surface_get_width (surface);
+  height = cairo_image_surface_get_height (surface);
+  stride = cairo_image_surface_get_stride (surface);
+  modify_image_data (data, width, height, stride);
 
-  <span class="gtkdoc slc">// mark the image dirty so Cairo clears its caches.</span>
-  <span class="function"><a href="../cairo/cairo-cairo-surface-t.html#cairo-surface-mark-dirty">cairo_surface_mark_dirty</a></span> <span class="gtkdoc opt">(</span>surface<span class="gtkdoc opt">);</span>
-<span class="gtkdoc opt">}</span></pre></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+  // mark the image dirty so Cairo clears its caches.
+  cairo_surface_mark_dirty (surface);
+}
+</pre></div>
 </div>
 <p><br class="example-break">
 Note that for other surface types it might be necessary to acquire the

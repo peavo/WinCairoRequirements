@@ -61,7 +61,7 @@
 
 #include <windows.h>
 
-void InitWGLStuff ();
+void InitWGLStuff();
 
 /* declare to avoid "no previous prototype for 'DllMain'" warning */
 BOOL WINAPI
@@ -77,7 +77,7 @@ DllMain (HINSTANCE hinstDLL,
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH:
             CAIRO_MUTEX_INITIALIZE ();
-            InitWGLStuff ();
+            InitWGLStuff();
             break;
 
         case DLL_PROCESS_DETACH:
