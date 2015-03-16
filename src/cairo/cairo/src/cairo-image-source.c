@@ -938,9 +938,13 @@ _pixman_image_for_surface (cairo_image_surface_t *dst,
 		    void *data = source->data
 			+ sub->extents.x * PIXMAN_FORMAT_BPP(source->pixman_format)/8
 			+ sub->extents.y * source->stride;
+			int width = sub->extents.width;
+			int height = sub->extents.height;
+			if (sub->extents.y + height > source->height)
+				height = source->height - sub->extents.y;
 		    pixman_image = pixman_image_create_bits (source->pixman_format,
-							     sub->extents.width,
-							     sub->extents.height,
+							     width,
+							     height,
 							     data,
 							     source->stride);
 		    if (unlikely (pixman_image == NULL))
