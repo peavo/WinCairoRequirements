@@ -274,6 +274,7 @@ EXPORTS
     BIO_f_nbio_test                         @915
     BIO_f_null                              @61
     BIO_f_reliable                          @1244
+    BIO_f_zlib
     BIO_fd_non_fatal_error                  @63
     BIO_fd_should_retry                     @64
     BIO_find_type                           @65
