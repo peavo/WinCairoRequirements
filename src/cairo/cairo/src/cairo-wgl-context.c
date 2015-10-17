@@ -260,21 +260,24 @@ cairo_gl_surface_create_for_dc (cairo_device_t	*device,
     return &surface->base.base;
 }
 
-static PFNGLACTIVETEXTUREARBPROC _glActiveTextureARB = NULL;
-static PFNGLBLENDFUNCSEPARATEPROC _glBlendFuncSeparate = NULL;
-
-void InitWGLStuff()
-{
-    _glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress((LPCSTR)"glActiveTextureARB");
-    _glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress((LPCSTR)"glBlendFuncSeparate");
-}
-
 GLAPI void APIENTRY glActiveTexture(GLenum texture)
 {
-    (*_glActiveTextureARB)(texture);
+    static PFNGLACTIVETEXTUREARBPROC _glActiveTextureARB = NULL;
+
+    if(!_glActiveTextureARB)
+        _glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress((LPCSTR)"glActiveTextureARB");
+
+    if (_glActiveTextureARB)
+        (*_glActiveTextureARB)(texture);
 }
 
 GLAPI void APIENTRY glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
 {
-    (*_glBlendFuncSeparate)(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+    static PFNGLBLENDFUNCSEPARATEPROC _glBlendFuncSeparate = NULL;
+
+    if(!_glBlendFuncSeparate)
+        _glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress((LPCSTR)"glBlendFuncSeparate");
+
+    if (_glBlendFuncSeparate)
+        (*_glBlendFuncSeparate)(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
 }

@@ -121,7 +121,7 @@ Supported, "platform" surface backends
 
 	quartz backend
 	--------------
-	MacOS X >= 10.4 with Xcode >= 2.4
+	MacOS X >= 10.5 with Xcode >= 3.0
 
 	win32 backend
 	-------------
@@ -180,6 +180,12 @@ Experimental surface backends
 	requires a font backend. See the freetype dependency list. Ready to use
 	packages and developer dependencies are available at Netlabs:
 				ftp://ftp.netlabs.org/pub/cairo
+
+	skia backend
+	------------
+	Requires the skia library as of June 2014.  Since skia is not
+	API stable, building against newer (or older) versions of skia
+	will probably fail.
 
 
 Compiling

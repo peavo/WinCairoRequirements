@@ -148,7 +148,7 @@ CAIRO_ENABLE_SURFACE_BACKEND(xlib_xrender, Xlib Xrender, auto, [
     old_LIBS=$LIBS
     CFLAGS="$CFLAGS $xlib_CFLAGS $xlib_NONPKGCONFIG_CFLAGS $xlib_xrender_CFLAGS $xlib_xrender_NONPKGCONFIG_CFLAGS"
     LIBS="$LIBS $xlib_LIBS $xlib_NONPKGCONFIG_LIBS $xlib_xrender_LIBS $xlib_xrender_NONPKGCONFIG_LIBS"
-    AC_CHECK_FUNCS([XRenderCreateLinearGradient XRenderCreateRadialGradient XRenderCreateConicalGradient])
+    AC_CHECK_FUNCS([XRenderCreateSolidFill XRenderCreateLinearGradient XRenderCreateRadialGradient XRenderCreateConicalGradient])
     CFLAGS=$old_CFLAGS
     LIBS=$old_LIBS
 
@@ -251,16 +251,16 @@ CAIRO_ENABLE_SURFACE_BACKEND(skia, Skia, no, [
 			      [directory to find compiled skia sources])],
 	      [skia_DIR="$withval"],
 	      [skia_DIR="`pwd`/../skia"])
-  AC_ARG_WITH([skia-bulid],
-	      [AS_HELP_STRING([--with-skia-build=(Release|Debug)]
+  AC_ARG_WITH([skia-build-type],
+	      [AS_HELP_STRING([--with-skia-build-type=(Release|Debug)]
 			      [build of skia to link with, default is Release])],
-	      [skia_BUILD="$withval"],
-	      [skia_BUILD="Release"])
+	      [skia_BUILD_TYPE="$withval"],
+	      [skia_BUILD_TYPE="Release"])
   skia_NONPKGCONFIG_CFLAGS="-I$skia_DIR/include/config -I$skia_DIR/include/core -I$skia_DIR/include/effects"
-  if test "x$skia_BUILD" = x"Release"; then
+  if test "x$skia_BUILD_TYPE" = "xRelease"; then
   	skia_NONPKGCONFIG_CFLAGS="-DSK_RELEASE -DSK_CAN_USE_FLOAT $skia_NONPKGCONFIG_CFLAGS"
   fi
-  skia_NONPKGCONFIG_LIBS="--start-group $skia_DIR/out/$skia_BUILD/obj.target/gyp/libeffects.a $skia_DIR/out/$skia_BUILD/obj.target/gyp/libimages.a $skia_DIR/out/$skia_BUILD/obj.target/gyp/libutils.a $skia_DIR/out/$skia_BUILD/obj.target/gyp/libopts.a $skia_DIR/out/$skia_BUILD/obj.target/gyp/libcore.a -end-group"
+  skia_NONPKGCONFIG_LIBS="-L$skia_DIR/out/$skia_BUILD_TYPE/lib.target/ -lskia -lstdc++"
   AC_SUBST(skia_DIR)
 ])
 
@@ -376,6 +376,10 @@ CAIRO_ENABLE_SURFACE_BACKEND(glesv2, OpenGLESv2, no, [
 
   if test "x$have_dl" = "xyes" -a "x$have_dlsym" = "xyes"; then
     glesv2_LIBS="$glesv2_LIBS -ldl"
+  fi
+
+  if test "x$use_glesv2" = "xyes" -a "x$use_gl" = "xyes"; then
+      AC_MSG_ERROR([use either --enable-gl=yes or --enable-glesv2=yes. Not both at the same time.])
   fi
 
   need_egl_functions=yes
@@ -658,7 +662,7 @@ CAIRO_ENABLE(test_surfaces, test surfaces, no)
 dnl ===========================================================================
 
 CAIRO_ENABLE_SURFACE_BACKEND(image, image, always, [
-  pixman_REQUIRES="pixman-1 >= 0.16.0"
+  pixman_REQUIRES="pixman-1 >= 0.30.0"
   PKG_CHECK_MODULES(pixman, $pixman_REQUIRES, ,
     [use_image="no (requires $pixman_REQUIRES http://cairographics.org/releases/)"])
   image_REQUIRES=$pixman_REQUIRES
@@ -801,7 +805,7 @@ CAIRO_ENABLE(symbol_lookup, symbol-lookup, auto, [
 PKG_CHECK_MODULES(glib, glib-2.0, have_glib=yes, have_glib=no)
 AC_SUBST(glib_CFLAGS)
 AC_SUBST(glib_LIBS)
-AM_CONDITIONAL(BUILD_SPHINX, test "x$have_glib" = "xyes")
+AM_CONDITIONAL(BUILD_SPHINX, test "x$have_glib" = "xyes" -a "x$have_windows" = "xno")
 
 save_LIBS="$LIBS"
 AC_CHECK_LIB(rt, shm_open, shm_LIBS="-lrt")
@@ -867,6 +871,8 @@ util/cairo-trace/cairo-trace
 doc/Makefile
 doc/public/Makefile
 ])
+AC_CONFIG_COMMANDS([cairo-trace],
+		   [chmod a+x util/cairo-trace/cairo-trace])
 
 AC_OUTPUT
 CAIRO_REPORT

@@ -588,23 +588,20 @@ _cairo_ft_unscaled_font_create_from_face (FT_Face face,
     return _cairo_ft_unscaled_font_create_internal (TRUE, NULL, 0, face, out);
 }
 
-static void
+static cairo_bool_t
 _cairo_ft_unscaled_font_destroy (void *abstract_font)
 {
     cairo_ft_unscaled_font_t *unscaled  = abstract_font;
     cairo_ft_unscaled_font_map_t *font_map;
 
-    if (unscaled == NULL)
-	return;
-
     font_map = _cairo_ft_unscaled_font_map_lock ();
     /* All created objects must have been mapped in the font map. */
     assert (font_map != NULL);
 
-    if (CAIRO_REFERENCE_COUNT_HAS_REFERENCE (&unscaled->base.ref_count)) {
+    if (! _cairo_reference_count_dec_and_test (&unscaled->base.ref_count)) {
 	/* somebody recreated the font whilst we waited for the lock */
 	_cairo_ft_unscaled_font_map_unlock ();
-	return;
+	return FALSE;
     }
 
     _cairo_hash_table_remove (font_map->hash_table,
@@ -626,6 +623,7 @@ _cairo_ft_unscaled_font_destroy (void *abstract_font)
     _cairo_ft_unscaled_font_map_unlock ();
 
     _cairo_ft_unscaled_font_fini (unscaled);
+    return TRUE;
 }
 
 static cairo_bool_t
@@ -743,12 +741,11 @@ _compute_transform (cairo_ft_font_transform_t *sf,
 	double min_distance = DBL_MAX;
 	cairo_bool_t magnify = TRUE;
 	int i;
-	int best_i = 0;
 	double best_x_size = 0;
 	double best_y_size = 0;
 
 	for (i = 0; i < unscaled->face->num_fixed_sizes; i++) {
-	    double x_size = unscaled->face->available_sizes[i].y_ppem / 64.;
+	    double x_size = unscaled->face->available_sizes[i].x_ppem / 64.;
 	    double y_size = unscaled->face->available_sizes[i].y_ppem / 64.;
 	    double distance = y_size - y_scale;
 
@@ -762,7 +759,6 @@ _compute_transform (cairo_ft_font_transform_t *sf,
 	    if ((magnify && distance >= 0) || fabs (distance) <= min_distance) {
 		magnify = distance < 0;
 		min_distance = fabs (distance);
-		best_i = i;
 		best_x_size = x_size;
 		best_y_size = y_size;
 	    }
@@ -1163,7 +1159,9 @@ _get_bitmap_surface (FT_Bitmap		     *bitmap,
 		source = bitmap->buffer;
 		dest = data;
 		for (i = height; i; i--) {
-		    memcpy (dest, source, stride);
+		    memcpy (dest, source, bitmap->pitch);
+		    memset (dest + bitmap->pitch, '\0', stride - bitmap->pitch);
+
 		    source += bitmap->pitch;
 		    dest += stride;
 		}
@@ -2771,7 +2769,7 @@ _cairo_ft_font_face_create_for_toy (cairo_toy_font_face_t *toy_face,
 }
 #endif
 
-static void
+static cairo_bool_t
 _cairo_ft_font_face_destroy (void *abstract_face)
 {
     cairo_ft_font_face_t *font_face = abstract_face;
@@ -2797,12 +2795,10 @@ _cairo_ft_font_face_destroy (void *abstract_face)
 	font_face->unscaled->faces == font_face &&
 	CAIRO_REFERENCE_COUNT_GET_VALUE (&font_face->unscaled->base.ref_count) > 1)
     {
-	cairo_font_face_reference (&font_face->base);
-
 	_cairo_unscaled_font_destroy (&font_face->unscaled->base);
 	font_face->unscaled = NULL;
 
-	return;
+	return FALSE;
     }
 
     if (font_face->unscaled) {
@@ -2834,6 +2830,8 @@ _cairo_ft_font_face_destroy (void *abstract_face)
 	cairo_font_face_destroy (font_face->resolved_font_face);
     }
 #endif
+
+    return TRUE;
 }
 
 static cairo_font_face_t *

@@ -259,6 +259,7 @@ xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
     <ClCompile Include="cairo-image-info.c" />
     <ClCompile Include="cairo-image-source.c" />
     <ClCompile Include="cairo-image-surface.c" />
+    <ClCompile Include="cairo-line.c" />
     <ClCompile Include="cairo-lzw.c" />
     <ClCompile Include="cairo-mask-compositor.c" />
     <ClCompile Include="cairo-matrix.c" />

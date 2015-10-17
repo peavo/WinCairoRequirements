@@ -382,13 +382,10 @@ _get_image (cairo_xcb_surface_t		 *surface,
 	}
     }
 
-    status = _cairo_xcb_connection_get_image (connection,
-					      surface->drawable,
-					      x, y,
-					      width, height,
-					      &reply);
-    if (unlikely (status))
-	goto FAIL;
+    reply =_cairo_xcb_connection_get_image (connection,
+					    surface->drawable,
+					    x, y,
+					    width, height);
 
     if (reply == NULL && ! surface->owns_pixmap) {
 	/* xcb_get_image_t from a window is dangerous because it can
@@ -422,15 +419,11 @@ _get_image (cairo_xcb_surface_t		 *surface,
 
 	_cairo_xcb_screen_put_gc (surface->screen, surface->depth, gc);
 
-	status = _cairo_xcb_connection_get_image (connection,
-						  pixmap,
-						  0, 0,
-						  width, height,
-						  &reply);
+	reply = _cairo_xcb_connection_get_image (connection,
+						 pixmap,
+						 0, 0,
+						 width, height);
 	_cairo_xcb_connection_free_pixmap (connection, pixmap);
-
-	if (unlikely (status))
-	    goto FAIL;
     }
 
     if (unlikely (reply == NULL)) {
@@ -537,9 +530,9 @@ static void
 _cairo_xcb_surface_get_font_options (void *abstract_surface,
 				     cairo_font_options_t *options)
 {
-    /* XXX  copy from xlib */
-    _cairo_font_options_init_default (options);
-    _cairo_font_options_set_round_glyph_positions (options, CAIRO_ROUND_GLYPH_POS_ON);
+    cairo_xcb_surface_t *surface = abstract_surface;
+
+    *options = *_cairo_xcb_screen_get_font_options (surface->screen);
 }
 
 static cairo_status_t
@@ -1439,7 +1432,7 @@ cairo_xcb_surface_set_size (cairo_surface_t *abstract_surface,
     }
 
 
-    if (abstract_surface->type != CAIRO_SURFACE_TYPE_XCB) {
+    if ( !_cairo_surface_is_xcb(abstract_surface)) {
 	_cairo_surface_set_error (abstract_surface,
 				  _cairo_error (CAIRO_STATUS_SURFACE_TYPE_MISMATCH));
 	return;
@@ -1493,7 +1486,7 @@ cairo_xcb_surface_set_drawable (cairo_surface_t *abstract_surface,
     }
 
 
-    if (abstract_surface->type != CAIRO_SURFACE_TYPE_XCB) {
+    if ( !_cairo_surface_is_xcb(abstract_surface)) {
 	_cairo_surface_set_error (abstract_surface,
 				  _cairo_error (CAIRO_STATUS_SURFACE_TYPE_MISMATCH));
 	return;

@@ -11,6 +11,7 @@ extern void _register_script (void);
 extern void _register_ps (void);
 extern void _register_pdf (void);
 extern void _register_svg (void);
+extern void _register_test (void);
 
 void
 _cairo_boilerplate_register_all (void)
@@ -22,4 +23,5 @@ _cairo_boilerplate_register_all (void)
     _register_ps ();
     _register_pdf ();
     _register_svg ();
+    _register_test ();
 }

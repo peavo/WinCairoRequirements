@@ -9,10 +9,12 @@ cairo-skia
 
 </para>
 
+
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
+
 
 <!-- ##### SECTION Stability_Level ##### -->
 
@@ -20,35 +22,11 @@ cairo-skia
 <!-- ##### SECTION Image ##### -->
 
 
-<!-- ##### STRUCT cairo_skia_context ##### -->
-<para>
-
-</para>
-
-@base: 
-@original: 
-@target: 
-@matrix: 
-@canvas: 
-@paint: 
-@path: 
-@source: 
-@source_image: 
-@source_extra: 
-
 <!-- ##### TYPEDEF cairo_skia_context_t ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### STRUCT cairo_skia_surface ##### -->
-<para>
-
-</para>
-
-@image: 
-@bitmap: 
 
 <!-- ##### TYPEDEF cairo_skia_surface_t ##### -->
 <para>

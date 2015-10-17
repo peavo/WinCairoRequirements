@@ -26,6 +26,7 @@ test_sources = \
 	bilevel-image.c					\
 	bug-40410.c					\
 	bug-51910.c					\
+	bug-84115.c					\
 	bug-bo-rectangular.c				\
 	bug-bo-collins.c				\
 	bug-bo-ricotz.c					\
@@ -239,15 +240,18 @@ test_sources = \
 	paint-repeat.c					\
 	paint-source-alpha.c				\
 	paint-with-alpha.c				\
+	paint-with-alpha-group-clip.c			\
 	partial-clip-text.c				\
 	partial-coverage.c				\
 	pass-through.c					\
 	path-append.c					\
+	path-currentpoint.c				\
 	path-stroke-twice.c				\
 	path-precision.c				\
 	pattern-get-type.c				\
 	pattern-getters.c				\
 	pdf-isolated-group.c				\
+	pixman-downscale.c				\
 	pixman-rotate.c					\
 	png.c						\
 	push-group.c					\
@@ -282,6 +286,7 @@ test_sources = \
 	rel-path.c					\
 	rgb24-ignore-alpha.c				\
 	rotate-image-surface-paint.c			\
+	rotate-stroke-box.c                             \
 	rotated-clip.c					\
 	rounded-rectangle-fill.c			\
 	rounded-rectangle-stroke.c			\
@@ -306,6 +311,7 @@ test_sources = \
 	show-text-current-point.c			\
 	shape-general-convex.c				\
 	shape-sierpinski.c				\
+	simple.c					\
 	skew-extreme.c					\
 	smask.c						\
 	smask-fill.c					\
@@ -396,6 +402,10 @@ gl_surface_test_sources = \
 	gl-device-release.c \
 	gl-oversized-surface.c \
 	gl-surface-source.c
+
+egl_surface_test_sources = \
+       egl-oversized-surface.c \
+       egl-surface-source.c
 
 quartz_surface_test_sources = quartz-surface-source.c
 

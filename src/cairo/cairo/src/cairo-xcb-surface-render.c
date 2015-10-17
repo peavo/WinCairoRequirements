@@ -394,11 +394,6 @@ _pattern_is_supported (uint32_t flags,
     if (pattern->type == CAIRO_PATTERN_TYPE_SOLID)
 	return TRUE;
 
-    if (! _cairo_matrix_is_integer_translation (&pattern->matrix, NULL, NULL)) {
-	if ((flags & CAIRO_XCB_RENDER_HAS_PICTURE_TRANSFORM) == 0)
-	    return FALSE;
-    }
-
     switch (pattern->extend) {
     default:
 	ASSERT_NOT_REACHED;
@@ -412,19 +407,22 @@ _pattern_is_supported (uint32_t flags,
     }
 
     if (pattern->type == CAIRO_PATTERN_TYPE_SURFACE) {
-	cairo_filter_t filter;
-
-	filter = pattern->filter;
-	if (_cairo_matrix_has_unity_scale (&pattern->matrix) &&
-	    _cairo_matrix_is_integer_translation (&pattern->matrix, NULL, NULL))
-	{
-	    filter = CAIRO_FILTER_NEAREST;
+	switch (pattern->filter) {
+	case CAIRO_FILTER_FAST:
+	case CAIRO_FILTER_NEAREST:
+	    return (flags & CAIRO_XCB_RENDER_HAS_PICTURE_TRANSFORM) ||
+		_cairo_matrix_is_integer_translation (&pattern->matrix, NULL, NULL);
+	case CAIRO_FILTER_GOOD:
+	    return flags & CAIRO_XCB_RENDER_HAS_FILTER_GOOD;
+	case CAIRO_FILTER_BEST:
+	    return flags & CAIRO_XCB_RENDER_HAS_FILTER_BEST;
+	case CAIRO_FILTER_BILINEAR:
+	case CAIRO_FILTER_GAUSSIAN:
+	default:
+	    return flags & CAIRO_XCB_RENDER_HAS_FILTERS;
 	}
-
-	if (! (filter == CAIRO_FILTER_NEAREST || filter == CAIRO_FILTER_FAST)) {
-	    if ((flags & CAIRO_XCB_RENDER_HAS_FILTERS) == 0)
-		return FALSE;
-	}
+    } else if (pattern->type == CAIRO_PATTERN_TYPE_MESH) {
+	return FALSE;
     } else { /* gradient */
 	if ((flags & CAIRO_XCB_RENDER_HAS_GRADIENTS) == 0)
 	    return FALSE;
@@ -436,9 +434,8 @@ _pattern_is_supported (uint32_t flags,
 	{
 	    return FALSE;
 	}
+	return TRUE;
     }
-
-    return pattern->type != CAIRO_PATTERN_TYPE_MESH;
 }
 
 static void
@@ -1034,9 +1031,7 @@ _cairo_xcb_surface_setup_surface_picture(cairo_xcb_picture_t *picture,
 
     filter = pattern->base.filter;
     if (filter != CAIRO_FILTER_NEAREST &&
-	_cairo_matrix_has_unity_scale (&pattern->base.matrix) &&
-	_cairo_fixed_is_integer (_cairo_fixed_from_double (pattern->base.matrix.x0)) &&
-	_cairo_fixed_is_integer (_cairo_fixed_from_double (pattern->base.matrix.y0)))
+        _cairo_matrix_is_pixel_exact (&pattern->base.matrix))
     {
 	filter = CAIRO_FILTER_NEAREST;
     }
@@ -1102,11 +1097,11 @@ record_to_picture (cairo_surface_t *target,
 	return _cairo_xcb_transparent_picture ((cairo_xcb_surface_t *) target);
 
     /* Now draw the recording surface to an xcb surface */
-    tmp = _cairo_surface_create_similar_solid (target,
-					       source->content,
-					       limit.width,
-					       limit.height,
-					       CAIRO_COLOR_TRANSPARENT);
+    tmp = _cairo_surface_create_scratch (target,
+                                         source->content,
+                                         limit.width,
+                                         limit.height,
+                                         CAIRO_COLOR_TRANSPARENT);
     if (tmp->status != CAIRO_STATUS_SUCCESS) {
 	return (cairo_xcb_picture_t *) tmp;
     }
@@ -1155,7 +1150,7 @@ _cairo_xcb_surface_picture (cairo_xcb_surface_t *target,
 
     if (source->type == CAIRO_SURFACE_TYPE_XCB)
     {
-	if (source->backend->type == CAIRO_SURFACE_TYPE_XCB) {
+	if (_cairo_surface_is_xcb(source)) {
 	    cairo_xcb_surface_t *xcb = (cairo_xcb_surface_t *) source;
 	    if (xcb->screen == target->screen && xcb->fallback == NULL) {
 		picture = _copy_to_picture ((cairo_xcb_surface_t *) source);
@@ -1351,7 +1346,7 @@ _render_fill_boxes (void			*abstract_dst,
 		    cairo_boxes_t		*boxes)
 {
     cairo_xcb_surface_t *dst = abstract_dst;
-    xcb_rectangle_t stack_xrects[CAIRO_STACK_ARRAY_LENGTH (sizeof (xcb_rectangle_t))];
+    xcb_rectangle_t stack_xrects[CAIRO_STACK_ARRAY_LENGTH (xcb_rectangle_t)];
     xcb_rectangle_t *xrects = stack_xrects;
     xcb_render_color_t render_color;
     int render_op = _render_operator (op);
@@ -1694,11 +1689,11 @@ get_clip_surface (const cairo_clip_t *clip,
     cairo_surface_t *surface;
     cairo_status_t status;
 
-    surface = _cairo_surface_create_similar_solid (&target->base,
-						   CAIRO_CONTENT_ALPHA,
-						   clip->extents.width,
-						   clip->extents.height,
-						   CAIRO_COLOR_WHITE);
+    surface = _cairo_surface_create_scratch (&target->base,
+					    CAIRO_CONTENT_ALPHA,
+					    clip->extents.width,
+					    clip->extents.height,
+					    CAIRO_COLOR_WHITE);
     if (unlikely (surface->status))
 	return (cairo_xcb_surface_t *) surface;
 
@@ -4472,6 +4467,9 @@ _cairo_xcb_surface_add_glyph (cairo_xcb_connection_t *connection,
 	    const uint8_t *d;
 	    uint8_t *new, *n;
 
+	    if (c == 0)
+		break;
+
 	    new = malloc (c);
 	    if (unlikely (new == NULL)) {
 		status = _cairo_error (CAIRO_STATUS_NO_MEMORY);
@@ -4499,6 +4497,9 @@ _cairo_xcb_surface_add_glyph (cairo_xcb_connection_t *connection,
 	    unsigned int c = glyph_surface->stride * glyph_surface->height / 4;
 	    const uint32_t *d;
 	    uint32_t *new, *n;
+
+	    if (c == 0)
+		break;
 
 	    new = malloc (4 * c);
 	    if (unlikely (new == NULL)) {

@@ -307,10 +307,11 @@ __clip_to_surface (const cairo_traps_compositor_t *compositor,
     if (unlikely (status))
 	return status;
 
-    mask = _cairo_surface_create_similar_scratch (composite->surface,
-						  CAIRO_CONTENT_ALPHA,
-						  extents->width,
-						  extents->height);
+    mask = _cairo_surface_create_scratch (composite->surface,
+					  CAIRO_CONTENT_ALPHA,
+					  extents->width,
+					  extents->height,
+					  NULL);
     if (unlikely (mask->status)) {
 	_cairo_traps_fini (&traps);
 	return status;
@@ -371,11 +372,11 @@ traps_get_clip_surface (const cairo_traps_compositor_t *compositor,
 
     status = __clip_to_surface (compositor, composite, extents, &surface);
     if (status == CAIRO_INT_STATUS_UNSUPPORTED) {
-	surface = _cairo_surface_create_similar_solid (composite->surface,
-						       CAIRO_CONTENT_ALPHA,
-						       extents->width,
-						       extents->height,
-						       CAIRO_COLOR_WHITE);
+	surface = _cairo_surface_create_scratch (composite->surface,
+						 CAIRO_CONTENT_ALPHA,
+						 extents->width,
+						 extents->height,
+						 CAIRO_COLOR_WHITE);
 	if (unlikely (surface->status))
 	    return surface;
 
@@ -430,9 +431,10 @@ create_composite_mask (const cairo_traps_compositor_t *compositor,
 
     TRACE ((stderr, "%s\n", __FUNCTION__));
 
-    surface = _cairo_surface_create_similar_scratch (dst, CAIRO_CONTENT_ALPHA,
-						     extents->bounded.width,
-						     extents->bounded.height);
+    surface = _cairo_surface_create_scratch (dst, CAIRO_CONTENT_ALPHA,
+					     extents->bounded.width,
+					     extents->bounded.height,
+					     NULL);
     if (unlikely (surface->status))
 	return surface;
 
@@ -590,9 +592,10 @@ clip_and_composite_combine (const cairo_traps_compositor_t *compositor,
 
     TRACE ((stderr, "%s\n", __FUNCTION__));
 
-    tmp = _cairo_surface_create_similar_scratch (dst, dst->content,
-						 extents->bounded.width,
-						 extents->bounded.height);
+    tmp = _cairo_surface_create_scratch (dst, dst->content,
+					 extents->bounded.width,
+					 extents->bounded.height,
+					 NULL);
     if (unlikely (tmp->status))
 	return tmp->status;
 
@@ -1206,7 +1209,9 @@ composite_aligned_boxes (const cairo_traps_compositor_t *compositor,
 					   &extents->source_sample_area))
     {
 	cairo_clip_t *recording_clip;
-	cairo_pattern_t *source = &extents->source_pattern.base;
+	const cairo_pattern_t *source = &extents->source_pattern.base;
+	const cairo_matrix_t *m;
+	cairo_matrix_t matrix;
 
 	/* XXX could also do tiling repeat modes... */
 
@@ -1225,10 +1230,17 @@ composite_aligned_boxes (const cairo_traps_compositor_t *compositor,
 		return status;
 	}
 
+	m = &source->matrix;
+	if (_cairo_surface_has_device_transform (dst)) {
+	    cairo_matrix_multiply (&matrix,
+				   &source->matrix,
+				   &dst->device_transform);
+	    m = &matrix;
+	}
+
 	recording_clip = _cairo_clip_from_boxes (boxes);
 	status = _cairo_recording_surface_replay_with_clip (recording_pattern_get_surface (source),
-							    &source->matrix,
-							    dst, recording_clip);
+							    m, dst, recording_clip);
 	_cairo_clip_destroy (recording_clip);
 
 	return status;
