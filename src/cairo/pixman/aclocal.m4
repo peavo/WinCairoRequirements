@@ -1,6 +1,6 @@
-# generated automatically by aclocal 1.13.2 -*- Autoconf -*-
+# generated automatically by aclocal 1.15 -*- Autoconf -*-
 
-# Copyright (C) 1996-2013 Free Software Foundation, Inc.
+# Copyright (C) 1996-2014 Free Software Foundation, Inc.
 
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -14,8 +14,8 @@
 m4_ifndef([AC_CONFIG_MACRO_DIRS], [m4_defun([_AM_CONFIG_MACRO_DIRS], [])m4_defun([AC_CONFIG_MACRO_DIRS], [_AM_CONFIG_MACRO_DIRS($@)])])
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
-m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.68],,
-[m4_warning([this file was generated for autoconf 2.68.
+m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.69],,
+[m4_warning([this file was generated for autoconf 2.69.
 You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically 'autoreconf'.])])
@@ -1326,7 +1326,7 @@ ia64-*-hpux*)
   rm -rf conftest*
   ;;
 
-x86_64-*kfreebsd*-gnu|x86_64-*linux*|ppc*-*linux*|powerpc*-*linux*| \
+x86_64-*kfreebsd*-gnu|x86_64-*linux*|powerpc*-*linux*| \
 s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
   # Find out which ABI we are using.
   echo 'int i;' > conftest.$ac_ext
@@ -1340,7 +1340,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_i386"
 	    ;;
-	  ppc64-*linux*|powerpc64-*linux*)
+	  powerpc64le-*linux*)
+	    LD="${LD-ld} -m elf32lppclinux"
+	    ;;
+	  powerpc64-*linux*)
 	    LD="${LD-ld} -m elf32ppclinux"
 	    ;;
 	  s390x-*linux*)
@@ -1359,7 +1362,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  ppc*-*linux*|powerpc*-*linux*)
+	  powerpcle-*linux*)
+	    LD="${LD-ld} -m elf64lppc"
+	    ;;
+	  powerpc-*linux*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)
@@ -8639,7 +8645,8 @@ m4_ifndef([_LT_PROG_CXX],		[AC_DEFUN([_LT_PROG_CXX])])
 # ----------------------------------
 AC_DEFUN([PKG_PROG_PKG_CONFIG],
 [m4_pattern_forbid([^_?PKG_[A-Z_]+$])
-m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
+m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
+m4_pattern_allow([^PKG_CONFIG_(DISABLE_UNINSTALLED|TOP_BUILD_DIR|DEBUG_SPEW)$])
 AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
 AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
 AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
@@ -8685,7 +8692,8 @@ m4_define([_PKG_CONFIG],
     pkg_cv_[]$1="$$1"
  elif test -n "$PKG_CONFIG"; then
     PKG_CHECK_EXISTS([$3],
-                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
+                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ],
 		     [pkg_failed=yes])
  else
     pkg_failed=untried
@@ -8733,9 +8741,9 @@ if test $pkg_failed = yes; then
    	AC_MSG_RESULT([no])
         _PKG_SHORT_ERRORS_SUPPORTED
         if test $_pkg_short_errors_supported = yes; then
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$2" 2>&1`
+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "$2" 2>&1`
         else 
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors "$2" 2>&1`
+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "$2" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
@@ -8748,7 +8756,7 @@ $$1_PKG_ERRORS
 Consider adjusting the PKG_CONFIG_PATH environment variable if you
 installed software in a non-standard prefix.
 
-_PKG_TEXT])
+_PKG_TEXT])[]dnl
         ])
 elif test $pkg_failed = untried; then
      	AC_MSG_RESULT([no])
@@ -8759,7 +8767,7 @@ path to pkg-config.
 
 _PKG_TEXT
 
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.])
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.])[]dnl
         ])
 else
 	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
@@ -8769,7 +8777,62 @@ else
 fi[]dnl
 ])# PKG_CHECK_MODULES
 
-# Copyright (C) 2002-2013 Free Software Foundation, Inc.
+
+# PKG_INSTALLDIR(DIRECTORY)
+# -------------------------
+# Substitutes the variable pkgconfigdir as the location where a module
+# should install pkg-config .pc files. By default the directory is
+# $libdir/pkgconfig, but the default can be changed by passing
+# DIRECTORY. The user can override through the --with-pkgconfigdir
+# parameter.
+AC_DEFUN([PKG_INSTALLDIR],
+[m4_pushdef([pkg_default], [m4_default([$1], ['${libdir}/pkgconfig'])])
+m4_pushdef([pkg_description],
+    [pkg-config installation directory @<:@]pkg_default[@:>@])
+AC_ARG_WITH([pkgconfigdir],
+    [AS_HELP_STRING([--with-pkgconfigdir], pkg_description)],,
+    [with_pkgconfigdir=]pkg_default)
+AC_SUBST([pkgconfigdir], [$with_pkgconfigdir])
+m4_popdef([pkg_default])
+m4_popdef([pkg_description])
+]) dnl PKG_INSTALLDIR
+
+
+# PKG_NOARCH_INSTALLDIR(DIRECTORY)
+# -------------------------
+# Substitutes the variable noarch_pkgconfigdir as the location where a
+# module should install arch-independent pkg-config .pc files. By
+# default the directory is $datadir/pkgconfig, but the default can be
+# changed by passing DIRECTORY. The user can override through the
+# --with-noarch-pkgconfigdir parameter.
+AC_DEFUN([PKG_NOARCH_INSTALLDIR],
+[m4_pushdef([pkg_default], [m4_default([$1], ['${datadir}/pkgconfig'])])
+m4_pushdef([pkg_description],
+    [pkg-config arch-independent installation directory @<:@]pkg_default[@:>@])
+AC_ARG_WITH([noarch-pkgconfigdir],
+    [AS_HELP_STRING([--with-noarch-pkgconfigdir], pkg_description)],,
+    [with_noarch_pkgconfigdir=]pkg_default)
+AC_SUBST([noarch_pkgconfigdir], [$with_noarch_pkgconfigdir])
+m4_popdef([pkg_default])
+m4_popdef([pkg_description])
+]) dnl PKG_NOARCH_INSTALLDIR
+
+
+# PKG_CHECK_VAR(VARIABLE, MODULE, CONFIG-VARIABLE,
+# [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -------------------------------------------
+# Retrieves the value of the pkg-config variable for the given module.
+AC_DEFUN([PKG_CHECK_VAR],
+[AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
+AC_ARG_VAR([$1], [value of $3 for $2, overriding pkg-config])dnl
+
+_PKG_CONFIG([$1], [variable="][$3]["], [$2])
+AS_VAR_COPY([$1], [pkg_cv_][$1])
+
+AS_VAR_IF([$1], [""], [$5], [$4])dnl
+])# PKG_CHECK_VAR
+
+# Copyright (C) 2002-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -8781,10 +8844,10 @@ fi[]dnl
 # generated from the m4 files accompanying Automake X.Y.
 # (This private macro should not be called outside this file.)
 AC_DEFUN([AM_AUTOMAKE_VERSION],
-[am__api_version='1.13'
+[am__api_version='1.15'
 dnl Some users find AM_AUTOMAKE_VERSION and mistake it for a way to
 dnl require some minimum version.  Point them to the right macro.
-m4_if([$1], [1.13.2], [],
+m4_if([$1], [1.15], [],
       [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
 ])
 
@@ -8800,14 +8863,14 @@ m4_define([_AM_AUTOCONF_VERSION], [])
 # Call AM_AUTOMAKE_VERSION and AM_AUTOMAKE_VERSION so they can be traced.
 # This function is AC_REQUIREd by AM_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-[AM_AUTOMAKE_VERSION([1.13.2])dnl
+[AM_AUTOMAKE_VERSION([1.15])dnl
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
 _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
 
 # Figure out how to run the assembler.                      -*- Autoconf -*-
 
-# Copyright (C) 2001-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -8827,7 +8890,7 @@ _AM_IF_OPTION([no-dependencies],, [_AM_DEPENDENCIES([CCAS])])dnl
 
 # AM_AUX_DIR_EXPAND                                         -*- Autoconf -*-
 
-# Copyright (C) 2001-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -8872,15 +8935,14 @@ _AM_IF_OPTION([no-dependencies],, [_AM_DEPENDENCIES([CCAS])])dnl
 # configured tree to be moved without reconfiguration.
 
 AC_DEFUN([AM_AUX_DIR_EXPAND],
-[dnl Rely on autoconf to set up CDPATH properly.
-AC_PREREQ([2.50])dnl
-# expand $ac_aux_dir to an absolute path
-am_aux_dir=`cd $ac_aux_dir && pwd`
+[AC_REQUIRE([AC_CONFIG_AUX_DIR_DEFAULT])dnl
+# Expand $ac_aux_dir to an absolute path.
+am_aux_dir=`cd "$ac_aux_dir" && pwd`
 ])
 
 # AM_CONDITIONAL                                            -*- Autoconf -*-
 
-# Copyright (C) 1997-2013 Free Software Foundation, Inc.
+# Copyright (C) 1997-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -8911,7 +8973,7 @@ AC_CONFIG_COMMANDS_PRE(
 Usually this means the macro was only invoked conditionally.]])
 fi])])
 
-# Copyright (C) 1999-2013 Free Software Foundation, Inc.
+# Copyright (C) 1999-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9102,7 +9164,7 @@ _AM_SUBST_NOTMAKE([am__nodep])dnl
 
 # Generate code to set up dependency tracking.              -*- Autoconf -*-
 
-# Copyright (C) 1999-2013 Free Software Foundation, Inc.
+# Copyright (C) 1999-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9178,7 +9240,7 @@ AC_DEFUN([AM_OUTPUT_DEPENDENCY_COMMANDS],
 
 # Do all the work for Automake.                             -*- Autoconf -*-
 
-# Copyright (C) 1996-2013 Free Software Foundation, Inc.
+# Copyright (C) 1996-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9186,6 +9248,12 @@ AC_DEFUN([AM_OUTPUT_DEPENDENCY_COMMANDS],
 
 # This macro actually does too much.  Some checks are only needed if
 # your package does certain things.  But this isn't really a big deal.
+
+dnl Redefine AC_PROG_CC to automatically invoke _AM_PROG_CC_C_O.
+m4_define([AC_PROG_CC],
+m4_defn([AC_PROG_CC])
+[_AM_PROG_CC_C_O
+])
 
 # AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])
 # AM_INIT_AUTOMAKE([OPTIONS])
@@ -9262,8 +9330,8 @@ AC_REQUIRE([AC_PROG_MKDIR_P])dnl
 # <http://lists.gnu.org/archive/html/automake/2012-07/msg00001.html>
 # <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
 AC_SUBST([mkdir_p], ['$(MKDIR_P)'])
-# We need awk for the "check" target.  The system "awk" is bad on
-# some platforms.
+# We need awk for the "check" target (and possibly the TAP driver).  The
+# system "awk" is bad on some platforms.
 AC_REQUIRE([AC_PROG_AWK])dnl
 AC_REQUIRE([AC_PROG_MAKE_SET])dnl
 AC_REQUIRE([AM_SET_LEADING_DOT])dnl
@@ -9295,6 +9363,51 @@ dnl macro is hooked onto _AC_COMPILER_EXEEXT early, see below.
 AC_CONFIG_COMMANDS_PRE(dnl
 [m4_provide_if([_AM_COMPILER_EXEEXT],
   [AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])])])dnl
+
+# POSIX will say in a future version that running "rm -f" with no argument
+# is OK; and we want to be able to make that assumption in our Makefile
+# recipes.  So use an aggressive probe to check that the usage we want is
+# actually supported "in the wild" to an acceptable degree.
+# See automake bug#10828.
+# To make any issue more visible, cause the running configure to be aborted
+# by default if the 'rm' program in use doesn't match our expectations; the
+# user can still override this though.
+if rm -f && rm -fr && rm -rf; then : OK; else
+  cat >&2 <<'END'
+Oops!
+
+Your 'rm' program seems unable to run without file operands specified
+on the command line, even when the '-f' option is present.  This is contrary
+to the behaviour of most rm programs out there, and not conforming with
+the upcoming POSIX standard: <http://austingroupbugs.net/view.php?id=542>
+
+Please tell bug-automake@gnu.org about your system, including the value
+of your $PATH and any error possibly output before this message.  This
+can help us improve future automake versions.
+
+END
+  if test x"$ACCEPT_INFERIOR_RM_PROGRAM" = x"yes"; then
+    echo 'Configuration will proceed anyway, since you have set the' >&2
+    echo 'ACCEPT_INFERIOR_RM_PROGRAM variable to "yes"' >&2
+    echo >&2
+  else
+    cat >&2 <<'END'
+Aborting the configuration process, to ensure you take notice of the issue.
+
+You can download and install GNU coreutils to get an 'rm' implementation
+that behaves properly: <http://www.gnu.org/software/coreutils/>.
+
+If you want to complete the configuration process using your problematic
+'rm' anyway, export the environment variable ACCEPT_INFERIOR_RM_PROGRAM
+to "yes", and re-run configure.
+
+END
+    AC_MSG_ERROR([Your 'rm' program is bad, sorry.])
+  fi
+fi
+dnl The trailing newline in this macro's definition is deliberate, for
+dnl backward compatibility and to allow trailing 'dnl'-style comments
+dnl after the AM_INIT_AUTOMAKE invocation. See automake bug#16841.
 ])
 
 dnl Hook into '_AC_COMPILER_EXEEXT' early to learn its expansion.  Do not
@@ -9302,7 +9415,6 @@ dnl add the conditional right here, as _AC_COMPILER_EXEEXT may be further
 dnl mangled by Autoconf and run in a shell conditional statement.
 m4_define([_AC_COMPILER_EXEEXT],
 m4_defn([_AC_COMPILER_EXEEXT])[m4_provide([_AM_COMPILER_EXEEXT])])
-
 
 # When config.status generates a header, we must update the stamp-h file.
 # This file resides in the same directory as the config header
@@ -9325,7 +9437,7 @@ for _am_header in $config_headers :; do
 done
 echo "timestamp for $_am_arg" >`AS_DIRNAME(["$_am_arg"])`/stamp-h[]$_am_stamp_count])
 
-# Copyright (C) 2001-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9336,7 +9448,7 @@ echo "timestamp for $_am_arg" >`AS_DIRNAME(["$_am_arg"])`/stamp-h[]$_am_stamp_co
 # Define $install_sh.
 AC_DEFUN([AM_PROG_INSTALL_SH],
 [AC_REQUIRE([AM_AUX_DIR_EXPAND])dnl
-if test x"${install_sh}" != xset; then
+if test x"${install_sh+set}" != xset; then
   case $am_aux_dir in
   *\ * | *\	*)
     install_sh="\${SHELL} '$am_aux_dir/install-sh'" ;;
@@ -9346,7 +9458,7 @@ if test x"${install_sh}" != xset; then
 fi
 AC_SUBST([install_sh])])
 
-# Copyright (C) 2003-2013 Free Software Foundation, Inc.
+# Copyright (C) 2003-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9367,7 +9479,7 @@ AC_SUBST([am__leading_dot])])
 
 # Check to see how 'make' treats includes.	            -*- Autoconf -*-
 
-# Copyright (C) 2001-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9417,7 +9529,7 @@ rm -f confinc confmf
 
 # Fake the existence of programs that GNU maintainers use.  -*- Autoconf -*-
 
-# Copyright (C) 1997-2013 Free Software Foundation, Inc.
+# Copyright (C) 1997-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9456,7 +9568,7 @@ fi
 
 # Helper functions for option handling.                     -*- Autoconf -*-
 
-# Copyright (C) 2001-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9485,9 +9597,73 @@ AC_DEFUN([_AM_SET_OPTIONS],
 AC_DEFUN([_AM_IF_OPTION],
 [m4_ifset(_AM_MANGLE_OPTION([$1]), [$2], [$3])])
 
+# Copyright (C) 1999-2014 Free Software Foundation, Inc.
+#
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# _AM_PROG_CC_C_O
+# ---------------
+# Like AC_PROG_CC_C_O, but changed for automake.  We rewrite AC_PROG_CC
+# to automatically call this.
+AC_DEFUN([_AM_PROG_CC_C_O],
+[AC_REQUIRE([AM_AUX_DIR_EXPAND])dnl
+AC_REQUIRE_AUX_FILE([compile])dnl
+AC_LANG_PUSH([C])dnl
+AC_CACHE_CHECK(
+  [whether $CC understands -c and -o together],
+  [am_cv_prog_cc_c_o],
+  [AC_LANG_CONFTEST([AC_LANG_PROGRAM([])])
+  # Make sure it works both with $CC and with simple cc.
+  # Following AC_PROG_CC_C_O, we do the test twice because some
+  # compilers refuse to overwrite an existing .o file with -o,
+  # though they will create one.
+  am_cv_prog_cc_c_o=yes
+  for am_i in 1 2; do
+    if AM_RUN_LOG([$CC -c conftest.$ac_ext -o conftest2.$ac_objext]) \
+         && test -f conftest2.$ac_objext; then
+      : OK
+    else
+      am_cv_prog_cc_c_o=no
+      break
+    fi
+  done
+  rm -f core conftest*
+  unset am_i])
+if test "$am_cv_prog_cc_c_o" != yes; then
+   # Losing compiler, so override with the script.
+   # FIXME: It is wrong to rewrite CC.
+   # But if we don't then we get into trouble of one sort or another.
+   # A longer-term fix would be to have automake use am__CC in this case,
+   # and then we could set am__CC="\$(top_srcdir)/compile \$(CC)"
+   CC="$am_aux_dir/compile $CC"
+fi
+AC_LANG_POP([C])])
+
+# For backward compatibility.
+AC_DEFUN_ONCE([AM_PROG_CC_C_O], [AC_REQUIRE([AC_PROG_CC])])
+
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
+#
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# AM_RUN_LOG(COMMAND)
+# -------------------
+# Run COMMAND, save the exit status in ac_status, and log it.
+# (This has been adapted from Autoconf's _AC_RUN_LOG macro.)
+AC_DEFUN([AM_RUN_LOG],
+[{ echo "$as_me:$LINENO: $1" >&AS_MESSAGE_LOG_FD
+   ($1) >&AS_MESSAGE_LOG_FD 2>&AS_MESSAGE_LOG_FD
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
+   (exit $ac_status); }])
+
 # Check to make sure that the build environment is sane.    -*- Autoconf -*-
 
-# Copyright (C) 1996-2013 Free Software Foundation, Inc.
+# Copyright (C) 1996-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9568,7 +9744,7 @@ AC_CONFIG_COMMANDS_PRE(
 rm -f conftest.file
 ])
 
-# Copyright (C) 2009-2013 Free Software Foundation, Inc.
+# Copyright (C) 2009-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9628,7 +9804,7 @@ AC_SUBST([AM_BACKSLASH])dnl
 _AM_SUBST_NOTMAKE([AM_BACKSLASH])dnl
 ])
 
-# Copyright (C) 2001-2013 Free Software Foundation, Inc.
+# Copyright (C) 2001-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9656,7 +9832,7 @@ fi
 INSTALL_STRIP_PROGRAM="\$(install_sh) -c -s"
 AC_SUBST([INSTALL_STRIP_PROGRAM])])
 
-# Copyright (C) 2006-2013 Free Software Foundation, Inc.
+# Copyright (C) 2006-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -9675,7 +9851,7 @@ AC_DEFUN([AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE($@)])
 
 # Check how to create a tarball.                            -*- Autoconf -*-
 
-# Copyright (C) 2004-2013 Free Software Foundation, Inc.
+# Copyright (C) 2004-2014 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
