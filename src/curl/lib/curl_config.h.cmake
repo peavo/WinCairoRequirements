@@ -53,7 +53,7 @@
 #endif
 
 /* Use Windows LDAP implementation */
-#cmakedefine CURL_LDAP_WIN 1
+#cmakedefine USE_WIN32_LDAP 1
 
 /* when not building a shared library */
 #cmakedefine CURL_STATICLIB 1
@@ -909,9 +909,6 @@
 /* if OpenSSL is in use */
 #cmakedefine USE_OPENSSL 1
 
-/* if SSL is enabled */
-#cmakedefine USE_SSLEAY 1
-
 /* if Unix domain sockets are enabled  */
 #cmakedefine USE_UNIX_SOCKETS
 
@@ -921,6 +918,9 @@
 
 /* to enable SSPI support */
 #cmakedefine USE_WINDOWS_SSPI 1
+
+/* to enable Windows SSL  */
+#cmakedefine USE_SCHANNEL 1
 
 /* Define to 1 if using yaSSL in OpenSSL compatibility mode. */
 #cmakedefine USE_YASSLEMUL 1

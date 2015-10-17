@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -40,6 +40,7 @@ void config_init(struct OperationConfig* config)
                         ~(CURLPROTO_FILE | CURLPROTO_SCP | CURLPROTO_SMB |
                           CURLPROTO_SMBS);
   config->proto_redir_present = FALSE;
+  config->proto_default = NULL;
 }
 
 static void free_config_fields(struct OperationConfig *config)
@@ -117,6 +118,7 @@ static void free_config_fields(struct OperationConfig *config)
 
   Curl_safefree(config->unix_socket_path);
   Curl_safefree(config->writeout);
+  Curl_safefree(config->proto_default);
 
   curl_slist_free_all(config->quote);
   curl_slist_free_all(config->postquote);
@@ -136,6 +138,8 @@ static void free_config_fields(struct OperationConfig *config)
 
   Curl_safefree(config->socksproxy);
   Curl_safefree(config->socks5_gssapi_service);
+  Curl_safefree(config->proxy_service_name);
+  Curl_safefree(config->service_name);
 
   Curl_safefree(config->ftp_account);
   Curl_safefree(config->ftp_alternative_to_user);

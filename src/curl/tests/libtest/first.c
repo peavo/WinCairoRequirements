@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -31,6 +31,10 @@
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h> /* for setmode() */
+#endif
+
+#ifdef USE_NSS
+#include <nspr.h>
 #endif
 
 #ifdef CURLDEBUG
@@ -111,9 +115,24 @@ static void memory_tracking_init(void)
 #  define memory_tracking_init() Curl_nop_stmt
 #endif
 
+/* returns a hexdump in a static memory area */
+char *hexdump(unsigned char *buffer, size_t len)
+{
+  static char dump[200*3+1];
+  char *p = dump;
+  size_t i;
+  if(len > 200)
+    return NULL;
+  for(i=0; i<len; i++, p += 3)
+    snprintf(p, 4, "%02x ", buffer[i]);
+  return dump;
+}
+
+
 int main(int argc, char **argv)
 {
   char *URL;
+  int result;
 
 #ifdef O_BINARY
 #  ifdef __HIGHC__
@@ -152,5 +171,13 @@ int main(int argc, char **argv)
 
   fprintf(stderr, "URL: %s\n", URL);
 
-  return test(URL);
+  result = test(URL);
+
+#ifdef USE_NSS
+  if(PR_Initialized())
+    /* prevent valgrind from reporting possibly lost memory (fd cache, ...) */
+    PR_Cleanup();
+#endif
+
+  return result;
 }

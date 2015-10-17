@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -41,10 +41,7 @@
 #include "curl_ntlm_wb.h"
 #include "curl_sasl.h"
 #include "url.h"
-#include "curl_memory.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
+#include "curl_printf.h"
 
 #if defined(USE_NSS)
 #include "vtls/nssg.h"
@@ -52,7 +49,8 @@
 #include "curl_sspi.h"
 #endif
 
-/* The last #include file should be: */
+/* The last #include files should be: */
+#include "curl_memory.h"
 #include "memdebug.h"
 
 #if DEBUG_ME
@@ -86,7 +84,11 @@ CURLcode Curl_input_ntlm(struct connectdata *conn,
       ntlm->state = NTLMSTATE_TYPE2; /* We got a type-2 message */
     }
     else {
-      if(ntlm->state == NTLMSTATE_TYPE3) {
+      if(ntlm->state == NTLMSTATE_LAST) {
+        infof(conn->data, "NTLM auth restarted\n");
+        Curl_http_ntlm_cleanup(conn);
+      }
+      else if(ntlm->state == NTLMSTATE_TYPE3) {
         infof(conn->data, "NTLM handshake rejected\n");
         Curl_http_ntlm_cleanup(conn);
         ntlm->state = NTLMSTATE_NONE;
@@ -175,7 +177,7 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
       return result;
 
     if(base64) {
-      Curl_safefree(*allocuserpwd);
+      free(*allocuserpwd);
       *allocuserpwd = aprintf("%sAuthorization: NTLM %s\r\n",
                               proxy ? "Proxy-" : "",
                               base64);
@@ -195,7 +197,7 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
       return result;
 
     if(base64) {
-      Curl_safefree(*allocuserpwd);
+      free(*allocuserpwd);
       *allocuserpwd = aprintf("%sAuthorization: NTLM %s\r\n",
                               proxy ? "Proxy-" : "",
                               base64);
@@ -213,6 +215,9 @@ CURLcode Curl_output_ntlm(struct connectdata *conn, bool proxy)
   case NTLMSTATE_TYPE3:
     /* connection is already authenticated,
      * don't send a header in future requests */
+    ntlm->state = NTLMSTATE_LAST;
+    /* fall-through */
+  case NTLMSTATE_LAST:
     Curl_safefree(*allocuserpwd);
     authp->done = TRUE;
     break;

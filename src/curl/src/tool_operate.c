@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -151,7 +151,7 @@ static curl_off_t vms_realfilesize(const char * name,
   int ret_stat;
   FILE * file;
 
-  file = fopen(name, "r");
+  file = fopen(name, "r"); /* VMS */
   if(file == NULL) {
     return 0;
   }
@@ -320,7 +320,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
     if(!curlx_strequal(config->headerfile, "-")) {
       FILE *newfile = fopen(config->headerfile, "wb");
       if(!newfile) {
-        warnf(config, "Failed to open %s\n", config->headerfile);
+        warnf(config->global, "Failed to open %s\n", config->headerfile);
         result = CURLE_WRITE_ERROR;
         goto quit_curl;
       }
@@ -565,7 +565,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
             Curl_safefree(storefile);
             if(result) {
               /* bad globbing */
-              warnf(config, "bad output glob!\n");
+              warnf(config->global, "bad output glob!\n");
               goto quit_urls;
             }
           }
@@ -710,7 +710,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
            * we should warn him/her.
            */
           if(config->proxyanyauth || (authbits>1)) {
-            warnf(config,
+            warnf(config->global,
                   "Using --anyauth or --proxy-anyauth with upload from stdin"
                   " involves a big risk of it not working. Use a temporary"
                   " file or a fixed auth type instead!\n");
@@ -722,7 +722,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
           set_binmode(stdin);
           if(curlx_strequal(uploadfile, ".")) {
             if(curlx_nonblock((curl_socket_t)infd, TRUE) < 0)
-              warnf(config,
+              warnf(config->global,
                     "fcntl failed on fd=%d: %s\n", infd, strerror(errno));
           }
         }
@@ -935,7 +935,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
             my_setopt(curl, CURLOPT_POSTFIELDSIZE_LARGE,
                       config->postfieldsize);
             break;
-          case HTTPREQ_POST:
+          case HTTPREQ_FORMPOST:
             my_setopt_httppost(curl, CURLOPT_HTTPPOST, config->httppost);
             break;
           default:
@@ -998,10 +998,6 @@ static CURLcode operate_do(struct GlobalConfig *global,
         else
           my_setopt(curl, CURLOPT_RESUME_FROM_LARGE, CURL_OFF_T_C(0));
 
-        my_setopt_str(curl, CURLOPT_SSLCERT, config->cert);
-        my_setopt_str(curl, CURLOPT_SSLCERTTYPE, config->cert_type);
-        my_setopt_str(curl, CURLOPT_SSLKEY, config->key);
-        my_setopt_str(curl, CURLOPT_SSLKEYTYPE, config->key_type);
         my_setopt_str(curl, CURLOPT_KEYPASSWD, config->key_passwd);
 
         if(built_in_protos & (CURLPROTO_SCP|CURLPROTO_SFTP)) {
@@ -1029,6 +1025,11 @@ static CURLcode operate_do(struct GlobalConfig *global,
           my_setopt_str(curl, CURLOPT_PINNEDPUBLICKEY, config->pinnedpubkey);
 
         if(curlinfo->features & CURL_VERSION_SSL) {
+          my_setopt_str(curl, CURLOPT_SSLCERT, config->cert);
+          my_setopt_str(curl, CURLOPT_SSLCERTTYPE, config->cert_type);
+          my_setopt_str(curl, CURLOPT_SSLKEY, config->key);
+          my_setopt_str(curl, CURLOPT_SSLKEYTYPE, config->key_type);
+
           if(config->insecure_ok) {
             my_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
             my_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
@@ -1038,7 +1039,17 @@ static CURLcode operate_do(struct GlobalConfig *global,
             /* libcurl default is strict verifyhost -> 2L   */
             /* my_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L); */
           }
+
+          if(config->verifystatus)
+            my_setopt(curl, CURLOPT_SSL_VERIFYSTATUS, 1L);
+
+          if(config->falsestart)
+            my_setopt(curl, CURLOPT_SSL_FALSESTART, 1L);
+
+          my_setopt_enum(curl, CURLOPT_SSLVERSION, config->ssl_version);
         }
+        if(config->path_as_is)
+          my_setopt(curl, CURLOPT_PATH_AS_IS, 1L);
 
         if(built_in_protos & (CURLPROTO_SCP|CURLPROTO_SFTP)) {
           if(!config->insecure_ok) {
@@ -1088,16 +1099,16 @@ static CURLcode operate_do(struct GlobalConfig *global,
         my_setopt(curl, CURLOPT_COOKIESESSION, config->cookiesession?1L:0L);
 #else
         if(config->cookie || config->cookiefile || config->cookiejar) {
-          warnf(config, "cookie option(s) used even though cookie support "
-                "is disabled!\n");
+          warnf(config->global, "cookie option(s) used even though cookie "
+                "support is disabled!\n");
           return CURLE_NOT_BUILT_IN;
         }
 #endif
 
-        my_setopt_enum(curl, CURLOPT_SSLVERSION, config->ssl_version);
         my_setopt_enum(curl, CURLOPT_TIMECONDITION, (long)config->timecond);
         my_setopt(curl, CURLOPT_TIMEVALUE, (long)config->condtime);
         my_setopt_str(curl, CURLOPT_CUSTOMREQUEST, config->customrequest);
+        customrequest_helper(config, config->httpreq, config->customrequest);
         my_setopt(curl, CURLOPT_STDERR, global->errors);
 
         /* three new ones in libcurl 7.3: */
@@ -1194,21 +1205,26 @@ static CURLcode operate_do(struct GlobalConfig *global,
           my_setopt_enum(curl, CURLOPT_FTP_SSL_CCC,
                          (long)config->ftp_ssl_ccc_mode);
 
-#if defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI)
-        {
-          /* TODO: Make this a run-time check instead of compile-time one. */
+        /* new in curl 7.19.4 */
+        if(config->socks5_gssapi_service)
+          my_setopt_str(curl, CURLOPT_SOCKS5_GSSAPI_SERVICE,
+                        config->socks5_gssapi_service);
 
-          /* new in curl 7.19.4 */
-          if(config->socks5_gssapi_service)
-            my_setopt_str(curl, CURLOPT_SOCKS5_GSSAPI_SERVICE,
-                          config->socks5_gssapi_service);
+        /* new in curl 7.19.4 */
+        if(config->socks5_gssapi_nec)
+          my_setopt_str(curl, CURLOPT_SOCKS5_GSSAPI_NEC,
+                        config->socks5_gssapi_nec);
 
-          /* new in curl 7.19.4 */
-          if(config->socks5_gssapi_nec)
-            my_setopt_str(curl, CURLOPT_SOCKS5_GSSAPI_NEC,
-                          config->socks5_gssapi_nec);
-        }
-#endif
+        /* new in curl 7.43.0 */
+        if(config->proxy_service_name)
+          my_setopt_str(curl, CURLOPT_PROXY_SERVICE_NAME,
+                        config->proxy_service_name);
+
+        /* new in curl 7.43.0 */
+        if(config->service_name)
+          my_setopt_str(curl, CURLOPT_SERVICE_NAME,
+                        config->service_name);
+
         /* curl 7.13.0 */
         my_setopt_str(curl, CURLOPT_FTP_ACCOUNT, config->ftp_account);
 
@@ -1247,8 +1263,8 @@ static CURLcode operate_do(struct GlobalConfig *global,
           my_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
           if(config->alivetime != 0) {
 #if !defined(TCP_KEEPIDLE) || !defined(TCP_KEEPINTVL)
-            warnf(config, "Keep-alive functionality somewhat crippled due to "
-                "missing support in your operating system!\n");
+            warnf(config->global, "Keep-alive functionality somewhat crippled "
+                "due to missing support in your operating system!\n");
 #endif
             my_setopt(curl, CURLOPT_TCP_KEEPIDLE, config->alivetime);
             my_setopt(curl, CURLOPT_TCP_KEEPINTVL, config->alivetime);
@@ -1312,9 +1328,13 @@ static CURLcode operate_do(struct GlobalConfig *global,
           my_setopt_str(curl, CURLOPT_GSSAPI_DELEGATION,
                         config->gssapi_delegation);
 
-        /* new in 7.25.0 */
-        if(config->ssl_allow_beast)
-          my_setopt(curl, CURLOPT_SSL_OPTIONS, (long)CURLSSLOPT_ALLOW_BEAST);
+        /* new in 7.25.0 and 7.44.0 */
+        {
+          long mask = (config->ssl_allow_beast ? CURLSSLOPT_ALLOW_BEAST : 0) |
+                      (config->ssl_no_revoke ? CURLSSLOPT_NO_REVOKE : 0);
+          if(mask)
+            my_setopt_bitmask(curl, CURLOPT_SSL_OPTIONS, mask);
+        }
 
         if(config->mail_auth)
           my_setopt_str(curl, CURLOPT_MAIL_AUTH, config->mail_auth);
@@ -1336,6 +1356,10 @@ static CURLcode operate_do(struct GlobalConfig *global,
           my_setopt_str(curl, CURLOPT_UNIX_SOCKET_PATH,
                         config->unix_socket_path);
 
+        /* new in 7.45.0 */
+        if(config->proto_default)
+          my_setopt_str(curl, CURLOPT_DEFAULT_PROTOCOL, config->proto_default);
+
         /* initialize retry vars for loop below */
         retry_sleep_default = (config->retry_delay) ?
           config->retry_delay*1000L : RETRY_SLEEP_DEFAULT; /* ms */
@@ -1345,9 +1369,10 @@ static CURLcode operate_do(struct GlobalConfig *global,
         retrystart = tvnow();
 
 #ifndef CURL_DISABLE_LIBCURL_OPTION
-        result = easysrc_perform();
-        if(result) {
-          goto show_error;
+        if(global->libcurl) {
+          result = easysrc_perform();
+          if(result)
+            goto show_error;
         }
 #endif
 
@@ -1377,6 +1402,18 @@ static CURLcode operate_do(struct GlobalConfig *global,
           else
 #endif
           result = curl_easy_perform(curl);
+
+          if(!result && !outs.stream && !outs.bytes) {
+            /* we have received no data despite the transfer was successful
+               ==> force cration of an empty output file (if an output file
+               was specified) */
+            long cond_unmet = 0L;
+            /* do not create (or even overwrite) the file in case we get no
+               data because of unmet condition */
+            curl_easy_getinfo(curl, CURLINFO_CONDITION_UNMET, &cond_unmet);
+            if(!cond_unmet && !tool_create_output_file(&outs))
+              result = CURLE_WRITE_ERROR;
+          }
 
           if(outs.is_cd_filename && outs.stream && !global->mute &&
              outs.filename)
@@ -1451,7 +1488,8 @@ static CURLcode operate_do(struct GlobalConfig *global,
               static const char * const m[]={
                 NULL, "timeout", "HTTP error", "FTP error"
               };
-              warnf(config, "Transient problem: %s "
+
+              warnf(config->global, "Transient problem: %s "
                     "Will retry in %ld seconds. "
                     "%ld retries left.\n",
                     m[retry], retry_sleep/1000L, retry_numretries);
@@ -1463,7 +1501,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
                 if(retry_sleep > RETRY_SLEEP_MAX)
                   retry_sleep = RETRY_SLEEP_MAX;
               }
-              if(outs.bytes && outs.filename) {
+              if(outs.bytes && outs.filename && outs.stream) {
                 /* We have written data to a output file, we truncate file
                  */
                 if(!global->mute)
@@ -1594,7 +1632,7 @@ static CURLcode operate_do(struct GlobalConfig *global,
         if(!result && config->xattr && outs.fopened && outs.stream) {
           int rc = fwrite_xattr(curl, fileno(outs.stream));
           if(rc)
-            warnf(config, "Error setting extended attributes: %s\n",
+            warnf(config->global, "Error setting extended attributes: %s\n",
                   strerror(errno));
         }
 
@@ -1818,13 +1856,17 @@ CURLcode operate(struct GlobalConfig *config, int argc, argv_item_t argv[])
       /* Check if we were asked to list the SSL engines */
       else if(res == PARAM_ENGINES_REQUESTED)
         tool_list_engines(config->easy);
+      else if(res == PARAM_LIBCURL_UNSUPPORTED_PROTOCOL)
+        result = CURLE_UNSUPPORTED_PROTOCOL;
       else
         result = CURLE_FAILED_INIT;
     }
     else {
 #ifndef CURL_DISABLE_LIBCURL_OPTION
-      /* Initialise the libcurl source output */
-      result = easysrc_init();
+      if(config->libcurl) {
+        /* Initialise the libcurl source output */
+        result = easysrc_init();
+      }
 #endif
 
       /* Perform the main operations */
@@ -1850,14 +1892,13 @@ CURLcode operate(struct GlobalConfig *config, int argc, argv_item_t argv[])
         }
 
 #ifndef CURL_DISABLE_LIBCURL_OPTION
-        /* Cleanup the libcurl source output */
-        easysrc_cleanup();
+        if(config->libcurl) {
+          /* Cleanup the libcurl source output */
+          easysrc_cleanup();
 
-        /* set current back to first so that isn't NULL */
-        config->current = config->first;
-
-        /* Dump the libcurl code if previously enabled */
-        dumpeasysrc(config);
+          /* Dump the libcurl code if previously enabled */
+          dumpeasysrc(config);
+        }
 #endif
       }
       else

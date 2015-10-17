@@ -923,9 +923,9 @@ USE_POLARSSL
 HAVE_GNUTLS_SRP
 USE_GNUTLS_NETTLE
 USE_GNUTLS
-HAVE_SSLEAY_SRP
+HAVE_OPENSSL_SRP
 RANDOM_FILE
-USE_SSLEAY
+SSL_LIBS
 PKGCONFIG
 USE_DARWINSSL
 USE_WINDOWS_SSPI
@@ -1074,6 +1074,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -1105,6 +1106,7 @@ enable_curldebug
 enable_symbol_hiding
 enable_hidden_symbols
 enable_ares
+enable_rt
 enable_dependency_tracking
 enable_silent_rules
 enable_largefile
@@ -1216,6 +1218,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1468,6 +1471,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1605,7 +1617,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1758,6 +1770,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1816,6 +1829,7 @@ Optional Features:
                           To be deprecated, use --disable-symbol-hiding
   --enable-ares[=PATH]    Enable c-ares for DNS lookups
   --disable-ares          Disable c-ares for DNS lookups
+  --disable-rt            disable dependency on -lrt
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -3257,6 +3271,36 @@ fi
   esac
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: $want_ares" >&5
 $as_echo "$want_ares" >&6; }
+
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to disable dependency on -lrt" >&5
+$as_echo_n "checking whether to disable dependency on -lrt... " >&6; }
+  OPT_RT="default"
+  # Check whether --enable-rt was given.
+if test "${enable_rt+set}" = set; then :
+  enableval=$enable_rt; OPT_RT=$enableval
+fi
+
+  case "$OPT_RT" in
+    no)
+            dontwant_rt="yes"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      ;;
+    default)
+            dontwant_rt="no"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: (assumed no)" >&5
+$as_echo "(assumed no)" >&6; }
+      ;;
+    *)
+            dontwant_rt="no"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      ;;
+  esac
+    if test "$dontwant_rt" = "yes" && test "$want_thres" = "yes" ; then
+    as_fn_error $? "options --disable-rt and --enable-thread-resolver are mutually exclusive, at most one can be selected." "$LINENO" 5
+  fi
 
 
 #
@@ -4858,7 +4902,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-am__api_version='1.14'
+am__api_version='1.15'
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether build environment is sane" >&5
 $as_echo_n "checking whether build environment is sane... " >&6; }
@@ -4937,17 +4981,24 @@ test "$program_suffix" != NONE &&
 ac_script='s/[\\$]/&&/g;s/;s,x,x,$//'
 program_transform_name=`$as_echo "$program_transform_name" | sed "$ac_script"`
 
-test x"${MISSING+set}" = xset || MISSING="\${SHELL} \"$am_aux_dir/missing\""
+if test x"${MISSING+set}" != xset; then
+  case $am_aux_dir in
+  *\ * | *\	*)
+    MISSING="\${SHELL} \"$am_aux_dir/missing\"" ;;
+  *)
+    MISSING="\${SHELL} $am_aux_dir/missing" ;;
+  esac
+fi
 # Use eval to expand $SHELL
-if eval "$MISSING --run true"; then
-  am_missing_run="$MISSING --run "
+if eval "$MISSING --is-lightweight"; then
+  am_missing_run="$MISSING "
 else
   am_missing_run=
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \`missing' script is too old or missing" >&5
-$as_echo "$as_me: WARNING: \`missing' script is too old or missing" >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: 'missing' script is too old or missing" >&5
+$as_echo "$as_me: WARNING: 'missing' script is too old or missing" >&2;}
 fi
 
-if test x"${install_sh}" != xset; then
+if test x"${install_sh+set}" != xset; then
   case $am_aux_dir in
   *\ * | *\	*)
     install_sh="\${SHELL} '$am_aux_dir/install-sh'" ;;
@@ -5342,8 +5393,8 @@ MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 # <http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
 mkdir_p='$(MKDIR_P)'
 
-# We need awk for the "check" target.  The system "awk" is bad on
-# some platforms.
+# We need awk for the "check" target (and possibly the TAP driver).  The
+# system "awk" is bad on some platforms.
 # Always define AMTAR for backward compatibility.  Yes, it's still used
 # in the wild :-(  We should find a proper way to deprecate it ...
 AMTAR='$${TAR-tar}'
@@ -19929,7 +19980,9 @@ done
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for monotonic clock_gettime" >&5
 $as_echo_n "checking for monotonic clock_gettime... " >&6; }
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  #
+  if test "x$dontwant_rt" == "xno" ; then
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 
@@ -19950,8 +20003,8 @@ $as_echo_n "checking for monotonic clock_gettime... " >&6; }
 int main (void)
 {
 
-      struct timespec ts;
-      (void)clock_gettime(CLOCK_MONOTONIC, &ts);
+        struct timespec ts;
+        (void)clock_gettime(CLOCK_MONOTONIC, &ts);
 
  ;
  return 0;
@@ -19960,18 +20013,19 @@ int main (void)
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-    ac_cv_func_clock_gettime="yes"
+      ac_cv_func_clock_gettime="yes"
 
 else
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-    ac_cv_func_clock_gettime="no"
+      ac_cv_func_clock_gettime="no"
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  fi
 
 
     #
@@ -20921,7 +20975,7 @@ done
   if test "$LDAPLIBNAME" = "wldap32"; then
     curl_ldap_msg="enabled (winldap)"
 
-$as_echo "#define CURL_LDAP_WIN 1" >>confdefs.h
+$as_echo "#define USE_WIN32_LDAP 1" >>confdefs.h
 
   else
     curl_ldap_msg="enabled (OpenLDAP)"
@@ -21117,6 +21171,8 @@ if test "${with_gssapi+set}" = set; then :
 fi
 
 
+: ${KRB5CONFIG:="$GSSAPI_ROOT/bin/krb5-config"}
+
 save_CPPFLAGS="$CPPFLAGS"
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if GSS-API support is requested" >&5
 $as_echo_n "checking if GSS-API support is requested... " >&6; }
@@ -21127,8 +21183,8 @@ $as_echo "yes" >&6; }
   if test -z "$GSSAPI_INCS"; then
      if test -n "$host_alias" -a -f "$GSSAPI_ROOT/bin/$host_alias-krb5-config"; then
         GSSAPI_INCS=`$GSSAPI_ROOT/bin/$host_alias-krb5-config --cflags gssapi`
-     elif test -f "$GSSAPI_ROOT/bin/krb5-config"; then
-        GSSAPI_INCS=`$GSSAPI_ROOT/bin/krb5-config --cflags gssapi`
+     elif test -f "$KRB5CONFIG"; then
+        GSSAPI_INCS=`$KRB5CONFIG --cflags gssapi`
      elif test "$GSSAPI_ROOT" != "yes"; then
         GSSAPI_INCS="-I$GSSAPI_ROOT/include"
      fi
@@ -21272,8 +21328,8 @@ $as_echo "#define HAVE_GSSAPI 1" >>confdefs.h
         if test -n "$host_alias" -a -f "$GSSAPI_ROOT/bin/$host_alias-krb5-config"; then
                                  gss_libs=`$GSSAPI_ROOT/bin/$host_alias-krb5-config --libs gssapi`
            LIBS="$gss_libs $LIBS"
-        elif test -f "$GSSAPI_ROOT/bin/krb5-config"; then
-                                 gss_libs=`$GSSAPI_ROOT/bin/krb5-config --libs gssapi`
+        elif test -f "$KRB5CONFIG"; then
+                                 gss_libs=`$KRB5CONFIG --libs gssapi`
            LIBS="$gss_libs $LIBS"
         else
            case $host in
@@ -21579,6 +21635,7 @@ $as_echo "found" >&6; }
     fi
          $PKGCONFIG --cflags-only-I openssl 2>/dev/null`
 
+
       { $as_echo "$as_me:${as_lineno-$LINENO}: pkg-config: SSL_LIBS: \"$SSL_LIBS\"" >&5
 $as_echo "$as_me: pkg-config: SSL_LIBS: \"$SSL_LIBS\"" >&6;}
       { $as_echo "$as_me:${as_lineno-$LINENO}: pkg-config: SSL_LDFLAGS: \"$SSL_LDFLAGS\"" >&5
@@ -21626,9 +21683,9 @@ rm -f core conftest.err conftest.$ac_objext \
       ;;
   esac
 
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CRYPTO_lock in -lcrypto" >&5
-$as_echo_n "checking for CRYPTO_lock in -lcrypto... " >&6; }
-if ${ac_cv_lib_crypto_CRYPTO_lock+:} false; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for HMAC_Update in -lcrypto" >&5
+$as_echo_n "checking for HMAC_Update in -lcrypto... " >&6; }
+if ${ac_cv_lib_crypto_HMAC_Update+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -21640,26 +21697,26 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char CRYPTO_lock ();
+char HMAC_Update ();
 int main (void)
 {
-return CRYPTO_lock ();
+return HMAC_Update ();
  ;
  return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_crypto_CRYPTO_lock=yes
+  ac_cv_lib_crypto_HMAC_Update=yes
 else
-  ac_cv_lib_crypto_CRYPTO_lock=no
+  ac_cv_lib_crypto_HMAC_Update=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_CRYPTO_lock" >&5
-$as_echo "$ac_cv_lib_crypto_CRYPTO_lock" >&6; }
-if test "x$ac_cv_lib_crypto_CRYPTO_lock" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_HMAC_Update" >&5
+$as_echo "$ac_cv_lib_crypto_HMAC_Update" >&6; }
+if test "x$ac_cv_lib_crypto_HMAC_Update" = xyes; then :
 
      HAVECRYPTO="yes"
      LIBS="-lcrypto $LIBS"
@@ -21668,9 +21725,9 @@ else
 
      LDFLAGS="$CLEANLDFLAGS -L$LIB_OPENSSL"
      CPPFLAGS="$CLEANCPPFLAGS -I$PREFIX_OPENSSL/include/openssl -I$PREFIX_OPENSSL/include"
-     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CRYPTO_add_lock in -lcrypto" >&5
-$as_echo_n "checking for CRYPTO_add_lock in -lcrypto... " >&6; }
-if ${ac_cv_lib_crypto_CRYPTO_add_lock+:} false; then :
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for HMAC_Init_ex in -lcrypto" >&5
+$as_echo_n "checking for HMAC_Init_ex in -lcrypto... " >&6; }
+if ${ac_cv_lib_crypto_HMAC_Init_ex+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -21682,26 +21739,26 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char CRYPTO_add_lock ();
+char HMAC_Init_ex ();
 int main (void)
 {
-return CRYPTO_add_lock ();
+return HMAC_Init_ex ();
  ;
  return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_crypto_CRYPTO_add_lock=yes
+  ac_cv_lib_crypto_HMAC_Init_ex=yes
 else
-  ac_cv_lib_crypto_CRYPTO_add_lock=no
+  ac_cv_lib_crypto_HMAC_Init_ex=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_CRYPTO_add_lock" >&5
-$as_echo "$ac_cv_lib_crypto_CRYPTO_add_lock" >&6; }
-if test "x$ac_cv_lib_crypto_CRYPTO_add_lock" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_HMAC_Init_ex" >&5
+$as_echo "$ac_cv_lib_crypto_HMAC_Init_ex" >&6; }
+if test "x$ac_cv_lib_crypto_HMAC_Init_ex" = xyes; then :
 
        HAVECRYPTO="yes"
        LIBS="-lcrypto $LIBS"
@@ -21717,6 +21774,76 @@ fi
 fi
 
 
+
+  if test X"$HAVECRYPTO" = X"yes"; then
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking OpenSSL linking without -ldl" >&5
+$as_echo_n "checking OpenSSL linking without -ldl... " >&6; }
+     saved_libs=$LIBS
+     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <openssl/evp.h>
+
+int main (void)
+{
+
+          SSLeay_add_all_algorithms();
+
+ ;
+ return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+          LIBS="$saved_libs"
+
+else
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+          { $as_echo "$as_me:${as_lineno-$LINENO}: checking OpenSSL linking with -ldl" >&5
+$as_echo_n "checking OpenSSL linking with -ldl... " >&6; }
+          LIBS="-ldl $LIBS"
+          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+            #include <openssl/evp.h>
+
+int main (void)
+{
+
+            SSLeay_add_all_algorithms();
+
+ ;
+ return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+            LIBS="$saved_libs -ldl"
+
+else
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+            LIBS="$saved_libs"
+
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+  fi
 
   if test X"$HAVECRYPTO" = X"yes"; then
 
@@ -21865,10 +21992,6 @@ done
     fi
 
     if test X"$OPENSSL_ENABLED" = X"1"; then
-
-$as_echo "#define USE_SSLEAY 1" >>confdefs.h
-
-
               for ac_header in openssl/pkcs12.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "openssl/pkcs12.h" "ac_cv_header_openssl_pkcs12_h" "$ac_includes_default"
@@ -21884,8 +22007,6 @@ done
     else
        LIBS="$CLEANLIBS"
     fi
-            USE_SSLEAY="$OPENSSL_ENABLED"
-
 
     if test X"$OPT_SSL" != Xoff &&
        test "$OPENSSL_ENABLED" != "1"; then
@@ -21932,7 +22053,8 @@ fi
                     ENGINE_cleanup \
                     CRYPTO_cleanup_all_ex_data \
                     SSL_get_shutdown \
-                    SSLv2_client_method
+                    SSLv2_client_method \
+                    DES_set_odd_parity
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -21945,23 +22067,56 @@ fi
 done
 
 
-
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for yaSSL using OpenSSL compatibility mode" >&5
-$as_echo_n "checking for yaSSL using OpenSSL compatibility mode... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for BoringSSL" >&5
+$as_echo_n "checking for BoringSSL... " >&6; }
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 
-#include <openssl/ssl.h>
+                #include <openssl/base.h>
 
 int main (void)
 {
 
-#if defined(YASSL_VERSION) && defined(OPENSSL_VERSION_NUMBER)
-        int dummy = SSL_ERROR_NONE;
-#else
-        Not the yaSSL OpenSSL compatibility header.
-#endif
+                #ifndef OPENSSL_IS_BORINGSSL
+                #error not boringssl
+                #endif
+
+ ;
+ return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_BORINGSSL 1
+_ACEOF
+
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libressl" >&5
+$as_echo_n "checking for libressl... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#include <openssl/opensslv.h>
+
+int main (void)
+{
+
+        int dummy = LIBRESSL_VERSION_NUMBER;
 
  ;
  return 0;
@@ -21974,10 +22129,10 @@ if ac_fn_c_try_compile "$LINENO"; then :
 $as_echo "yes" >&6; }
 
 cat >>confdefs.h <<_ACEOF
-#define USE_YASSLEMUL 1
+#define HAVE_LIBRESSL 1
 _ACEOF
 
-      curl_ssl_msg="enabled (OpenSSL emulation by yaSSL)"
+      curl_ssl_msg="enabled (libressl)"
 
 else
 
@@ -22072,6 +22227,7 @@ rm -f conftest.err conftest.i conftest.$ac_ext
     esac
     case $tst_api in
       0x110) tst_show="1.1.0" ;;
+      0x102) tst_show="1.0.2" ;;
       0x101) tst_show="1.0.1" ;;
       0x100) tst_show="1.0.0" ;;
       0x099) tst_show="0.9.9" ;;
@@ -22175,6 +22331,42 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
         ;;
     esac
+  fi
+  if test "$tst_api" = "unknown"; then
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#define SSL_CONF_CTX_new innocuous_SSL_CONF_CTX_new
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+#undef SSL_CONF_CTX_new
+#ifdef __cplusplus
+extern "C"
+#endif
+char SSL_CONF_CTX_new ();
+#if defined __stub_SSL_CONF_CTX_new || defined __stub___SSL_CONF_CTX_new
+choke me
+#endif
+
+int main (void)
+{
+return SSL_CONF_CTX_new ();
+ ;
+ return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+      tst_api="0x102"
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
   fi
   if test "$tst_api" = "unknown"; then
     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -22538,6 +22730,7 @@ rm -f core conftest.err conftest.$ac_objext \
   fi
   case $tst_api in
     0x110) tst_show="1.1.0" ;;
+    0x102) tst_show="1.0.2" ;;
     0x101) tst_show="1.0.1" ;;
     0x100) tst_show="1.0.0" ;;
     0x099) tst_show="0.9.9" ;;
@@ -22680,9 +22873,9 @@ $as_echo "$ac_cv_lib_crypto_SRP_Calc_client_key" >&6; }
 if test "x$ac_cv_lib_crypto_SRP_Calc_client_key" = xyes; then :
 
 
-$as_echo "#define HAVE_SSLEAY_SRP 1" >>confdefs.h
+$as_echo "#define HAVE_OPENSSL_SRP 1" >>confdefs.h
 
-     HAVE_SSLEAY_SRP=1
+     HAVE_OPENSSL_SRP=1
 
 
 fi
@@ -22948,6 +23141,17 @@ $as_echo "$as_me: detected GnuTLS version $version" >&6;}
 $as_echo "$as_me: Added $gtlslib to LD_LIBRARY_PATH" >&6;}
           fi
         fi
+        for ac_func in gnutls_certificate_set_x509_key_file2
+do :
+  ac_fn_c_check_func "$LINENO" "gnutls_certificate_set_x509_key_file2" "ac_cv_func_gnutls_certificate_set_x509_key_file2"
+if test "x$ac_cv_func_gnutls_certificate_set_x509_key_file2" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GNUTLS_CERTIFICATE_SET_X509_KEY_FILE2 1
+_ACEOF
+
+fi
+done
+
       fi
 
     fi
@@ -23352,6 +23556,9 @@ if test "$curl_ssl_msg" = "$init_ssl_msg"; then
       OPT_CYASSL=""
     fi
 
+
+    cyassllibname=cyassl
+
     if test -z "$OPT_CYASSL" ; then
 
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CyaSSL_Init in -lcyassl" >&5
@@ -23465,9 +23672,77 @@ else
 
          CPPFLAGS=$_cppflags
          LDFLAGS=$_ldflags
+         cyassllib=""
 
 fi
 
+    fi
+
+    addld=""
+    addlib=""
+    addcflags=""
+
+    if test "x$USE_CYASSL" != "xyes"; then
+            addld=-L$OPT_CYASSL/lib$libsuff
+      addcflags=-I$OPT_CYASSL/include
+      cyassllib=$OPT_CYASSL/lib$libsuff
+
+      LDFLAGS="$LDFLAGS $addld"
+      if test "$addcflags" != "-I/usr/include"; then
+         CPPFLAGS="$CPPFLAGS $addcflags"
+      fi
+
+      cyassllibname=wolfssl
+      my_ac_save_LIBS="$LIBS"
+      LIBS="-l$cyassllibname -lm $LIBS"
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CyaSSL_Init in -lwolfssl" >&5
+$as_echo_n "checking for CyaSSL_Init in -lwolfssl... " >&6; }
+      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+/* These aren't needed for detection and confuse WolfSSL.
+   They are set up properly later if it is detected.  */
+#undef SIZEOF_LONG
+#undef SIZEOF_LONG_LONG
+#include <cyassl/ssl.h>
+
+int main (void)
+{
+
+	  return CyaSSL_Init();
+
+ ;
+ return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define USE_CYASSL 1" >>confdefs.h
+
+         USE_CYASSL=1
+
+         CYASSL_ENABLED=1
+         USE_CYASSL="yes"
+         curl_ssl_msg="enabled (CyaSSL)"
+
+else
+
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+         CPPFLAGS=$_cppflags
+         LDFLAGS=$_ldflags
+         cyassllib=""
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+      LIBS="$my_ac_save_LIBS"
     fi
 
     if test "x$USE_CYASSL" = "xyes"; then
@@ -23508,6 +23783,19 @@ _ACEOF
 
 
 
+            for ac_header in cyassl/options.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "cyassl/options.h" "ac_cv_header_cyassl_options_h" "$ac_includes_default"
+if test "x$ac_cv_header_cyassl_options_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_CYASSL_OPTIONS_H 1
+_ACEOF
+
+fi
+
+done
+
+
             for ac_header in cyassl/error-ssl.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "cyassl/error-ssl.h" "ac_cv_header_cyassl_error_ssl_h" "$ac_includes_default"
@@ -23521,7 +23809,7 @@ fi
 done
 
 
-      LIBS="-lcyassl -lm $LIBS"
+      LIBS="-l$cyassllibname -lm $LIBS"
 
       if test -n "$cyassllib"; then
                                         if test "x$cross_compiling" != "xyes"; then
@@ -23705,24 +23993,190 @@ $as_echo "found" >&6; }
         fi
       fi
     else
-        # Without pkg-config, we'll kludge in some defaults
-        addlib="-L$OPT_NSS/lib -lssl3 -lsmime3 -lnss3 -lplds4 -lplc4 -lnspr4 -lpthread -ldl"
-        addcflags="-I$OPT_NSS/include"
-        version="unknown"
-        nssprefix=$OPT_NSS
+      NSS_PCDIR="$OPT_NSS/lib/pkgconfig"
+      if test -f "$NSS_PCDIR/nss.pc"; then
+
+
+    PKGCONFIG="no"
+
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}pkg-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKGCONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PKGCONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKGCONFIG="$PKGCONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$PATH:/usr/bin:/usr/local/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKGCONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+PKGCONFIG=$ac_cv_path_PKGCONFIG
+if test -n "$PKGCONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKGCONFIG" >&5
+$as_echo "$PKGCONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_PKGCONFIG"; then
+  ac_pt_PKGCONFIG=$PKGCONFIG
+  # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_ac_pt_PKGCONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $ac_pt_PKGCONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_PKGCONFIG="$ac_pt_PKGCONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$PATH:/usr/bin:/usr/local/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_ac_pt_PKGCONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_PKGCONFIG=$ac_cv_path_ac_pt_PKGCONFIG
+if test -n "$ac_pt_PKGCONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_pt_PKGCONFIG" >&5
+$as_echo "$ac_pt_PKGCONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_pt_PKGCONFIG" = x; then
+    PKGCONFIG="no"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    PKGCONFIG=$ac_pt_PKGCONFIG
+  fi
+else
+  PKGCONFIG="$ac_cv_path_PKGCONFIG"
+fi
+
+
+    if test x$PKGCONFIG != xno; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nss options with pkg-config" >&5
+$as_echo_n "checking for nss options with pkg-config... " >&6; }
+            itexists=`
+    if test -n "$NSS_PCDIR"; then
+      PKG_CONFIG_LIBDIR="$NSS_PCDIR"
+      export PKG_CONFIG_LIBDIR
+    fi
+         $PKGCONFIG --exists nss >/dev/null 2>&1 && echo 1`
+
+      if test -z "$itexists"; then
+                        PKGCONFIG="no"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: found" >&5
+$as_echo "found" >&6; }
+      fi
     fi
 
-    if test -n "$addlib"; then
-
-      CLEANLIBS="$LIBS"
-      CLEANCPPFLAGS="$CPPFLAGS"
-
-      LIBS="$addlib $LIBS"
-      if test "$addcflags" != "-I/usr/include"; then
-         CPPFLAGS="$CPPFLAGS $addcflags"
+        if test "$PKGCONFIG" != "no" ; then
+          addld=`
+    if test -n "$NSS_PCDIR"; then
+      PKG_CONFIG_LIBDIR="$NSS_PCDIR"
+      export PKG_CONFIG_LIBDIR
+    fi
+ $PKGCONFIG --libs-only-L nss`
+          addlib=`
+    if test -n "$NSS_PCDIR"; then
+      PKG_CONFIG_LIBDIR="$NSS_PCDIR"
+      export PKG_CONFIG_LIBDIR
+    fi
+ $PKGCONFIG --libs-only-l nss`
+          addcflags=`
+    if test -n "$NSS_PCDIR"; then
+      PKG_CONFIG_LIBDIR="$NSS_PCDIR"
+      export PKG_CONFIG_LIBDIR
+    fi
+ $PKGCONFIG --cflags nss`
+          version=`
+    if test -n "$NSS_PCDIR"; then
+      PKG_CONFIG_LIBDIR="$NSS_PCDIR"
+      export PKG_CONFIG_LIBDIR
+    fi
+ $PKGCONFIG --modversion nss`
+          nssprefix=`
+    if test -n "$NSS_PCDIR"; then
+      PKG_CONFIG_LIBDIR="$NSS_PCDIR"
+      export PKG_CONFIG_LIBDIR
+    fi
+ $PKGCONFIG --variable=prefix nss`
+        fi
       fi
+    fi
 
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SSL_VersionRangeSet in -lnss3" >&5
+    if test -z "$addlib"; then
+      # Without pkg-config, we'll kludge in some defaults
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Using hard-wired libraries and compilation flags for NSS." >&5
+$as_echo "$as_me: WARNING: Using hard-wired libraries and compilation flags for NSS." >&2;}
+      addld="-L$OPT_NSS/lib"
+      addlib="-lssl3 -lsmime3 -lnss3 -lplds4 -lplc4 -lnspr4"
+      addcflags="-I$OPT_NSS/include"
+      version="unknown"
+      nssprefix=$OPT_NSS
+    fi
+
+    CLEANLDFLAGS="$LDFLAGS"
+    CLEANLIBS="$LIBS"
+    CLEANCPPFLAGS="$CPPFLAGS"
+
+    LDFLAGS="$addld $LDFLAGS"
+    LIBS="$addlib $LIBS"
+    if test "$addcflags" != "-I/usr/include"; then
+       CPPFLAGS="$CPPFLAGS $addcflags"
+    fi
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SSL_VersionRangeSet in -lnss3" >&5
 $as_echo_n "checking for SSL_VersionRangeSet in -lnss3... " >&6; }
 if ${ac_cv_lib_nss3_SSL_VersionRangeSet+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -23760,37 +24214,36 @@ if test "x$ac_cv_lib_nss3_SSL_VersionRangeSet" = xyes; then :
 
 $as_echo "#define USE_NSS 1" >>confdefs.h
 
-       USE_NSS=1
+     USE_NSS=1
 
-       USE_NSS="yes"
-       NSS_ENABLED=1
-       curl_ssl_msg="enabled (NSS)"
+     USE_NSS="yes"
+     NSS_ENABLED=1
+     curl_ssl_msg="enabled (NSS)"
 
 else
 
-         LIBS="$CLEANLIBS"
-         CPPFLAGS="$CLEANCPPFLAGS"
+       LDFLAGS="$CLEANLDFLAGS"
+       LIBS="$CLEANLIBS"
+       CPPFLAGS="$CLEANCPPFLAGS"
 
 fi
 
 
-      if test "x$USE_NSS" = "xyes"; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: detected NSS version $version" >&5
+    if test "x$USE_NSS" = "xyes"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: detected NSS version $version" >&5
 $as_echo "$as_me: detected NSS version $version" >&6;}
 
-                NSS_LIBS=$addlib
+            NSS_LIBS=$addlib
 
 
-                                        if test "x$cross_compiling" != "xyes"; then
-          LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$nssprefix/lib$libsuff"
-          export LD_LIBRARY_PATH
-          { $as_echo "$as_me:${as_lineno-$LINENO}: Added $nssprefix/lib$libsuff to LD_LIBRARY_PATH" >&5
+                              if test "x$cross_compiling" != "xyes"; then
+        LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$nssprefix/lib$libsuff"
+        export LD_LIBRARY_PATH
+        { $as_echo "$as_me:${as_lineno-$LINENO}: Added $nssprefix/lib$libsuff to LD_LIBRARY_PATH" >&5
 $as_echo "$as_me: Added $nssprefix/lib$libsuff to LD_LIBRARY_PATH" >&6;}
-        fi
       fi
 
     fi
-
   fi
 fi
 OPT_AXTLS=off
@@ -23935,13 +24388,14 @@ fi
 
   if test "x$want_ca" != "xno" -a "x$want_ca" != "xunset" -a \
           "x$want_capath" != "xno" -a "x$want_capath" != "xunset"; then
-        as_fn_error $? "Can't specify both --with-ca-bundle and --with-ca-path." "$LINENO" 5
+        ca="$want_ca"
+    capath="$want_capath"
   elif test "x$want_ca" != "xno" -a "x$want_ca" != "xunset"; then
         ca="$want_ca"
     capath="no"
   elif test "x$want_capath" != "xno" -a "x$want_capath" != "xunset"; then
-        if test "x$OPENSSL_ENABLED" != "x1" -a "x$POLARSSL_ENABLED" != "x1"; then
-      as_fn_error $? "--with-ca-path only works with openSSL or PolarSSL" "$LINENO" 5
+        if test "x$OPENSSL_ENABLED" != "x1" -a "x$GNUTLS_ENABLED" != "x1" -a "x$POLARSSL_ENABLED" != "x1"; then
+      as_fn_error $? "--with-ca-path only works with OpenSSL, GnuTLS or PolarSSL" "$LINENO" 5
     fi
     capath="$want_capath"
     ca="no"
@@ -23993,7 +24447,8 @@ _ACEOF
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ca" >&5
 $as_echo "$ca" >&6; }
-  elif test "x$capath" != "xno"; then
+  fi
+  if test "x$capath" != "xno"; then
     CURL_CA_PATH="\"$capath\""
 
 cat >>confdefs.h <<_ACEOF
@@ -24002,7 +24457,8 @@ _ACEOF
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $capath (capath)" >&5
 $as_echo "$capath (capath)" >&6; }
-  else
+  fi
+  if test "x$ca" = "xno" && test "x$capath" = "xno"; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
   fi
@@ -25744,9 +26200,11 @@ $as_echo "$as_me: -L is $LD_H2" >&6;}
     CPPFLAGS="$CPPFLAGS $CPP_H2"
     LIBS="$LIB_H2 $LIBS"
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nghttp2_session_callbacks_set_send_callback in -lnghttp2" >&5
-$as_echo_n "checking for nghttp2_session_callbacks_set_send_callback in -lnghttp2... " >&6; }
-if ${ac_cv_lib_nghttp2_nghttp2_session_callbacks_set_send_callback+:} false; then :
+    # use nghttp2_option_set_no_recv_client_magic to require nghttp2
+    # >= 1.0.0
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for nghttp2_option_set_no_recv_client_magic in -lnghttp2" >&5
+$as_echo_n "checking for nghttp2_option_set_no_recv_client_magic in -lnghttp2... " >&6; }
+if ${ac_cv_lib_nghttp2_nghttp2_option_set_no_recv_client_magic+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -25758,26 +26216,26 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __cplusplus
 extern "C"
 #endif
-char nghttp2_session_callbacks_set_send_callback ();
+char nghttp2_option_set_no_recv_client_magic ();
 int main (void)
 {
-return nghttp2_session_callbacks_set_send_callback ();
+return nghttp2_option_set_no_recv_client_magic ();
  ;
  return 0;
 }
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_nghttp2_nghttp2_session_callbacks_set_send_callback=yes
+  ac_cv_lib_nghttp2_nghttp2_option_set_no_recv_client_magic=yes
 else
-  ac_cv_lib_nghttp2_nghttp2_session_callbacks_set_send_callback=no
+  ac_cv_lib_nghttp2_nghttp2_option_set_no_recv_client_magic=no
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_nghttp2_nghttp2_session_callbacks_set_send_callback" >&5
-$as_echo "$ac_cv_lib_nghttp2_nghttp2_session_callbacks_set_send_callback" >&6; }
-if test "x$ac_cv_lib_nghttp2_nghttp2_session_callbacks_set_send_callback" = xyes; then :
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_nghttp2_nghttp2_option_set_no_recv_client_magic" >&5
+$as_echo "$ac_cv_lib_nghttp2_nghttp2_option_set_no_recv_client_magic" >&6; }
+if test "x$ac_cv_lib_nghttp2_nghttp2_option_set_no_recv_client_magic" = xyes; then :
 
        for ac_header in nghttp2/nghttp2.h
 do :
@@ -38758,7 +39216,7 @@ if test "x$want_thres" = xyes && test "x$want_ares" = xyes; then
   as_fn_error $? "Options --enable-threaded-resolver and --enable-ares are mutually exclusive" "$LINENO" 5
 fi
 
-if test "$want_thres" = "yes"; then
+if test "$want_thres" = "yes" && test "$dontwant_rt" = "no"; then
   ac_fn_c_check_header_mongrel "$LINENO" "pthread.h" "ac_cv_header_pthread_h" "$ac_includes_default"
 if test "x$ac_cv_header_pthread_h" = xyes; then :
 
@@ -38998,7 +39456,7 @@ $as_echo "yes" >&6; }
 fi
 
 
-if test "$want_tls_srp" = "yes" && ( test "x$HAVE_GNUTLS_SRP" = "x1" || test "x$HAVE_SSLEAY_SRP" = "x1") ; then
+if test "$want_tls_srp" = "yes" && ( test "x$HAVE_GNUTLS_SRP" = "x1" || test "x$HAVE_OPENSSL_SRP" = "x1") ; then
 
 $as_echo "#define USE_TLS_SRP 1" >>confdefs.h
 
@@ -39164,7 +39622,7 @@ ENABLE_STATIC="$enable_static"
 
 
 
-if test "x$USE_SSLEAY" = "x1"; then
+if test "x$OPENSSL_ENABLED" = "x1"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES SSL"
 elif test -n "$SSL_ENABLED"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES SSL"
@@ -39203,7 +39661,7 @@ if test "x$CURL_DISABLE_CRYPTO_AUTH" != "x1" -a \
 fi
 
 if test "x$CURL_DISABLE_CRYPTO_AUTH" != "x1"; then
-  if test "x$USE_SSLEAY" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \
+  if test "x$OPENSSL_ENABLED" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \
       -o "x$GNUTLS_ENABLED" = "x1" -o "x$NSS_ENABLED" = "x1" \
       -o "x$DARWINSSL_ENABLED" = "x1"; then
     SUPPORT_FEATURES="$SUPPORT_FEATURES NTLM"
@@ -39275,7 +39733,7 @@ if test "x$CURL_DISABLE_IMAP" != "x1"; then
 fi
 if test "x$CURL_DISABLE_SMB" != "x1" \
     -a "x$CURL_DISABLE_CRYPTO_AUTH" != "x1" \
-    -a \( "x$USE_SSLEAY" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \
+    -a \( "x$OPENSSL_ENABLED" = "x1" -o "x$USE_WINDOWS_SSPI" = "x1" \
       -o "x$GNUTLS_ENABLED" = "x1" -o "x$NSS_ENABLED" = "x1" \
       -o "x$DARWINSSL_ENABLED" = "x1" \); then
   SUPPORT_PROTOCOLS="$SUPPORT_PROTOCOLS SMB"

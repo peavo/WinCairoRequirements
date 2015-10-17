@@ -1,9 +1,31 @@
+#***************************************************************************
+#                                  _   _ ____  _
+#  Project                     ___| | | |  _ \| |
+#                             / __| | | | |_) | |
+#                            | (__| |_| |  _ <| |___
+#                             \___|\___/|_| \_\_____|
+#
+# Copyright (C) 2004 - 2015, Guenter Knauf, <http://www.gknw.net/phpbb>.
+# Copyright (C) 2001 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
+#
+# This software is licensed as described in the file COPYING, which
+# you should have received as part of this distribution. The terms
+# are also available at http://curl.haxx.se/docs/copyright.html.
+#
+# You may opt to use, copy, modify, merge, publish, distribute and/or sell
+# copies of the Software, and permit persons to whom the Software is
+# furnished to do so, under the terms of the COPYING file.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+#***************************************************************************
+
 #################################################################
 #
 ## Makefile for building libcurl.nlm (NetWare version - gnu make)
-## Use: make -f Makefile.netware
 ##
-## Comments to: Guenter Knauf http://www.gknw.net/phpbb
+## Use: make -f Makefile.netware
 #
 #################################################################
 
@@ -19,12 +41,12 @@ endif
 
 # Edit the path below to point to the base of your OpenSSL package.
 ifndef OPENSSL_PATH
-OPENSSL_PATH = ../../openssl-0.9.8zc
+OPENSSL_PATH = ../../openssl-1.0.2a
 endif
 
 # Edit the path below to point to the base of your LibSSH2 package.
 ifndef LIBSSH2_PATH
-LIBSSH2_PATH = ../../libssh2-1.4.3
+LIBSSH2_PATH = ../../libssh2-1.5.0
 endif
 
 # Edit the path below to point to the base of your axTLS package.
@@ -214,6 +236,11 @@ WITH_SSL =
 else
 ifeq ($(findstring -ssl,$(CFG)),-ssl)
 WITH_SSL = 1
+ifeq ($(findstring -srp,$(CFG)),-srp)
+ifeq "$(wildcard $(OPENSSL_PATH)/outinc_nw_$(LIBARCH_L)/openssl/srp.h)" "$(OPENSSL_PATH)/outinc_nw_$(LIBARCH_L)/openssl/srp.h"
+WITH_SRP = 1
+endif
+endif
 endif
 endif
 ifeq ($(findstring -zlib,$(CFG)),-zlib)
@@ -638,6 +665,10 @@ ifdef WITH_SSL
 	@echo $(DL)#define HAVE_LIBSSL 1$(DL) >> $@
 	@echo $(DL)#define HAVE_LIBCRYPTO 1$(DL) >> $@
 	@echo $(DL)#define OPENSSL_NO_KRB5 1$(DL) >> $@
+ifdef WITH_SRP
+	@echo $(DL)#define HAVE_SSLEAY_SRP 1$(DL) >> $@
+	@echo $(DL)#define USE_TLS_SRP 1$(DL) >> $@
+endif
 ifdef WITH_SPNEGO
 	@echo $(DL)#define HAVE_SPNEGO 1$(DL) >> $@
 endif
@@ -689,6 +720,11 @@ ifdef WITH_SSL
 	@echo SSL support:     enabled (OpenSSL)
 else
 	@echo SSL support:     no
+endif
+ifdef WITH_SRP
+	@echo SRP support:     enabled
+else
+	@echo SRP support:     no
 endif
 ifdef WITH_SSH2
 	@echo SSH2 support:    enabled (libssh2)

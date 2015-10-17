@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -79,7 +79,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
       /* Ok, this is somewhat hackish but we do it undocumented for now */
       config->trace_stream = config->errors;  /* aka stderr */
     else {
-      config->trace_stream = fopen(config->trace_dump, "w");
+      config->trace_stream = fopen(config->trace_dump, FOPEN_WRITETEXT);
       config->trace_fopened = TRUE;
     }
   }
@@ -88,7 +88,7 @@ int tool_debug_cb(CURL *handle, curl_infotype type,
     output = config->trace_stream;
 
   if(!output) {
-    warnf(operation, "Failed to create/open output");
+    warnf(config, "Failed to create/open output");
     return 0;
   }
 

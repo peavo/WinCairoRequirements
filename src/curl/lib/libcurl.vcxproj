@@ -102,12 +102,12 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include\openssl;$(SolutionDir)include\zlib;$(ProjectDir);$(ProjectDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_SSLEAY;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_OPENSSL;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib32/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -130,11 +130,11 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include\openssl;$(SolutionDir)include\zlib;$(ProjectDir);$(ProjectDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_SSLEAY;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_OPENSSL;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib64/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -158,11 +158,11 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include\openssl;$(SolutionDir)include\zlib;$(ProjectDir);$(ProjectDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_SSLEAY;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_OPENSSL;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib32/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -188,11 +188,11 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)include\openssl;$(SolutionDir)include\zlib;$(ProjectDir);$(ProjectDir)..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_SSLEAY;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILDING_LIBCURL;HAVE_ZLIB_H;HAVE_ZLIB;HAVE_LIBZ;USE_OPENSSL;USE_WINDOWS_SSPI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib64/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -211,12 +211,13 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="asyn-ares.c" />
     <ClCompile Include="asyn-thread.c" />
     <ClCompile Include="base64.c" />
-    <ClCompile Include="bundles.c" />
     <ClCompile Include="conncache.c" />
     <ClCompile Include="connect.c" />
     <ClCompile Include="content_encoding.c" />
     <ClCompile Include="cookie.c" />
     <ClCompile Include="curl_addrinfo.c" />
+    <ClCompile Include="curl_des.c" />
+    <ClCompile Include="curl_endian.c" />
     <ClCompile Include="curl_fnmatch.c" />
     <ClCompile Include="curl_gethostname.c" />
     <ClCompile Include="curl_gssapi.c" />
@@ -285,6 +286,7 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="sendf.c" />
     <ClCompile Include="share.c" />
     <ClCompile Include="slist.c" />
+    <ClCompile Include="smb.c" />
     <ClCompile Include="smtp.c" />
     <ClCompile Include="socks.c" />
     <ClCompile Include="socks_gssapi.c" />

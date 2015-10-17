@@ -21,6 +21,7 @@ FAQ
   1.12 I have a problem who can I chat with?
   1.13 curl's ECCN number?
   1.14 How do I submit my patch?
+  1.15 How do I port libcurl to my OS?
 
  2. Install Related Problems
   2.1 configure doesn't find OpenSSL even when it is installed
@@ -81,6 +82,7 @@ FAQ
   4.18 file:// URLs containing drive letters (Windows, NetWare)
   4.19 Why doesn't cURL return an error when the network cable is unplugged?
   4.20 curl doesn't return error for HTTP non-200 responses!
+  4.21 Why is there a HTTP/1.1 in my HTTP/2 request?
 
  5. libcurl Issues
   5.1 Is libcurl thread-safe?
@@ -350,7 +352,7 @@ FAQ
   cryptography. When doing so, the Export Control Classification Number (ECCN)
   is used to identify the level of export control etc.
 
-  ASF gives a good explanation at http://www.apache.org/dev/crypto.html
+  ASF gives a good explanation at https://www.apache.org/dev/crypto.html
 
   We believe curl's number might be ECCN 5D002, another possibility is
   5D992. It seems necessary to write them, asking to confirm.
@@ -378,6 +380,19 @@ FAQ
     people involved there.
 
   Lots of more details are found in the CONTRIBUTE and INTERNALS docs.
+
+  1.15 How do I port libcurl to my OS?
+
+  Here's a rough step-by-step:
+
+  1. copy a suitable lib/config-*.h file as a start to lib/config-[youros].h
+
+  2. edit lib/config-[youros].h to match your OS and setup
+
+  3. edit lib/curl_setup.h to include config-[youros].h when your OS is
+     detected by the preprocessor, in the style others already exist
+
+  4. compile lib/*.c and make them into a library
 
 
 2. Install Related Problems
@@ -764,8 +779,9 @@ FAQ
   request-body in a GET request with something like "curl -X GET -d data
   [URL]"
 
-  Note that -X doesn't change curl's behavior. It only modifies the actual
-  string sent in the request.
+  Note that -X doesn't actually change curl's behavior as it only modifies the
+  actual string sent in the request, but that may of course trigger a
+  different set of events.
 
   Accordingly, by using -XPOST on a command line that for example would follow
   a 303 redirect, you will effectively prevent curl from behaving
@@ -1026,7 +1042,7 @@ FAQ
   timeout is set.
 
   See option TcpMaxConnectRetransmissions on this page:
-  http://support.microsoft.com/?scid=kb%3Ben-us%3B175523&x=6&y=7
+  https://support.microsoft.com/en-us/kb/175523/en-us
 
   Also, even on non-Windows systems there may run a firewall or anti-virus
   software or similar that accepts the connection but does not actually do
@@ -1043,7 +1059,7 @@ FAQ
   You'll find that even if D:\blah.txt does exist, cURL returns a 'file
   not found' error.
 
-  According to RFC 1738 (http://www.faqs.org/rfcs/rfc1738.html),
+  According to RFC 1738 (https://www.ietf.org/rfc/rfc1738.txt),
   file:// URLs must contain a host component, but it is ignored by
   most implementations. In the above example, 'D:' is treated as the
   host component, and is taken away. Thus, cURL tries to open '/blah.txt'.
@@ -1115,6 +1131,16 @@ FAQ
   You can also use the -w option and the variable %{response_code} to extract
   the exact response code that was return in the response.
 
+  4.21 Why is there a HTTP/1.1 in my HTTP/2 request?
+
+  If you use verbose to see the HTTP request when you send off a HTTP/2
+  request, it will still say 1.1.
+
+  The reason for this is that we first generate the request to send using the
+  old 1.1 style and show that request in the verbose output, and then we
+  convert it over to the binary header-compressed HTTP/2 style. The actual
+  "1.1" part from that request is then not actually used in the transfer. The
+  binary HTTP/2 headers are not human readable.
 
 5. libcurl Issues
 
@@ -1137,13 +1163,13 @@ FAQ
   If you use a OpenSSL-powered libcurl in a multi-threaded environment, you
   need to provide one or two locking functions:
 
-    http://www.openssl.org/docs/crypto/threads.html
+    https://www.openssl.org/docs/crypto/threads.html
 
   If you use a GnuTLS-powered libcurl in a multi-threaded environment, you
   need to provide locking function(s) for libgcrypt (which is used by GnuTLS
   for the crypto functions).
 
-    http://www.gnu.org/software/gnutls/manual/html_node/Multi_002dthreaded-applications.html
+    https://web.archive.org/web/20111103083330/http://www.gnu.org/software/gnutls/manual/html_node/Multi_002dthreaded-applications.html
 
   No special locking is needed with a NSS-powered libcurl. NSS is thread-safe.
 
@@ -1319,7 +1345,7 @@ FAQ
   Also note that on many networks NATs or other IP-munging techniques are used
   that makes you see and use a different IP address locally than what the
   remote server will see you coming from. You may also consider using
-  http://www.torproject.org .
+  https://www.torproject.org/ .
 
   5.13 How do I stop an ongoing transfer?
 

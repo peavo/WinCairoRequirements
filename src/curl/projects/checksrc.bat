@@ -6,7 +6,7 @@ rem *                             / __| | | | |_) | |
 rem *                            | (__| |_| |  _ <| |___
 rem *                             \___|\___/|_| \_\_____|
 rem *
-rem * Copyright (C) 2014, Steve Holme, <steve_holme@hotmail.com>.
+rem * Copyright (C) 2014 - 2015, Steve Holme, <steve_holme@hotmail.com>.
 rem *
 rem * This software is licensed as described in the file COPYING, which
 rem * you should have received as part of this distribution. The terms
@@ -24,29 +24,61 @@ rem ***************************************************************************
 :begin
   rem Check we are running on a Windows NT derived OS
   if not "%OS%" == "Windows_NT" goto nodos
+
+  rem Set our variables
   setlocal
 
-  rem Display the help
-  if /i "%~1" == "-?" goto syntax
-  if /i "%~1" == "-h" goto syntax
-  if /i "%~1" == "-help" goto syntax
+:parseArgs
+  if "%~1" == "" goto prerequisites
+
+  if /i "%~1" == "-?" (
+    goto syntax
+  ) else if /i "%~1" == "-h" (
+    goto syntax
+  ) else if /i "%~1" == "-help" (
+    goto syntax
+  ) else (
+    if not defined SRC_DIR (
+      set SRC_DIR=%~1%
+    ) else (
+      goto unknown
+    )
+  )
+
+  shift & goto parseArgs
 
 :prerequisites
   rem Check we have Perl installed
-  if not exist "C:\Perl" (
-    if not exist "C:\Perl64" goto noperl
+  echo %PATH% | findstr /I /C:"\Perl" 1>nul
+  if errorlevel 1 (
+    if not exist "%SystemDrive%\Perl" (
+      if not exist "%SystemDrive%\Perl64" goto noperl
+    )
   )
 
 :configure
-  if "%1" == "" set SRC_DIR=..
-  if not "%1" == "" set SRC_DIR=%~1%
+  if "%SRC_DIR%" == "" set SRC_DIR=..
   if not exist "%SRC_DIR%" goto nosrc
 
 :start
-  for /f "delims=" %%i in ('dir %SRC_DIR%\src\*.c.* /b') do @perl %SRC_DIR%\lib\checksrc.pl -D%SRC_DIR%\src "%%i"
-  for /f "delims=" %%i in ('dir %SRC_DIR%\src\*.h.* /b') do @perl %SRC_DIR%\lib\checksrc.pl -D%SRC_DIR%\src "%%i"
-  for /f "delims=" %%i in ('dir %SRC_DIR%\lib\*.c.* /b') do @perl %SRC_DIR%\lib\checksrc.pl -D%SRC_DIR%\lib "%%i"
-  for /f "delims=" %%i in ('dir %SRC_DIR%\lib\*.h.* /b') do @perl %SRC_DIR%\lib\checksrc.pl -D%SRC_DIR%\lib -Wcurl_config.h.cmake "%%i"
+  rem Check the src directory
+  if exist %SRC_DIR%\src (
+    for /f "delims=" %%i in ('dir "%SRC_DIR%\src\*.c.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\src" -Wtool_hugehelp.c "%%i"
+    for /f "delims=" %%i in ('dir "%SRC_DIR%\src\*.h.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\src" "%%i"
+  )
+
+  rem Check the lib directory
+  if exist %SRC_DIR%\lib (
+    for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\*.c.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib" "%%i"
+    for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\*.h.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib" -Wcurl_config.h.cmake "%%i"
+  )
+
+  rem Check the lib\vtls directory
+  if exist %SRC_DIR%\lib\vtls (
+    for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\vtls\*.c.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib\vtls" "%%i"
+    for /f "delims=" %%i in ('dir "%SRC_DIR%\lib\vtls\*.h.*" /b 2^>NUL') do @perl "%SRC_DIR%\lib\checksrc.pl" "-D%SRC_DIR%\lib\vtls" "%%i"
+  )
+
   goto success
 
 :syntax
@@ -56,6 +88,11 @@ rem ***************************************************************************
   echo.
   echo directory - Specifies the curl source directory
   goto success
+
+:unknown
+  echo.
+  echo Error: Unknown argument '%1'
+  goto error
 
 :nodos
   echo.

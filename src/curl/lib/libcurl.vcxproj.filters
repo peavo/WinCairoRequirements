@@ -286,9 +286,6 @@
     <ClCompile Include="pipeline.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bundles.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="vtls\openssl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -311,6 +308,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vtls\gtls.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="smb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="curl_des.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="curl_endian.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -227,6 +227,12 @@
 /* Define if you have the `CRYPTO_cleanup_all_ex_data' function.
    This is present in OpenSSL versions after 0.9.6b */
 #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
+
+/* Define if you have the 'DES_set_odd_parity' function when using OpenSSL/
+   BoringSSL */
+#if defined(USE_OPENSSL) || defined(HAVE_BORINGSSL)
+#define HAVE_DES_SET_ODD_PARITY 1
+#endif
 
 /* Define if you have the select function. */
 #define HAVE_SELECT 1
@@ -481,8 +487,9 @@
 #endif
 
 /* Define if the compiler supports the 'long long' data type. */
-#if defined(__MINGW32__) || defined(__WATCOMC__) || \
-    (defined(_MSC_VER) && (_MSC_VER >= 1310))
+#if defined(__MINGW32__) || defined(__WATCOMC__)      || \
+    (defined(_MSC_VER)     && (_MSC_VER     >= 1310)) || \
+    (defined(__BORLANDC__) && (__BORLANDC__ >= 0x561))
 #define HAVE_LONGLONG 1
 #endif
 
@@ -547,7 +554,7 @@
 #endif
 
 /* VS2012 default target settings and minimum build target check. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1700) && (_MSC_VER <= 1800)
+#if defined(_MSC_VER) && (_MSC_VER >= 1700)
 #  ifndef _WIN32_WINNT
 #    define _WIN32_WINNT VS2012_DEF_TARGET
 #  endif
@@ -678,30 +685,30 @@ Vista
 /* ---------------------------------------------------------------- */
 
 #if defined(CURL_HAS_NOVELL_LDAPSDK) || defined(CURL_HAS_MOZILLA_LDAPSDK)
-#undef CURL_LDAP_WIN
+#undef USE_WIN32_LDAP
 #define HAVE_LDAP_SSL_H 1
 #define HAVE_LDAP_URL_PARSE 1
 #elif defined(CURL_HAS_OPENLDAP_LDAPSDK)
-#undef CURL_LDAP_WIN
+#undef USE_WIN32_LDAP
 #define HAVE_LDAP_URL_PARSE 1
 #else
 #undef HAVE_LDAP_URL_PARSE
-#define CURL_LDAP_WIN 1
+#define USE_WIN32_LDAP 1
 #endif
 
-#if defined(__WATCOMC__) && defined(CURL_LDAP_WIN)
+#if defined(__WATCOMC__) && defined(USE_WIN32_LDAP)
 #if __WATCOMC__ < 1280
 #define WINBERAPI  __declspec(cdecl)
 #define WINLDAPAPI __declspec(cdecl)
 #endif
 #endif
 
-#if defined(__POCC__) && defined(CURL_LDAP_WIN)
+#if defined(__POCC__) && defined(USE_WIN32_LDAP)
 #  define CURL_DISABLE_LDAP 1
 #endif
 
 /* Define to use the Windows crypto library. */
-#if !defined(USE_SSLEAY) && !defined(USE_NSS)
+#if !defined(USE_OPENSSL) && !defined(USE_NSS)
 #define USE_WIN32_CRYPTO
 #endif
 

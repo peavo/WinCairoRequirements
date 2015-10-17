@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -56,15 +56,12 @@
 #include <inet.h>
 #endif
 
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
+#include "curl_printf.h"
 #include "urldata.h"
 #include "sendf.h"
 #include "if2ip.h"
 #include "strerror.h"
 #include "connect.h"
-#include "curl_memory.h"
 #include "select.h"
 #include "url.h" /* for Curl_safefree() */
 #include "multiif.h"
@@ -77,7 +74,8 @@
 #include "conncache.h"
 #include "multihandle.h"
 
-/* The last #include file should be: */
+/* The last #include files should be: */
+#include "curl_memory.h"
 #include "memdebug.h"
 
 #ifdef __SYMBIAN32__
@@ -542,6 +540,7 @@ static CURLcode trynextip(struct connectdata *conn,
                           int sockindex,
                           int tempindex)
 {
+  const int other = tempindex ^ 1;
   CURLcode result = CURLE_COULDNT_CONNECT;
 
   /* First clean up after the failed socket.
@@ -560,20 +559,21 @@ static CURLcode trynextip(struct connectdata *conn,
       family = conn->tempaddr[tempindex]->ai_family;
       ai = conn->tempaddr[tempindex]->ai_next;
     }
+#ifdef ENABLE_IPV6
     else if(conn->tempaddr[0]) {
       /* happy eyeballs - try the other protocol family */
       int firstfamily = conn->tempaddr[0]->ai_family;
-#ifdef ENABLE_IPV6
       family = (firstfamily == AF_INET) ? AF_INET6 : AF_INET;
-#else
-      family = firstfamily;
-#endif
       ai = conn->tempaddr[0]->ai_next;
     }
+#endif
 
     while(ai) {
-      while(ai && ai->ai_family != family)
-        ai = ai->ai_next;
+      if(conn->tempaddr[other]) {
+        /* we can safely skip addresses of the other protocol family */
+        while(ai && ai->ai_family != family)
+          ai = ai->ai_next;
+      }
 
       if(ai) {
         result = singleipconnect(conn, ai, &conn->tempsock[tempindex]);
@@ -619,7 +619,7 @@ static bool getaddressinfo(struct sockaddr* sa, char* addr,
 
   switch (sa->sa_family) {
     case AF_INET:
-      si = (struct sockaddr_in*) sa;
+      si = (struct sockaddr_in*)(void*) sa;
       if(Curl_inet_ntop(sa->sa_family, &si->sin_addr,
                         addr, MAX_IPADR_LEN)) {
         us_port = ntohs(si->sin_port);
@@ -629,7 +629,7 @@ static bool getaddressinfo(struct sockaddr* sa, char* addr,
       break;
 #ifdef ENABLE_IPV6
     case AF_INET6:
-      si6 = (struct sockaddr_in6*)sa;
+      si6 = (struct sockaddr_in6*)(void*) sa;
       if(Curl_inet_ntop(sa->sa_family, &si6->sin6_addr,
                         addr, MAX_IPADR_LEN)) {
         us_port = ntohs(si6->sin6_port);
@@ -749,6 +749,7 @@ CURLcode Curl_is_connected(struct connectdata *conn,
   }
 
   for(i=0; i<2; i++) {
+    const int other = i ^ 1;
     if(conn->tempsock[i] == CURL_SOCKET_BAD)
       continue;
 
@@ -778,7 +779,6 @@ CURLcode Curl_is_connected(struct connectdata *conn,
     else if(rc == CURL_CSELECT_OUT) {
       if(verifyconnect(conn->tempsock[i], &error)) {
         /* we are connected with TCP, awesome! */
-        int other = i ^ 1;
 
         /* use this socket from now on */
         conn->sock[sockindex] = conn->tempsock[i];
@@ -820,6 +820,7 @@ CURLcode Curl_is_connected(struct connectdata *conn,
       data->state.os_errno = error;
       SET_SOCKERRNO(error);
       if(conn->tempaddr[i]) {
+        CURLcode status;
         char ipaddress[MAX_IPADR_LEN];
         Curl_printable_address(conn->tempaddr[i], ipaddress, MAX_IPADR_LEN);
         infof(data, "connect to %s port %ld failed: %s\n",
@@ -828,7 +829,11 @@ CURLcode Curl_is_connected(struct connectdata *conn,
         conn->timeoutms_per_addr = conn->tempaddr[i]->ai_next == NULL ?
                                    allow : allow / 2;
 
-        result = trynextip(conn, sockindex, i);
+        status = trynextip(conn, sockindex, i);
+        if(status != CURLE_COULDNT_CONNECT
+            || conn->tempsock[other] == CURL_SOCKET_BAD)
+          /* the last attempt failed and no other sockets remain open */
+          result = status;
       }
     }
   }
@@ -852,12 +857,11 @@ CURLcode Curl_is_connected(struct connectdata *conn,
   return result;
 }
 
-static void tcpnodelay(struct connectdata *conn,
-                       curl_socket_t sockfd)
+void Curl_tcpnodelay(struct connectdata *conn, curl_socket_t sockfd)
 {
 #ifdef TCP_NODELAY
   struct SessionHandle *data= conn->data;
-  curl_socklen_t onoff = (curl_socklen_t) data->set.tcp_nodelay;
+  curl_socklen_t onoff = (curl_socklen_t) 1;
   int level = IPPROTO_TCP;
 
 #if 0
@@ -878,7 +882,7 @@ static void tcpnodelay(struct connectdata *conn,
     infof(data, "Could not set TCP_NODELAY: %s\n",
           Curl_strerror(conn, SOCKERRNO));
   else
-    infof(data,"TCP_NODELAY set\n");
+    infof(data, "TCP_NODELAY set\n");
 #else
   (void)conn;
   (void)sockfd;
@@ -944,16 +948,21 @@ void Curl_sndbufset(curl_socket_t sockfd)
         detectOsState = DETECT_OS_VISTA_OR_LATER;
     }
 #else
-    ULONGLONG majorVersionMask;
+    ULONGLONG cm;
     OSVERSIONINFOEX osver;
 
     memset(&osver, 0, sizeof(osver));
     osver.dwOSVersionInfoSize = sizeof(osver);
     osver.dwMajorVersion = majorVersion;
-    majorVersionMask = VerSetConditionMask(0, VER_MAJORVERSION,
-                                           VER_GREATER_EQUAL);
 
-    if(VerifyVersionInfo(&osver, VER_MAJORVERSION, majorVersionMask))
+    cm = VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL);
+    cm = VerSetConditionMask(cm, VER_MINORVERSION, VER_GREATER_EQUAL);
+    cm = VerSetConditionMask(cm, VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    cm = VerSetConditionMask(cm, VER_SERVICEPACKMINOR, VER_GREATER_EQUAL);
+
+    if(VerifyVersionInfo(&osver, (VER_MAJORVERSION | VER_MINORVERSION |
+                                  VER_SERVICEPACKMAJOR | VER_SERVICEPACKMINOR),
+                         cm))
       detectOsState = DETECT_OS_VISTA_OR_LATER;
     else
       detectOsState = DETECT_OS_PREVISTA;
@@ -1016,10 +1025,14 @@ static CURLcode singleipconnect(struct connectdata *conn,
   }
   infof(data, "  Trying %s...\n", ipaddress);
 
+#ifdef ENABLE_IPV6
   is_tcp = (addr.family == AF_INET || addr.family == AF_INET6) &&
-           addr.socktype == SOCK_STREAM;
+    addr.socktype == SOCK_STREAM;
+#else
+  is_tcp = (addr.family == AF_INET) && addr.socktype == SOCK_STREAM;
+#endif
   if(is_tcp && data->set.tcp_nodelay)
-    tcpnodelay(conn, sockfd);
+    Curl_tcpnodelay(conn, sockfd);
 
   nosigpipe(conn, sockfd);
 
@@ -1043,7 +1056,11 @@ static CURLcode singleipconnect(struct connectdata *conn,
   }
 
   /* possibly bind the local end to an IP, interface or port */
-  if(addr.family == AF_INET || addr.family == AF_INET6) {
+  if(addr.family == AF_INET
+#ifdef ENABLE_IPV6
+     || addr.family == AF_INET6
+#endif
+    ) {
     result = bindlocal(conn, sockfd, addr.family,
                        Curl_ipv6_scope((struct sockaddr*)&addr.sa_addr));
     if(result) {
@@ -1098,7 +1115,7 @@ static CURLcode singleipconnect(struct connectdata *conn,
     default:
       /* unknown error, fallthrough and try another address! */
       infof(data, "Immediate connect fail for %s: %s\n",
-            ipaddress, Curl_strerror(conn,error));
+            ipaddress, Curl_strerror(conn, error));
       data->state.os_errno = error;
 
       /* connect failed */
@@ -1153,8 +1170,11 @@ CURLcode Curl_connecthost(struct connectdata *conn,  /* context */
     conn->tempaddr[0] = conn->tempaddr[0]->ai_next;
   }
 
-  if(conn->tempsock[0] == CURL_SOCKET_BAD)
+  if(conn->tempsock[0] == CURL_SOCKET_BAD) {
+    if(!result)
+      result = CURLE_COULDNT_CONNECT;
     return result;
+  }
 
   data->info.numconnects++; /* to track the number of connections made */
 
@@ -1189,15 +1209,20 @@ curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
 
   DEBUGASSERT(data);
 
-  /* this only works for an easy handle that has been used for
-     curl_easy_perform()! */
-  if(data->state.lastconnect && data->multi_easy) {
+  /* this works for an easy handle:
+   * - that has been used for curl_easy_perform()
+   * - that is associated with a multi handle, and whose connection
+   *   was detached with CURLOPT_CONNECT_ONLY
+   */
+  if(data->state.lastconnect && (data->multi_easy || data->multi)) {
     struct connectdata *c = data->state.lastconnect;
     struct connfind find;
     find.tofind = data->state.lastconnect;
     find.found = FALSE;
 
-    Curl_conncache_foreach(data->multi_easy->conn_cache, &find, conn_is_conn);
+    Curl_conncache_foreach(data->multi_easy?
+                           &data->multi_easy->conn_cache:
+                           &data->multi->conn_cache, &find, conn_is_conn);
 
     if(!find.found) {
       data->state.lastconnect = NULL;
@@ -1248,8 +1273,10 @@ int Curl_closesocket(struct connectdata *conn,
          accept, then we MUST NOT call the callback but clear the accepted
          status */
       conn->sock_accepted[SECONDARYSOCKET] = FALSE;
-    else
+    else {
+      Curl_multi_closed(conn, sock);
       return conn->fclosesocket(conn->closesocket_client, sock);
+    }
   }
 
   if(conn)
@@ -1344,11 +1371,12 @@ void Curl_conncontrol(struct connectdata *conn, bool closeit,
 #if defined(CURL_DISABLE_VERBOSE_STRINGS)
   (void) reason;
 #endif
+  if(closeit != conn->bits.close) {
+    infof(conn->data, "Marked for [%s]: %s\n", closeit?"closure":"keep alive",
+          reason);
 
-  infof(conn->data, "Marked for [%s]: %s\n", closeit?"closure":"keep alive",
-        reason);
-
-  conn->bits.close = closeit; /* the only place in the source code that should
-                                 assign this bit */
+    conn->bits.close = closeit; /* the only place in the source code that
+                                   should assign this bit */
+  }
 }
 #endif

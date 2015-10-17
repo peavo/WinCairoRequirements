@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2004 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2004 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -39,11 +39,12 @@
 #include <idna.h>
 #endif
 
+#ifdef USE_WINDOWS_SSPI
+#include "curl_sspi.h"
+#endif
+
 #include "strerror.h"
-
-#define _MPRINTF_REPLACE /* use our functions only */
-#include <curl/mprintf.h>
-
+#include "curl_printf.h"
 #include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
@@ -300,6 +301,9 @@ curl_easy_strerror(CURLcode error)
 
   case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
     return "SSL public key does not match pinned public key";
+
+  case CURLE_SSL_INVALIDCERTSTATUS:
+    return "SSL server certificate status verification FAILED";
 
     /* error codes not used by current libcurl */
   case CURLE_OBSOLETE20:
@@ -641,7 +645,7 @@ const char *Curl_strerror(struct connectdata *conn, int err)
 
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
                   LANG_NEUTRAL, wbuf, sizeof(wbuf)/sizeof(wchar_t), NULL);
-    wcstombs(buf,wbuf,max);
+    wcstombs(buf, wbuf, max);
   }
 #else
   /* 'sys_nerr' is the maximum errno number, it is not widely portable */
@@ -708,9 +712,9 @@ const char *Curl_strerror(struct connectdata *conn, int err)
   buf[max] = '\0'; /* make sure the string is zero terminated */
 
   /* strip trailing '\r\n' or '\n'. */
-  if((p = strrchr(buf,'\n')) != NULL && (p - buf) >= 2)
+  if((p = strrchr(buf, '\n')) != NULL && (p - buf) >= 2)
      *p = '\0';
-  if((p = strrchr(buf,'\r')) != NULL && (p - buf) >= 1)
+  if((p = strrchr(buf, '\r')) != NULL && (p - buf) >= 1)
      *p = '\0';
 
   if(old_errno != ERRNO)
@@ -823,6 +827,9 @@ const char *Curl_sspi_strerror (struct connectdata *conn, int err)
   switch (err) {
     case SEC_E_OK:
       txt = "No error";
+      break;
+    case CRYPT_E_REVOKED:
+      txt = "CRYPT_E_REVOKED";
       break;
     case SEC_E_ALGORITHM_MISMATCH:
       txt = "SEC_E_ALGORITHM_MISMATCH";
@@ -1067,6 +1074,12 @@ const char *Curl_sspi_strerror (struct connectdata *conn, int err)
 
   if(err == SEC_E_OK)
     strncpy(outbuf, txt, outmax);
+  else if(err == SEC_E_ILLEGAL_MESSAGE)
+    snprintf(outbuf, outmax,
+             "SEC_E_ILLEGAL_MESSAGE (0x%04X%04X) - This error usually occurs "
+             "when a fatal SSL/TLS alert is received (e.g. handshake failed). "
+             "More detail may be available in the Windows System event log.",
+             (err >> 16) & 0xffff, err & 0xffff);
   else {
     str = txtbuf;
     snprintf(txtbuf, sizeof(txtbuf), "%s (0x%04X%04X)",
@@ -1082,7 +1095,7 @@ const char *Curl_sspi_strerror (struct connectdata *conn, int err)
                        FORMAT_MESSAGE_IGNORE_INSERTS,
                        NULL, err, LANG_NEUTRAL,
                        wbuf, sizeof(wbuf)/sizeof(wchar_t), NULL)) {
-        wcstombs(msgbuf,wbuf,sizeof(msgbuf)-1);
+        wcstombs(msgbuf, wbuf, sizeof(msgbuf)-1);
         msg_formatted = TRUE;
       }
     }
@@ -1097,9 +1110,9 @@ const char *Curl_sspi_strerror (struct connectdata *conn, int err)
     if(msg_formatted) {
       msgbuf[sizeof(msgbuf)-1] = '\0';
       /* strip trailing '\r\n' or '\n' */
-      if((p = strrchr(msgbuf,'\n')) != NULL && (p - msgbuf) >= 2)
+      if((p = strrchr(msgbuf, '\n')) != NULL && (p - msgbuf) >= 2)
          *p = '\0';
-      if((p = strrchr(msgbuf,'\r')) != NULL && (p - msgbuf) >= 1)
+      if((p = strrchr(msgbuf, '\r')) != NULL && (p - msgbuf) >= 1)
          *p = '\0';
       msg = msgbuf;
     }

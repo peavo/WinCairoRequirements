@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -61,7 +61,8 @@ size_t tool_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 
 #ifdef DEBUGBUILD
   if(size * nmemb > (size_t)CURL_MAX_HTTP_HEADER) {
-    warnf(heads->config, "Header data exceeds single call write limit!\n");
+    warnf(heads->config->global, "Header data exceeds single call write "
+          "limit!\n");
     return failure;
   }
 #endif
@@ -74,6 +75,8 @@ size_t tool_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
     size_t rc = fwrite(ptr, size, nmemb, heads->stream);
     if(rc != cb)
       return rc;
+    /* flush the stream to send off what we got earlier */
+    (void)fflush(heads->stream);
   }
 
   /*

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -382,7 +382,7 @@ CURLcode Curl_SOCKS5(const char *proxy_name,
 
   /* RFC1928 chapter 5 specifies max 255 chars for domain name in packet */
   if(!socks5_resolve_local && hostname_len > 255) {
-    infof(conn->data,"SOCKS5: server resolving disabled for hostnames of "
+    infof(conn->data, "SOCKS5: server resolving disabled for hostnames of "
           "length > 255 [actual len=%zu]\n", hostname_len);
     socks5_resolve_local = TRUE;
   }
@@ -603,7 +603,7 @@ CURLcode Curl_SOCKS5(const char *proxy_name,
       if(hp->ai_family == AF_INET) {
         socksreq[len++] = 1; /* ATYP: IPv4 = 1 */
 
-        saddr_in = (struct sockaddr_in*)hp->ai_addr;
+        saddr_in = (struct sockaddr_in*)(void*)hp->ai_addr;
         for(i = 0; i < 4; i++) {
           socksreq[len++] = ((unsigned char*)&saddr_in->sin_addr.s_addr)[i];
           infof(data, "%d\n", socksreq[len-1]);
@@ -613,7 +613,7 @@ CURLcode Curl_SOCKS5(const char *proxy_name,
       else if(hp->ai_family == AF_INET6) {
         socksreq[len++] = 4; /* ATYP: IPv6 = 4 */
 
-        saddr_in6 = (struct sockaddr_in6*)hp->ai_addr;
+        saddr_in6 = (struct sockaddr_in6*)(void*)hp->ai_addr;
         for(i = 0; i < 16; i++) {
           socksreq[len++] = ((unsigned char*)&saddr_in6->sin6_addr.s6_addr)[i];
         }
