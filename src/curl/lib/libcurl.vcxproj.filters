@@ -319,6 +319,9 @@
     <ClCompile Include="curl_endian.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="vtls\schannel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="arpa_telnet.h">

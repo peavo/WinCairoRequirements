@@ -311,6 +311,7 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     <ClCompile Include="vtls\nss.c" />
     <ClCompile Include="vtls\openssl.c" />
     <ClCompile Include="vtls\polarssl.c" />
+    <ClCompile Include="vtls\schannel.c" />
     <ClCompile Include="vtls\vtls.c" />
     <ClCompile Include="warnless.c" />
     <ClCompile Include="wildcard.c" />
