@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 ALIGN	16
@@ -1327,7 +1329,7 @@ $L$in_prologue:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx

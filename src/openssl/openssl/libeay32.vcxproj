@@ -164,6 +164,7 @@
     <ClCompile Include="..\crypto\bn\bn_sqrt.c" />
     <ClCompile Include="..\crypto\bn\bn_word.c" />
     <ClCompile Include="..\crypto\bn\bn_x931p.c" />
+    <ClCompile Include="..\crypto\bn\rsaz_exp.c" />
     <ClCompile Include="..\crypto\buffer\buffer.c" />
     <ClCompile Include="..\crypto\buffer\buf_err.c" />
     <ClCompile Include="..\crypto\buffer\buf_str.c" />
@@ -196,6 +197,7 @@
     <ClCompile Include="..\crypto\cms\cms_err.c" />
     <ClCompile Include="..\crypto\cms\cms_ess.c" />
     <ClCompile Include="..\crypto\cms\cms_io.c" />
+    <ClCompile Include="..\crypto\cms\cms_kari.c" />
     <ClCompile Include="..\crypto\cms\cms_lib.c" />
     <ClCompile Include="..\crypto\cms\cms_pwri.c" />
     <ClCompile Include="..\crypto\cms\cms_sd.c" />
@@ -257,10 +259,12 @@
     <ClCompile Include="..\crypto\dh\dh_depr.c" />
     <ClCompile Include="..\crypto\dh\dh_err.c" />
     <ClCompile Include="..\crypto\dh\dh_gen.c" />
+    <ClCompile Include="..\crypto\dh\dh_kdf.c" />
     <ClCompile Include="..\crypto\dh\dh_key.c" />
     <ClCompile Include="..\crypto\dh\dh_lib.c" />
     <ClCompile Include="..\crypto\dh\dh_pmeth.c" />
     <ClCompile Include="..\crypto\dh\dh_prn.c" />
+    <ClCompile Include="..\crypto\dh\dh_rfc5114.c" />
     <ClCompile Include="..\crypto\dsa\dsa_ameth.c" />
     <ClCompile Include="..\crypto\dsa\dsa_asn1.c" />
     <ClCompile Include="..\crypto\dsa\dsa_depr.c" />
@@ -284,6 +288,7 @@
     <ClCompile Include="..\crypto\dso\dso_win32.c" />
     <ClCompile Include="..\crypto\ebcdic.c" />
     <ClCompile Include="..\crypto\ecdh\ech_err.c" />
+    <ClCompile Include="..\crypto\ecdh\ech_kdf.c" />
     <ClCompile Include="..\crypto\ecdh\ech_key.c" />
     <ClCompile Include="..\crypto\ecdh\ech_lib.c" />
     <ClCompile Include="..\crypto\ecdh\ech_ossl.c" />
@@ -330,7 +335,6 @@
     <ClCompile Include="..\crypto\engine\eng_openssl.c" />
     <ClCompile Include="..\crypto\engine\eng_pkey.c" />
     <ClCompile Include="..\crypto\engine\eng_rdrand.c" />
-    <ClCompile Include="..\crypto\engine\eng_rsax.c" />
     <ClCompile Include="..\crypto\engine\eng_table.c" />
     <ClCompile Include="..\crypto\engine\tb_asnmth.c" />
     <ClCompile Include="..\crypto\engine\tb_cipher.c" />
@@ -359,13 +363,13 @@
     <ClCompile Include="..\crypto\evp\evp_cnf.c" />
     <ClCompile Include="..\crypto\evp\evp_enc.c" />
     <ClCompile Include="..\crypto\evp\evp_err.c" />
-    <ClCompile Include="..\crypto\evp\evp_fips.c" />
     <ClCompile Include="..\crypto\evp\evp_key.c" />
     <ClCompile Include="..\crypto\evp\evp_lib.c" />
     <ClCompile Include="..\crypto\evp\evp_pbe.c" />
     <ClCompile Include="..\crypto\evp\evp_pkey.c" />
     <ClCompile Include="..\crypto\evp\e_aes.c" />
     <ClCompile Include="..\crypto\evp\e_aes_cbc_hmac_sha1.c" />
+    <ClCompile Include="..\crypto\evp\e_aes_cbc_hmac_sha256.c" />
     <ClCompile Include="..\crypto\evp\e_bf.c" />
     <ClCompile Include="..\crypto\evp\e_camellia.c" />
     <ClCompile Include="..\crypto\evp\e_cast.c" />
@@ -433,6 +437,7 @@
     <ClCompile Include="..\crypto\modes\cts128.c" />
     <ClCompile Include="..\crypto\modes\gcm128.c" />
     <ClCompile Include="..\crypto\modes\ofb128.c" />
+    <ClCompile Include="..\crypto\modes\wrap128.c" />
     <ClCompile Include="..\crypto\modes\xts128.c" />
     <ClCompile Include="..\crypto\objects\obj_dat.c" />
     <ClCompile Include="..\crypto\objects\obj_err.c" />
@@ -596,6 +601,7 @@
     <ClCompile Include="..\crypto\x509v3\v3_pmaps.c" />
     <ClCompile Include="..\crypto\x509v3\v3_prn.c" />
     <ClCompile Include="..\crypto\x509v3\v3_purp.c" />
+    <ClCompile Include="..\crypto\x509v3\v3_scts.c" />
     <ClCompile Include="..\crypto\x509v3\v3_skey.c" />
     <ClCompile Include="..\crypto\x509v3\v3_sxnet.c" />
     <ClCompile Include="..\crypto\x509v3\v3_utl.c" />
@@ -749,12 +755,24 @@
       <FileType>Document</FileType>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-mb-x86_64.asm">
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </NASM>
     <NASM Include="..\crypto\aes\asm\aesni-sha1-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Object File (-f x64)</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-sha256-x86_64.asm">
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </NASM>
     <NASM Include="..\crypto\aes\asm\aesni-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -777,12 +795,17 @@
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
-    <NASM Include="..\crypto\bn\asm\modexp512-x86_64.asm">
+    <NASM Include="..\crypto\bn\asm\rsaz-avx2.asm">
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\rsaz-x86_64.asm">
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </NASM>
     <NASM Include="..\crypto\bn\asm\x86_64-gf2m.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -819,6 +842,12 @@
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
+    <NASM Include="..\crypto\modes\asm\aesni-gcm-x86_64.asm">
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </NASM>
     <NASM Include="..\crypto\modes\asm\ghash-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -840,24 +869,33 @@
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
-    <NASM Include="..\crypto\sha\asm\sha1-x86_64.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    <NASM Include="..\crypto\sha\asm\sha1-mb-x86_64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha1-x86_64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha256-mb-x86_64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
     <NASM Include="..\crypto\sha\asm\sha256-x86_64.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
-      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
+      <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
     </NASM>
     <NASM Include="..\crypto\sha\asm\sha512-x86_64.asm">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">1</Outputswitch>
       <Outputswitch Condition="'$(Configuration)|$(Platform)'=='Release|x64'">1</Outputswitch>
     </NASM>
@@ -1050,7 +1088,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x86.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent />
     <PreBuildEvent>
@@ -1147,7 +1185,7 @@ xcopy /Y /R "$(ProjectDir)..\ssl\tls1.h" "$(SolutionDir)include\openssl"</Comman
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x64.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent />
     <PreBuildEvent>
@@ -1244,7 +1282,7 @@ xcopy /Y /R "$(ProjectDir)..\ssl\tls1.h" "$(SolutionDir)include\openssl"</Comman
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x86.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent />
     <PreBuildEvent>
@@ -1341,7 +1379,7 @@ xcopy /Y /R "$(ProjectDir)..\ssl\tls1.h" "$(SolutionDir)include\openssl"</Comman
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x64.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent />
     <PreBuildEvent>

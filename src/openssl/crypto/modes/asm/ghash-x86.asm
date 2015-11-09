@@ -942,27 +942,34 @@ db	102,15,58,68,220,0
 	pslldq	xmm4,8
 	pxor	xmm1,xmm3
 	pxor	xmm0,xmm4
+	movdqa	xmm4,xmm0
 	movdqa	xmm3,xmm0
+	psllq	xmm0,5
+	pxor	xmm3,xmm0
 	psllq	xmm0,1
 	pxor	xmm0,xmm3
-	psllq	xmm0,5
-	pxor	xmm0,xmm3
 	psllq	xmm0,57
-	movdqa	xmm4,xmm0
+	movdqa	xmm3,xmm0
 	pslldq	xmm0,8
-	psrldq	xmm4,8
-	pxor	xmm0,xmm3
-	pxor	xmm1,xmm4
+	psrldq	xmm3,8
+	pxor	xmm0,xmm4
+	pxor	xmm1,xmm3
 	movdqa	xmm4,xmm0
+	psrlq	xmm0,1
+	pxor	xmm1,xmm4
+	pxor	xmm4,xmm0
 	psrlq	xmm0,5
 	pxor	xmm0,xmm4
 	psrlq	xmm0,1
-	pxor	xmm0,xmm4
-	pxor	xmm4,xmm1
-	psrlq	xmm0,1
-	pxor	xmm0,xmm4
+	pxor	xmm0,xmm1
+	pshufd	xmm3,xmm2,78
+	pshufd	xmm4,xmm0,78
+	pxor	xmm3,xmm2
 	movdqu	[edx],xmm2
+	pxor	xmm4,xmm0
 	movdqu	[16+edx],xmm0
+db	102,15,58,15,227,8
+	movdqu	[32+edx],xmm4
 	ret
 global	_gcm_gmult_clmul
 align	16
@@ -978,11 +985,10 @@ L$011pic:
 	movdqa	xmm5,[ecx]
 	movups	xmm2,[edx]
 db	102,15,56,0,197
+	movups	xmm4,[32+edx]
 	movdqa	xmm1,xmm0
 	pshufd	xmm3,xmm0,78
-	pshufd	xmm4,xmm2,78
 	pxor	xmm3,xmm0
-	pxor	xmm4,xmm2
 db	102,15,58,68,194,0
 db	102,15,58,68,202,17
 db	102,15,58,68,220,0
@@ -993,25 +999,26 @@ db	102,15,58,68,220,0
 	pslldq	xmm4,8
 	pxor	xmm1,xmm3
 	pxor	xmm0,xmm4
+	movdqa	xmm4,xmm0
 	movdqa	xmm3,xmm0
+	psllq	xmm0,5
+	pxor	xmm3,xmm0
 	psllq	xmm0,1
 	pxor	xmm0,xmm3
-	psllq	xmm0,5
-	pxor	xmm0,xmm3
 	psllq	xmm0,57
-	movdqa	xmm4,xmm0
+	movdqa	xmm3,xmm0
 	pslldq	xmm0,8
-	psrldq	xmm4,8
-	pxor	xmm0,xmm3
-	pxor	xmm1,xmm4
+	psrldq	xmm3,8
+	pxor	xmm0,xmm4
+	pxor	xmm1,xmm3
 	movdqa	xmm4,xmm0
+	psrlq	xmm0,1
+	pxor	xmm1,xmm4
+	pxor	xmm4,xmm0
 	psrlq	xmm0,5
 	pxor	xmm0,xmm4
 	psrlq	xmm0,1
-	pxor	xmm0,xmm4
-	pxor	xmm4,xmm1
-	psrlq	xmm0,1
-	pxor	xmm0,xmm4
+	pxor	xmm0,xmm1
 db	102,15,56,0,197
 	movdqu	[eax],xmm0
 	ret
@@ -1041,127 +1048,115 @@ db	102,15,56,0,197
 	movdqu	xmm6,[16+esi]
 db	102,15,56,0,221
 db	102,15,56,0,245
+	movdqu	xmm5,[32+edx]
 	pxor	xmm0,xmm3
-	movdqa	xmm7,xmm6
 	pshufd	xmm3,xmm6,78
-	pshufd	xmm4,xmm2,78
+	movdqa	xmm7,xmm6
 	pxor	xmm3,xmm6
-	pxor	xmm4,xmm2
+	lea	esi,[32+esi]
 db	102,15,58,68,242,0
 db	102,15,58,68,250,17
-db	102,15,58,68,220,0
-	xorps	xmm3,xmm6
-	xorps	xmm3,xmm7
-	movdqa	xmm4,xmm3
-	psrldq	xmm3,8
-	pslldq	xmm4,8
-	pxor	xmm7,xmm3
-	pxor	xmm6,xmm4
+db	102,15,58,68,221,0
 	movups	xmm2,[16+edx]
-	lea	esi,[32+esi]
+	nop
 	sub	ebx,32
 	jbe	NEAR L$014even_tail
+	jmp	NEAR L$015mod_loop
+align	32
 L$015mod_loop:
+	pshufd	xmm4,xmm0,78
 	movdqa	xmm1,xmm0
-	pshufd	xmm3,xmm0,78
-	pshufd	xmm4,xmm2,78
-	pxor	xmm3,xmm0
-	pxor	xmm4,xmm2
+	pxor	xmm4,xmm0
+	nop
 db	102,15,58,68,194,0
 db	102,15,58,68,202,17
-db	102,15,58,68,220,0
-	xorps	xmm3,xmm0
-	xorps	xmm3,xmm1
-	movdqa	xmm4,xmm3
-	psrldq	xmm3,8
-	pslldq	xmm4,8
-	pxor	xmm1,xmm3
-	pxor	xmm0,xmm4
-	movdqu	xmm3,[esi]
+db	102,15,58,68,229,16
 	movups	xmm2,[edx]
-	pxor	xmm0,xmm6
-	pxor	xmm1,xmm7
+	xorps	xmm0,xmm6
+	movdqa	xmm5,[ecx]
+	xorps	xmm1,xmm7
+	movdqu	xmm7,[esi]
+	pxor	xmm3,xmm0
 	movdqu	xmm6,[16+esi]
-db	102,15,56,0,221
+	pxor	xmm3,xmm1
+db	102,15,56,0,253
+	pxor	xmm4,xmm3
+	movdqa	xmm3,xmm4
+	psrldq	xmm4,8
+	pslldq	xmm3,8
+	pxor	xmm1,xmm4
+	pxor	xmm0,xmm3
 db	102,15,56,0,245
-	movdqa	xmm5,xmm6
+	pxor	xmm1,xmm7
 	movdqa	xmm7,xmm6
-	pxor	xmm1,xmm3
+	movdqa	xmm4,xmm0
 	movdqa	xmm3,xmm0
+	psllq	xmm0,5
+	pxor	xmm3,xmm0
 	psllq	xmm0,1
 	pxor	xmm0,xmm3
-	psllq	xmm0,5
-	pxor	xmm0,xmm3
 db	102,15,58,68,242,0
+	movups	xmm5,[32+edx]
 	psllq	xmm0,57
-	movdqa	xmm4,xmm0
+	movdqa	xmm3,xmm0
 	pslldq	xmm0,8
-	psrldq	xmm4,8
-	pxor	xmm0,xmm3
-	pshufd	xmm3,xmm5,78
-	pxor	xmm1,xmm4
-	pxor	xmm3,xmm5
-	pshufd	xmm5,xmm2,78
-	pxor	xmm5,xmm2
-db	102,15,58,68,250,17
+	psrldq	xmm3,8
+	pxor	xmm0,xmm4
+	pxor	xmm1,xmm3
+	pshufd	xmm3,xmm7,78
 	movdqa	xmm4,xmm0
+	psrlq	xmm0,1
+	pxor	xmm3,xmm7
+	pxor	xmm1,xmm4
+db	102,15,58,68,250,17
+	movups	xmm2,[16+edx]
+	pxor	xmm4,xmm0
 	psrlq	xmm0,5
 	pxor	xmm0,xmm4
 	psrlq	xmm0,1
-	pxor	xmm0,xmm4
-	pxor	xmm4,xmm1
-	psrlq	xmm0,1
-	pxor	xmm0,xmm4
+	pxor	xmm0,xmm1
 db	102,15,58,68,221,0
-	movups	xmm2,[16+edx]
-	xorps	xmm3,xmm6
-	xorps	xmm3,xmm7
-	movdqa	xmm5,xmm3
-	psrldq	xmm3,8
-	pslldq	xmm5,8
-	pxor	xmm7,xmm3
-	pxor	xmm6,xmm5
-	movdqa	xmm5,[ecx]
 	lea	esi,[32+esi]
 	sub	ebx,32
 	ja	NEAR L$015mod_loop
 L$014even_tail:
+	pshufd	xmm4,xmm0,78
 	movdqa	xmm1,xmm0
-	pshufd	xmm3,xmm0,78
-	pshufd	xmm4,xmm2,78
-	pxor	xmm3,xmm0
-	pxor	xmm4,xmm2
+	pxor	xmm4,xmm0
 db	102,15,58,68,194,0
 db	102,15,58,68,202,17
-db	102,15,58,68,220,0
-	xorps	xmm3,xmm0
-	xorps	xmm3,xmm1
-	movdqa	xmm4,xmm3
-	psrldq	xmm3,8
-	pslldq	xmm4,8
-	pxor	xmm1,xmm3
-	pxor	xmm0,xmm4
-	pxor	xmm0,xmm6
-	pxor	xmm1,xmm7
+db	102,15,58,68,229,16
+	movdqa	xmm5,[ecx]
+	xorps	xmm0,xmm6
+	xorps	xmm1,xmm7
+	pxor	xmm3,xmm0
+	pxor	xmm3,xmm1
+	pxor	xmm4,xmm3
+	movdqa	xmm3,xmm4
+	psrldq	xmm4,8
+	pslldq	xmm3,8
+	pxor	xmm1,xmm4
+	pxor	xmm0,xmm3
+	movdqa	xmm4,xmm0
 	movdqa	xmm3,xmm0
+	psllq	xmm0,5
+	pxor	xmm3,xmm0
 	psllq	xmm0,1
 	pxor	xmm0,xmm3
-	psllq	xmm0,5
-	pxor	xmm0,xmm3
 	psllq	xmm0,57
-	movdqa	xmm4,xmm0
+	movdqa	xmm3,xmm0
 	pslldq	xmm0,8
-	psrldq	xmm4,8
-	pxor	xmm0,xmm3
-	pxor	xmm1,xmm4
+	psrldq	xmm3,8
+	pxor	xmm0,xmm4
+	pxor	xmm1,xmm3
 	movdqa	xmm4,xmm0
+	psrlq	xmm0,1
+	pxor	xmm1,xmm4
+	pxor	xmm4,xmm0
 	psrlq	xmm0,5
 	pxor	xmm0,xmm4
 	psrlq	xmm0,1
-	pxor	xmm0,xmm4
-	pxor	xmm4,xmm1
-	psrlq	xmm0,1
-	pxor	xmm0,xmm4
+	pxor	xmm0,xmm1
 	test	ebx,ebx
 	jnz	NEAR L$016done
 	movups	xmm2,[edx]
@@ -1184,25 +1179,26 @@ db	102,15,58,68,220,0
 	pslldq	xmm4,8
 	pxor	xmm1,xmm3
 	pxor	xmm0,xmm4
+	movdqa	xmm4,xmm0
 	movdqa	xmm3,xmm0
+	psllq	xmm0,5
+	pxor	xmm3,xmm0
 	psllq	xmm0,1
 	pxor	xmm0,xmm3
-	psllq	xmm0,5
-	pxor	xmm0,xmm3
 	psllq	xmm0,57
-	movdqa	xmm4,xmm0
+	movdqa	xmm3,xmm0
 	pslldq	xmm0,8
-	psrldq	xmm4,8
-	pxor	xmm0,xmm3
-	pxor	xmm1,xmm4
+	psrldq	xmm3,8
+	pxor	xmm0,xmm4
+	pxor	xmm1,xmm3
 	movdqa	xmm4,xmm0
+	psrlq	xmm0,1
+	pxor	xmm1,xmm4
+	pxor	xmm4,xmm0
 	psrlq	xmm0,5
 	pxor	xmm0,xmm4
 	psrlq	xmm0,1
-	pxor	xmm0,xmm4
-	pxor	xmm4,xmm1
-	psrlq	xmm0,1
-	pxor	xmm0,xmm4
+	pxor	xmm0,xmm1
 L$016done:
 db	102,15,56,0,197
 	movdqu	[eax],xmm0
@@ -1215,12 +1211,6 @@ align	64
 L$bswap:
 db	15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0
 db	1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194
-align	64
-L$rem_4bit:
-dd	0,0,0,471859200,0,943718400,0,610271232
-dd	0,1887436800,0,1822425088,0,1220542464,0,1423966208
-dd	0,3774873600,0,4246732800,0,3644850176,0,3311403008
-dd	0,2441084928,0,2376073216,0,2847932416,0,3051356160
 align	64
 L$rem_8bit:
 dw	0,450,900,582,1800,1738,1164,1358
@@ -1255,6 +1245,12 @@ dw	43456,43010,43588,43910,44744,44810,44364,44174
 dw	42960,42514,42068,42390,41176,41242,41820,41630
 dw	46560,46114,46692,47014,45800,45866,45420,45230
 dw	48112,47666,47220,47542,48376,48442,49020,48830
+align	64
+L$rem_4bit:
+dd	0,0,0,471859200,0,943718400,0,610271232
+dd	0,1887436800,0,1822425088,0,1220542464,0,1423966208
+dd	0,3774873600,0,4246732800,0,3644850176,0,3311403008
+dd	0,2441084928,0,2376073216,0,2847932416,0,3051356160
 db	71,72,65,83,72,32,102,111,114,32,120,56,54,44,32,67
 db	82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112
 db	112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62

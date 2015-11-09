@@ -71,228 +71,230 @@ L$003round:
 	movq	mm0,[4096+esi*8+ebp]
 	mov	eax,DWORD [esp]
 	mov	ebx,DWORD [4+esp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
+	movzx	ecx,al
+	movzx	edx,ah
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm0,[esi*8+ebp]
 	movq	mm1,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [8+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	movq	mm2,[6+esi*8+ebp]
 	movq	mm3,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	movq	mm4,[4+esi*8+ebp]
 	movq	mm5,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [12+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	movq	mm6,[2+esi*8+ebp]
 	movq	mm7,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm1,[esi*8+ebp]
 	pxor	mm2,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [16+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm3,[6+esi*8+ebp]
 	pxor	mm4,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm5,[4+esi*8+ebp]
 	pxor	mm6,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [20+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm7,[2+esi*8+ebp]
 	pxor	mm0,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm2,[esi*8+ebp]
 	pxor	mm3,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [24+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm4,[6+esi*8+ebp]
 	pxor	mm5,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm6,[4+esi*8+ebp]
 	pxor	mm7,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [28+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm0,[2+esi*8+ebp]
 	pxor	mm1,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm3,[esi*8+ebp]
 	pxor	mm4,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [32+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm5,[6+esi*8+ebp]
 	pxor	mm6,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm7,[4+esi*8+ebp]
 	pxor	mm0,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [36+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm1,[2+esi*8+ebp]
 	pxor	mm2,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm4,[esi*8+ebp]
 	pxor	mm5,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [40+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm6,[6+esi*8+ebp]
 	pxor	mm7,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm0,[4+esi*8+ebp]
 	pxor	mm1,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [44+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm2,[2+esi*8+ebp]
 	pxor	mm3,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm5,[esi*8+ebp]
 	pxor	mm6,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [48+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm7,[6+esi*8+ebp]
 	pxor	mm0,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm1,[4+esi*8+ebp]
 	pxor	mm2,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [52+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm3,[2+esi*8+ebp]
 	pxor	mm4,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm6,[esi*8+ebp]
 	pxor	mm7,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [56+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm0,[6+esi*8+ebp]
 	pxor	mm1,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm2,[4+esi*8+ebp]
 	pxor	mm3,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [60+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm4,[2+esi*8+ebp]
 	pxor	mm5,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm7,[esi*8+ebp]
 	pxor	mm0,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [64+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm1,[6+esi*8+ebp]
 	pxor	mm2,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm3,[4+esi*8+ebp]
 	pxor	mm4,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [68+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm5,[2+esi*8+ebp]
 	pxor	mm6,[1+edi*8+ebp]
 	movq	[esp],mm0
@@ -303,226 +305,226 @@ L$003round:
 	movq	[40+esp],mm5
 	movq	[48+esp],mm6
 	movq	[56+esp],mm7
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm0,[esi*8+ebp]
 	pxor	mm1,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [72+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm2,[6+esi*8+ebp]
 	pxor	mm3,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm4,[4+esi*8+ebp]
 	pxor	mm5,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [76+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm6,[2+esi*8+ebp]
 	pxor	mm7,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm1,[esi*8+ebp]
 	pxor	mm2,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [80+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm3,[6+esi*8+ebp]
 	pxor	mm4,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm5,[4+esi*8+ebp]
 	pxor	mm6,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [84+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm7,[2+esi*8+ebp]
 	pxor	mm0,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm2,[esi*8+ebp]
 	pxor	mm3,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [88+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm4,[6+esi*8+ebp]
 	pxor	mm5,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm6,[4+esi*8+ebp]
 	pxor	mm7,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [92+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm0,[2+esi*8+ebp]
 	pxor	mm1,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm3,[esi*8+ebp]
 	pxor	mm4,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [96+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm5,[6+esi*8+ebp]
 	pxor	mm6,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm7,[4+esi*8+ebp]
 	pxor	mm0,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [100+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm1,[2+esi*8+ebp]
 	pxor	mm2,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm4,[esi*8+ebp]
 	pxor	mm5,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [104+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm6,[6+esi*8+ebp]
 	pxor	mm7,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm0,[4+esi*8+ebp]
 	pxor	mm1,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [108+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm2,[2+esi*8+ebp]
 	pxor	mm3,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm5,[esi*8+ebp]
 	pxor	mm6,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [112+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm7,[6+esi*8+ebp]
 	pxor	mm0,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm1,[4+esi*8+ebp]
 	pxor	mm2,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [116+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm3,[2+esi*8+ebp]
 	pxor	mm4,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm6,[esi*8+ebp]
 	pxor	mm7,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	mov	eax,DWORD [120+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm0,[6+esi*8+ebp]
 	pxor	mm1,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm2,[4+esi*8+ebp]
 	pxor	mm3,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	mov	ebx,DWORD [124+esp]
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm4,[2+esi*8+ebp]
 	pxor	mm5,[1+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	eax,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
+	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm7,[esi*8+ebp]
 	pxor	mm0,[7+edi*8+ebp]
-	mov	cl,al
-	mov	dl,ah
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
 	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm1,[6+esi*8+ebp]
 	pxor	mm2,[5+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
-	lea	esi,[ecx*1+ecx]
-	lea	edi,[edx*1+edx]
 	shr	ebx,16
+	lea	esi,[ecx*1+ecx]
+	movzx	ecx,bl
+	lea	edi,[edx*1+edx]
+	movzx	edx,bh
 	pxor	mm3,[4+esi*8+ebp]
 	pxor	mm4,[3+edi*8+ebp]
-	mov	cl,bl
-	mov	dl,bh
 	lea	esi,[ecx*1+ecx]
+	movzx	ecx,al
 	lea	edi,[edx*1+edx]
+	movzx	edx,ah
 	pxor	mm5,[2+esi*8+ebp]
 	pxor	mm6,[1+edi*8+ebp]
 	lea	ebx,[128+esp]

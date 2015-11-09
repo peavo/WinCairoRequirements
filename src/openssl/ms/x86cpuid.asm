@@ -27,6 +27,8 @@ L$_OPENSSL_ia32_cpuid_begin:
 	xor	eax,eax
 	bt	ecx,21
 	jnc	NEAR L$000nocpuid
+	mov	esi,DWORD [20+esp]
+	mov	DWORD [8+esi],eax
 	cpuid
 	mov	edi,eax
 	xor	eax,eax
@@ -77,28 +79,36 @@ L$_OPENSSL_ia32_cpuid_begin:
 	and	edx,4026531839
 	jmp	NEAR L$002generic
 L$001intel:
+	cmp	edi,7
+	jb	NEAR L$003cacheinfo
+	mov	esi,DWORD [20+esp]
+	mov	eax,7
+	xor	ecx,ecx
+	cpuid
+	mov	DWORD [8+esi],ebx
+L$003cacheinfo:
 	cmp	edi,4
 	mov	edi,-1
-	jb	NEAR L$003nocacheinfo
+	jb	NEAR L$004nocacheinfo
 	mov	eax,4
 	mov	ecx,0
 	cpuid
 	mov	edi,eax
 	shr	edi,14
 	and	edi,4095
-L$003nocacheinfo:
+L$004nocacheinfo:
 	mov	eax,1
 	xor	ecx,ecx
 	cpuid
 	and	edx,3220176895
 	cmp	ebp,0
-	jne	NEAR L$004notintel
+	jne	NEAR L$005notintel
 	or	edx,1073741824
 	and	ah,15
 	cmp	ah,15
-	jne	NEAR L$004notintel
+	jne	NEAR L$005notintel
 	or	edx,1048576
-L$004notintel:
+L$005notintel:
 	bt	edx,28
 	jnc	NEAR L$002generic
 	and	edx,4026531839
@@ -115,20 +125,22 @@ L$002generic:
 	mov	esi,edx
 	or	ebp,ecx
 	bt	ecx,27
-	jnc	NEAR L$005clear_avx
+	jnc	NEAR L$006clear_avx
 	xor	ecx,ecx
 db	15,1,208
 	and	eax,6
 	cmp	eax,6
-	je	NEAR L$006done
+	je	NEAR L$007done
 	cmp	eax,2
-	je	NEAR L$005clear_avx
-L$007clear_xmm:
+	je	NEAR L$006clear_avx
+L$008clear_xmm:
 	and	ebp,4261412861
 	and	esi,4278190079
-L$005clear_avx:
+L$006clear_avx:
 	and	ebp,4026525695
-L$006done:
+	mov	edi,DWORD [20+esp]
+	and	DWORD [8+edi],4294967263
+L$007done:
 	mov	eax,esi
 	mov	edx,ebp
 L$000nocpuid:
@@ -146,9 +158,9 @@ L$_OPENSSL_rdtsc_begin:
 	xor	edx,edx
 	lea	ecx,[_OPENSSL_ia32cap_P]
 	bt	DWORD [ecx],4
-	jnc	NEAR L$008notsc
+	jnc	NEAR L$009notsc
 	rdtsc
-L$008notsc:
+L$009notsc:
 	ret
 global	_OPENSSL_instrument_halt
 align	16
@@ -156,14 +168,14 @@ _OPENSSL_instrument_halt:
 L$_OPENSSL_instrument_halt_begin:
 	lea	ecx,[_OPENSSL_ia32cap_P]
 	bt	DWORD [ecx],4
-	jnc	NEAR L$009nohalt
+	jnc	NEAR L$010nohalt
 dd	2421723150
 	and	eax,3
-	jnz	NEAR L$009nohalt
+	jnz	NEAR L$010nohalt
 	pushfd
 	pop	eax
 	bt	eax,9
-	jnc	NEAR L$009nohalt
+	jnc	NEAR L$010nohalt
 	rdtsc
 	push	edx
 	push	eax
@@ -173,7 +185,7 @@ dd	2421723150
 	sbb	edx,DWORD [4+esp]
 	add	esp,8
 	ret
-L$009nohalt:
+L$010nohalt:
 	xor	eax,eax
 	xor	edx,edx
 	ret
@@ -184,21 +196,21 @@ L$_OPENSSL_far_spin_begin:
 	pushfd
 	pop	eax
 	bt	eax,9
-	jnc	NEAR L$010nospin
+	jnc	NEAR L$011nospin
 	mov	eax,DWORD [4+esp]
 	mov	ecx,DWORD [8+esp]
 dd	2430111262
 	xor	eax,eax
 	mov	edx,DWORD [ecx]
-	jmp	NEAR L$011spin
+	jmp	NEAR L$012spin
 align	16
-L$011spin:
+L$012spin:
 	inc	eax
 	cmp	edx,DWORD [ecx]
-	je	NEAR L$011spin
+	je	NEAR L$012spin
 dd	529567888
 	ret
-L$010nospin:
+L$011nospin:
 	xor	eax,eax
 	xor	edx,edx
 	ret
@@ -211,10 +223,10 @@ L$_OPENSSL_wipe_cpu_begin:
 	lea	ecx,[_OPENSSL_ia32cap_P]
 	mov	ecx,DWORD [ecx]
 	bt	DWORD [ecx],1
-	jnc	NEAR L$012no_x87
+	jnc	NEAR L$013no_x87
 	and	ecx,83886080
 	cmp	ecx,83886080
-	jne	NEAR L$013no_sse2
+	jne	NEAR L$014no_sse2
 	pxor	xmm0,xmm0
 	pxor	xmm1,xmm1
 	pxor	xmm2,xmm2
@@ -223,9 +235,9 @@ L$_OPENSSL_wipe_cpu_begin:
 	pxor	xmm5,xmm5
 	pxor	xmm6,xmm6
 	pxor	xmm7,xmm7
-L$013no_sse2:
+L$014no_sse2:
 dd	4007259865,4007259865,4007259865,4007259865,2430851995
-L$012no_x87:
+L$013no_x87:
 	lea	eax,[4+esp]
 	ret
 global	_OPENSSL_atomic_add
@@ -237,11 +249,11 @@ L$_OPENSSL_atomic_add_begin:
 	push	ebx
 	nop
 	mov	eax,DWORD [edx]
-L$014spin:
+L$015spin:
 	lea	ebx,[ecx*1+eax]
 	nop
 dd	447811568
-	jne	NEAR L$014spin
+	jne	NEAR L$015spin
 	mov	eax,ebx
 	pop	ebx
 	ret
@@ -278,48 +290,61 @@ L$_OPENSSL_cleanse_begin:
 	mov	ecx,DWORD [8+esp]
 	xor	eax,eax
 	cmp	ecx,7
-	jae	NEAR L$015lot
+	jae	NEAR L$016lot
 	cmp	ecx,0
-	je	NEAR L$016ret
-L$017little:
+	je	NEAR L$017ret
+L$018little:
 	mov	BYTE [edx],al
 	sub	ecx,1
 	lea	edx,[1+edx]
-	jnz	NEAR L$017little
-L$016ret:
+	jnz	NEAR L$018little
+L$017ret:
 	ret
 align	16
-L$015lot:
+L$016lot:
 	test	edx,3
-	jz	NEAR L$018aligned
+	jz	NEAR L$019aligned
 	mov	BYTE [edx],al
 	lea	ecx,[ecx-1]
 	lea	edx,[1+edx]
-	jmp	NEAR L$015lot
-L$018aligned:
+	jmp	NEAR L$016lot
+L$019aligned:
 	mov	DWORD [edx],eax
 	lea	ecx,[ecx-4]
 	test	ecx,-4
 	lea	edx,[4+edx]
-	jnz	NEAR L$018aligned
+	jnz	NEAR L$019aligned
 	cmp	ecx,0
-	jne	NEAR L$017little
+	jne	NEAR L$018little
 	ret
 global	_OPENSSL_ia32_rdrand
 align	16
 _OPENSSL_ia32_rdrand:
 L$_OPENSSL_ia32_rdrand_begin:
 	mov	ecx,8
-L$019loop:
+L$020loop:
 db	15,199,240
-	jc	NEAR L$020break
-	loop	L$019loop
-L$020break:
+	jc	NEAR L$021break
+	loop	L$020loop
+L$021break:
+	cmp	eax,0
+	cmove	eax,ecx
+	ret
+global	_OPENSSL_ia32_rdseed
+align	16
+_OPENSSL_ia32_rdseed:
+L$_OPENSSL_ia32_rdseed_begin:
+	mov	ecx,8
+L$022loop:
+db	15,199,248
+	jc	NEAR L$023break
+	loop	L$022loop
+L$023break:
 	cmp	eax,0
 	cmove	eax,ecx
 	ret
 segment	.bss
-common	_OPENSSL_ia32cap_P 8
+common	_OPENSSL_ia32cap_P 16
 segment	.CRT$XCU data align=4
 extern	_OPENSSL_cpuid_setup
 dd	_OPENSSL_cpuid_setup

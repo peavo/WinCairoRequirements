@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 EXTERN	OPENSSL_ia32cap_P
@@ -62,7 +64,7 @@ $L$oop8_warmup:
 	mov	edx,DWORD[rax*4+rdi]
 	mov	eax,DWORD[r10*4+rdi]
 	xor	dl,BYTE[r12]
-	mov	BYTE[r12*1+r13],dl
+	mov	BYTE[r13*1+r12],dl
 	lea	r12,[1+r12]
 	dec	rbx
 	jnz	NEAR $L$oop8_warmup
@@ -141,7 +143,7 @@ $L$oop8:
 	sub	r11,8
 
 	xor	r8,QWORD[r12]
-	mov	QWORD[r12*1+r13],r8
+	mov	QWORD[r13*1+r12],r8
 	lea	r12,[8+r12]
 
 	test	r11,-8
@@ -167,7 +169,7 @@ $L$oop16_warmup:
 	mov	edx,DWORD[rax*4+rdi]
 	mov	eax,DWORD[r10*4+rdi]
 	xor	dl,BYTE[r12]
-	mov	BYTE[r12*1+r13],dl
+	mov	BYTE[r13*1+r12],dl
 	lea	r12,[1+r12]
 	dec	rbx
 	jnz	NEAR $L$oop16_warmup
@@ -204,7 +206,7 @@ $L$oop16:
 	pxor	xmm2,xmm1
 	add	cl,bl
 	pinsrw	xmm0,WORD[rax*4+rdi],0
-	movdqu	XMMWORD[r12*1+r13],xmm2
+	movdqu	XMMWORD[r13*1+r12],xmm2
 	lea	r12,[16+r12]
 $L$oop16_enter:
 	mov	edx,DWORD[rcx*4+rdi]
@@ -340,7 +342,7 @@ $L$oop16_enter:
 	psllq	xmm1,8
 	pxor	xmm2,xmm0
 	pxor	xmm2,xmm1
-	movdqu	XMMWORD[r12*1+r13],xmm2
+	movdqu	XMMWORD[r13*1+r12],xmm2
 	lea	r12,[16+r12]
 
 	cmp	r11,0
@@ -358,7 +360,7 @@ $L$loop1:
 	mov	edx,DWORD[rax*4+rdi]
 	mov	eax,DWORD[r10*4+rdi]
 	xor	dl,BYTE[r12]
-	mov	BYTE[r12*1+r13],dl
+	mov	BYTE[r13*1+r12],dl
 	lea	r12,[1+r12]
 	dec	r11
 	jnz	NEAR $L$loop1
@@ -383,7 +385,7 @@ $L$cloop8:
 	mov	BYTE[rcx*1+rdi],al
 	cmp	rcx,rsi
 	mov	BYTE[r10*1+rdi],dl
-	jne	NEAR $L$cmov0			
+	jne	NEAR $L$cmov0
 	mov	rbx,rax
 $L$cmov0:
 	add	dl,al
@@ -397,7 +399,7 @@ $L$cmov0:
 	mov	BYTE[rcx*1+rdi],bl
 	cmp	rcx,r10
 	mov	BYTE[rsi*1+rdi],dl
-	jne	NEAR $L$cmov1			
+	jne	NEAR $L$cmov1
 	mov	rax,rbx
 $L$cmov1:
 	add	dl,bl
@@ -411,7 +413,7 @@ $L$cmov1:
 	mov	BYTE[rcx*1+rdi],al
 	cmp	rcx,rsi
 	mov	BYTE[r10*1+rdi],dl
-	jne	NEAR $L$cmov2			
+	jne	NEAR $L$cmov2
 	mov	rbx,rax
 $L$cmov2:
 	add	dl,al
@@ -425,7 +427,7 @@ $L$cmov2:
 	mov	BYTE[rcx*1+rdi],bl
 	cmp	rcx,r10
 	mov	BYTE[rsi*1+rdi],dl
-	jne	NEAR $L$cmov3			
+	jne	NEAR $L$cmov3
 	mov	rax,rbx
 $L$cmov3:
 	add	dl,bl
@@ -439,7 +441,7 @@ $L$cmov3:
 	mov	BYTE[rcx*1+rdi],al
 	cmp	rcx,rsi
 	mov	BYTE[r10*1+rdi],dl
-	jne	NEAR $L$cmov4			
+	jne	NEAR $L$cmov4
 	mov	rbx,rax
 $L$cmov4:
 	add	dl,al
@@ -453,7 +455,7 @@ $L$cmov4:
 	mov	BYTE[rcx*1+rdi],bl
 	cmp	rcx,r10
 	mov	BYTE[rsi*1+rdi],dl
-	jne	NEAR $L$cmov5			
+	jne	NEAR $L$cmov5
 	mov	rax,rbx
 $L$cmov5:
 	add	dl,bl
@@ -467,7 +469,7 @@ $L$cmov5:
 	mov	BYTE[rcx*1+rdi],al
 	cmp	rcx,rsi
 	mov	BYTE[r10*1+rdi],dl
-	jne	NEAR $L$cmov6			
+	jne	NEAR $L$cmov6
 	mov	rbx,rax
 $L$cmov6:
 	add	dl,al
@@ -481,7 +483,7 @@ $L$cmov6:
 	mov	BYTE[rcx*1+rdi],bl
 	cmp	rcx,r10
 	mov	BYTE[rsi*1+rdi],dl
-	jne	NEAR $L$cmov7			
+	jne	NEAR $L$cmov7
 	mov	rax,rbx
 $L$cmov7:
 	add	dl,bl
@@ -716,7 +718,7 @@ $L$common_seh_exit:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx

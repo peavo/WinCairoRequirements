@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 
@@ -16,18 +18,18 @@ _bsaes_encrypt8:
 	movdqa	xmm7,XMMWORD[80+r11]
 	pxor	xmm15,xmm8
 	pxor	xmm0,xmm8
-DB	102,68,15,56,0,255
 	pxor	xmm1,xmm8
-DB	102,15,56,0,199
 	pxor	xmm2,xmm8
-DB	102,15,56,0,207
+DB	102,68,15,56,0,255
+DB	102,15,56,0,199
 	pxor	xmm3,xmm8
-DB	102,15,56,0,215
 	pxor	xmm4,xmm8
-DB	102,15,56,0,223
+DB	102,15,56,0,207
+DB	102,15,56,0,215
 	pxor	xmm5,xmm8
-DB	102,15,56,0,231
 	pxor	xmm6,xmm8
+DB	102,15,56,0,223
+DB	102,15,56,0,231
 DB	102,15,56,0,239
 DB	102,15,56,0,247
 _bsaes_encrypt8_bitslice:
@@ -124,21 +126,21 @@ ALIGN	16
 $L$enc_loop:
 	pxor	xmm15,XMMWORD[rax]
 	pxor	xmm0,XMMWORD[16+rax]
-DB	102,68,15,56,0,255
 	pxor	xmm1,XMMWORD[32+rax]
-DB	102,15,56,0,199
 	pxor	xmm2,XMMWORD[48+rax]
-DB	102,15,56,0,207
+DB	102,68,15,56,0,255
+DB	102,15,56,0,199
 	pxor	xmm3,XMMWORD[64+rax]
-DB	102,15,56,0,215
 	pxor	xmm4,XMMWORD[80+rax]
-DB	102,15,56,0,223
+DB	102,15,56,0,207
+DB	102,15,56,0,215
 	pxor	xmm5,XMMWORD[96+rax]
-DB	102,15,56,0,231
 	pxor	xmm6,XMMWORD[112+rax]
+DB	102,15,56,0,223
+DB	102,15,56,0,231
 DB	102,15,56,0,239
-	lea	rax,[128+rax]
 DB	102,15,56,0,247
+	lea	rax,[128+rax]
 $L$enc_sbox:
 	pxor	xmm4,xmm5
 	pxor	xmm1,xmm0
@@ -488,18 +490,18 @@ _bsaes_decrypt8:
 	movdqa	xmm7,XMMWORD[((-48))+r11]
 	pxor	xmm15,xmm8
 	pxor	xmm0,xmm8
-DB	102,68,15,56,0,255
 	pxor	xmm1,xmm8
-DB	102,15,56,0,199
 	pxor	xmm2,xmm8
-DB	102,15,56,0,207
+DB	102,68,15,56,0,255
+DB	102,15,56,0,199
 	pxor	xmm3,xmm8
-DB	102,15,56,0,215
 	pxor	xmm4,xmm8
-DB	102,15,56,0,223
+DB	102,15,56,0,207
+DB	102,15,56,0,215
 	pxor	xmm5,xmm8
-DB	102,15,56,0,231
 	pxor	xmm6,xmm8
+DB	102,15,56,0,223
+DB	102,15,56,0,231
 DB	102,15,56,0,239
 DB	102,15,56,0,247
 	movdqa	xmm7,XMMWORD[r11]
@@ -595,21 +597,21 @@ ALIGN	16
 $L$dec_loop:
 	pxor	xmm15,XMMWORD[rax]
 	pxor	xmm0,XMMWORD[16+rax]
-DB	102,68,15,56,0,255
 	pxor	xmm1,XMMWORD[32+rax]
-DB	102,15,56,0,199
 	pxor	xmm2,XMMWORD[48+rax]
-DB	102,15,56,0,207
+DB	102,68,15,56,0,255
+DB	102,15,56,0,199
 	pxor	xmm3,XMMWORD[64+rax]
-DB	102,15,56,0,215
 	pxor	xmm4,XMMWORD[80+rax]
-DB	102,15,56,0,223
+DB	102,15,56,0,207
+DB	102,15,56,0,215
 	pxor	xmm5,XMMWORD[96+rax]
-DB	102,15,56,0,231
 	pxor	xmm6,XMMWORD[112+rax]
+DB	102,15,56,0,223
+DB	102,15,56,0,231
 DB	102,15,56,0,239
-	lea	rax,[128+rax]
 DB	102,15,56,0,247
+	lea	rax,[128+rax]
 $L$dec_sbox:
 	pxor	xmm2,xmm3
 
@@ -1301,7 +1303,7 @@ $L$cbc_dec_one:
 	lea	rcx,[r12]
 	lea	rdx,[32+rbp]
 	lea	r8,[r15]
-	call	asm_AES_decrypt		
+	call	asm_AES_decrypt
 	pxor	xmm14,XMMWORD[32+rbp]
 	movdqu	XMMWORD[r13],xmm14
 	movdqa	xmm14,xmm15
@@ -1423,21 +1425,21 @@ $L$ctr_enc_loop:
 	movdqa	xmm7,XMMWORD[((-16))+r11]
 	pxor	xmm15,xmm8
 	pxor	xmm0,xmm8
-DB	102,68,15,56,0,255
 	pxor	xmm1,xmm8
-DB	102,15,56,0,199
 	pxor	xmm2,xmm8
-DB	102,15,56,0,207
+DB	102,68,15,56,0,255
+DB	102,15,56,0,199
 	pxor	xmm3,xmm8
-DB	102,15,56,0,215
 	pxor	xmm4,xmm8
-DB	102,15,56,0,223
+DB	102,15,56,0,207
+DB	102,15,56,0,215
 	pxor	xmm5,xmm8
-DB	102,15,56,0,231
 	pxor	xmm6,xmm8
+DB	102,15,56,0,223
+DB	102,15,56,0,231
 DB	102,15,56,0,239
-	lea	r11,[$L$BS0]
 DB	102,15,56,0,247
+	lea	r11,[$L$BS0]
 	mov	r10d,ebx
 
 	call	_bsaes_encrypt8_bitslice
@@ -1600,7 +1602,7 @@ $L$xts_enc_body:
 	lea	rcx,[r11]
 	lea	rdx,[32+rbp]
 	lea	r8,[r10]
-	call	asm_AES_encrypt		
+	call	asm_AES_encrypt
 
 	mov	eax,DWORD[240+r15]
 	mov	rbx,r14
@@ -1970,7 +1972,7 @@ $L$xts_enc_1:
 	lea	rcx,[32+rbp]
 	lea	rdx,[32+rbp]
 	lea	r8,[r15]
-	call	asm_AES_encrypt		
+	call	asm_AES_encrypt
 	pxor	xmm15,XMMWORD[32+rbp]
 
 
@@ -2003,7 +2005,7 @@ $L$xts_enc_steal:
 	lea	rdx,[32+rbp]
 	movdqa	XMMWORD[32+rbp],xmm15
 	lea	r8,[r15]
-	call	asm_AES_encrypt		
+	call	asm_AES_encrypt
 	pxor	xmm6,XMMWORD[32+rbp]
 	movdqu	XMMWORD[(-16)+r13],xmm6
 
@@ -2077,7 +2079,7 @@ $L$xts_dec_body:
 	lea	rcx,[r11]
 	lea	rdx,[32+rbp]
 	lea	r8,[r10]
-	call	asm_AES_encrypt		
+	call	asm_AES_encrypt
 
 	mov	eax,DWORD[240+r15]
 	mov	rbx,r14
@@ -2454,7 +2456,7 @@ $L$xts_dec_1:
 	lea	rcx,[32+rbp]
 	lea	rdx,[32+rbp]
 	lea	r8,[r15]
-	call	asm_AES_decrypt		
+	call	asm_AES_decrypt
 	pxor	xmm15,XMMWORD[32+rbp]
 
 
@@ -2485,7 +2487,7 @@ $L$xts_dec_done:
 	lea	rdx,[32+rbp]
 	movdqa	XMMWORD[32+rbp],xmm15
 	lea	r8,[r15]
-	call	asm_AES_decrypt		
+	call	asm_AES_decrypt
 	pxor	xmm6,XMMWORD[32+rbp]
 	mov	rdx,r13
 	movdqu	XMMWORD[r13],xmm6
@@ -2506,7 +2508,7 @@ $L$xts_dec_steal:
 	lea	rdx,[32+rbp]
 	movdqa	XMMWORD[32+rbp],xmm15
 	lea	r8,[r15]
-	call	asm_AES_decrypt		
+	call	asm_AES_decrypt
 	pxor	xmm5,XMMWORD[32+rbp]
 	movdqu	XMMWORD[r13],xmm5
 
@@ -2640,7 +2642,7 @@ se_handler:
 	lea	rsi,[64+rax]
 	lea	rdi,[512+r8]
 	mov	ecx,20
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 	lea	rax,[160+rax]
 
 	mov	rbp,QWORD[112+rax]
@@ -2663,7 +2665,7 @@ $L$in_prologue:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx
@@ -2716,16 +2718,16 @@ ALIGN	8
 $L$cbc_dec_info:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$cbc_dec_body wrt ..imagebase,$L$cbc_dec_epilogue wrt ..imagebase	
+	DD	$L$cbc_dec_body wrt ..imagebase,$L$cbc_dec_epilogue wrt ..imagebase
 $L$ctr_enc_info:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$ctr_enc_body wrt ..imagebase,$L$ctr_enc_epilogue wrt ..imagebase	
+	DD	$L$ctr_enc_body wrt ..imagebase,$L$ctr_enc_epilogue wrt ..imagebase
 $L$xts_enc_info:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$xts_enc_body wrt ..imagebase,$L$xts_enc_epilogue wrt ..imagebase	
+	DD	$L$xts_enc_body wrt ..imagebase,$L$xts_enc_epilogue wrt ..imagebase
 $L$xts_dec_info:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$xts_dec_body wrt ..imagebase,$L$xts_dec_epilogue wrt ..imagebase	
+	DD	$L$xts_dec_body wrt ..imagebase,$L$xts_dec_epilogue wrt ..imagebase

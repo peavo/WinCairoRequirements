@@ -1,16 +1,20 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 EXTERN	OPENSSL_ia32cap_P
 
 global	aesni_cbc_sha1_enc
 
-ALIGN	16
+ALIGN	32
 aesni_cbc_sha1_enc:
 
 	mov	r10d,DWORD[((OPENSSL_ia32cap_P+0))]
-	mov	r11d,DWORD[((OPENSSL_ia32cap_P+4))]
+	mov	r11,QWORD[((OPENSSL_ia32cap_P+4))]
+	bt	r11,61
+	jc	NEAR aesni_cbc_sha1_enc_shaext
 	and	r11d,268435456
 	and	r10d,1073741824
 	or	r10d,r11d
@@ -20,7 +24,7 @@ aesni_cbc_sha1_enc:
 	DB	0F3h,0C3h		;repret
 
 
-ALIGN	16
+ALIGN	32
 aesni_cbc_sha1_enc_ssse3:
 	mov	QWORD[8+rsp],rdi	;WIN64 prologue
 	mov	QWORD[16+rsp],rsi
@@ -60,12 +64,12 @@ $L$prologue_ssse3:
 	mov	r12,rdi
 	mov	r13,rsi
 	mov	r14,rdx
-	mov	r15,rcx
-	movdqu	xmm11,XMMWORD[r8]
+	lea	r15,[112+rcx]
+	movdqu	xmm2,XMMWORD[r8]
 	mov	QWORD[88+rsp],r8
 	shl	r14,6
 	sub	r13,r12
-	mov	r8d,DWORD[240+r15]
+	mov	r8d,DWORD[((240-112))+r15]
 	add	r14,r10
 
 	lea	r11,[K_XX_XX]
@@ -75,1188 +79,1168 @@ $L$prologue_ssse3:
 	mov	edx,DWORD[12+r9]
 	mov	esi,ebx
 	mov	ebp,DWORD[16+r9]
+	mov	edi,ecx
+	xor	edi,edx
+	and	esi,edi
 
-	movdqa	xmm6,XMMWORD[64+r11]
-	movdqa	xmm9,XMMWORD[r11]
-	movdqu	xmm0,XMMWORD[r10]
-	movdqu	xmm1,XMMWORD[16+r10]
-	movdqu	xmm2,XMMWORD[32+r10]
-	movdqu	xmm3,XMMWORD[48+r10]
-DB	102,15,56,0,198
+	movdqa	xmm3,XMMWORD[64+r11]
+	movdqa	xmm13,XMMWORD[r11]
+	movdqu	xmm4,XMMWORD[r10]
+	movdqu	xmm5,XMMWORD[16+r10]
+	movdqu	xmm6,XMMWORD[32+r10]
+	movdqu	xmm7,XMMWORD[48+r10]
+DB	102,15,56,0,227
+DB	102,15,56,0,235
+DB	102,15,56,0,243
 	add	r10,64
-DB	102,15,56,0,206
-DB	102,15,56,0,214
-DB	102,15,56,0,222
-	paddd	xmm0,xmm9
-	paddd	xmm1,xmm9
-	paddd	xmm2,xmm9
-	movdqa	XMMWORD[rsp],xmm0
-	psubd	xmm0,xmm9
-	movdqa	XMMWORD[16+rsp],xmm1
-	psubd	xmm1,xmm9
-	movdqa	XMMWORD[32+rsp],xmm2
-	psubd	xmm2,xmm9
-	movups	xmm13,XMMWORD[r15]
-	movups	xmm14,XMMWORD[16+r15]
+	paddd	xmm4,xmm13
+DB	102,15,56,0,251
+	paddd	xmm5,xmm13
+	paddd	xmm6,xmm13
+	movdqa	XMMWORD[rsp],xmm4
+	psubd	xmm4,xmm13
+	movdqa	XMMWORD[16+rsp],xmm5
+	psubd	xmm5,xmm13
+	movdqa	XMMWORD[32+rsp],xmm6
+	psubd	xmm6,xmm13
+	movups	xmm15,XMMWORD[((-112))+r15]
+	movups	xmm0,XMMWORD[((16-112))+r15]
 	jmp	NEAR $L$oop_ssse3
-ALIGN	16
+ALIGN	32
 $L$oop_ssse3:
-	movdqa	xmm4,xmm1
-	add	ebp,DWORD[rsp]
-	movups	xmm12,XMMWORD[r12]
-	xorps	xmm12,xmm13
-	xorps	xmm11,xmm12
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[32+r15]
-	xor	ecx,edx
-	movdqa	xmm8,xmm3
-DB	102,15,58,15,224,8
-	mov	edi,eax
-	rol	eax,5
-	paddd	xmm9,xmm3
-	and	esi,ecx
-	xor	ecx,edx
-	psrldq	xmm8,4
-	xor	esi,edx
-	add	ebp,eax
-	pxor	xmm4,xmm0
 	ror	ebx,2
-	add	ebp,esi
-	pxor	xmm8,xmm2
-	add	edx,DWORD[4+rsp]
+	movups	xmm14,XMMWORD[r12]
+	xorps	xmm14,xmm15
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+r15]
+DB	102,15,56,220,208
+	pshufd	xmm8,xmm4,238
+	xor	esi,edx
+	movdqa	xmm12,xmm7
+	paddd	xmm13,xmm7
+	mov	edi,eax
+	add	ebp,DWORD[rsp]
+	punpcklqdq	xmm8,xmm5
 	xor	ebx,ecx
-	mov	esi,ebp
-	rol	ebp,5
-	pxor	xmm4,xmm8
+	rol	eax,5
+	add	ebp,esi
+	psrldq	xmm12,4
 	and	edi,ebx
 	xor	ebx,ecx
-	movdqa	XMMWORD[48+rsp],xmm9
-	xor	edi,ecx
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[48+r15]
-	add	edx,ebp
-	movdqa	xmm10,xmm4
-	movdqa	xmm8,xmm4
+	pxor	xmm8,xmm4
+	add	ebp,eax
 	ror	eax,7
+	pxor	xmm12,xmm6
+	xor	edi,ecx
+	mov	esi,ebp
+	add	edx,DWORD[4+rsp]
+	pxor	xmm8,xmm12
+	xor	eax,ebx
+	rol	ebp,5
+	movdqa	XMMWORD[48+rsp],xmm13
 	add	edx,edi
-	add	ecx,DWORD[8+rsp]
-	xor	eax,ebx
-	pslldq	xmm10,12
-	paddd	xmm4,xmm4
-	mov	edi,edx
-	rol	edx,5
+	movups	xmm0,XMMWORD[((-64))+r15]
+DB	102,15,56,220,209
 	and	esi,eax
+	movdqa	xmm3,xmm8
 	xor	eax,ebx
-	psrld	xmm8,31
-	xor	esi,ebx
-	add	ecx,edx
-	movdqa	xmm9,xmm10
+	add	edx,ebp
 	ror	ebp,7
-	add	ecx,esi
-	psrld	xmm10,30
-	por	xmm4,xmm8
-	add	ebx,DWORD[12+rsp]
+	movdqa	xmm12,xmm8
+	xor	esi,ebx
+	pslldq	xmm3,12
+	paddd	xmm8,xmm8
+	mov	edi,edx
+	add	ecx,DWORD[8+rsp]
+	psrld	xmm12,31
 	xor	ebp,eax
-	mov	esi,ecx
-	rol	ecx,5
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[64+r15]
-	pslld	xmm9,2
-	pxor	xmm4,xmm10
+	rol	edx,5
+	add	ecx,esi
+	movdqa	xmm13,xmm3
 	and	edi,ebp
 	xor	ebp,eax
-	movdqa	xmm10,XMMWORD[r11]
-	xor	edi,eax
-	add	ebx,ecx
-	pxor	xmm4,xmm9
+	psrld	xmm3,30
+	add	ecx,edx
 	ror	edx,7
+	por	xmm8,xmm12
+	xor	edi,eax
+	mov	esi,ecx
+	add	ebx,DWORD[12+rsp]
+	movups	xmm1,XMMWORD[((-48))+r15]
+DB	102,15,56,220,208
+	pslld	xmm13,2
+	pxor	xmm8,xmm3
+	xor	edx,ebp
+	movdqa	xmm3,XMMWORD[r11]
+	rol	ecx,5
 	add	ebx,edi
-	movdqa	xmm5,xmm2
-	add	eax,DWORD[16+rsp]
-	xor	edx,ebp
-	movdqa	xmm9,xmm4
-DB	102,15,58,15,233,8
-	mov	edi,ebx
-	rol	ebx,5
-	paddd	xmm10,xmm4
 	and	esi,edx
+	pxor	xmm8,xmm13
 	xor	edx,ebp
-	psrldq	xmm9,4
-	xor	esi,ebp
-	add	eax,ebx
-	pxor	xmm5,xmm1
+	add	ebx,ecx
 	ror	ecx,7
-	add	eax,esi
-	pxor	xmm9,xmm3
-	add	ebp,DWORD[20+rsp]
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[80+r15]
+	pshufd	xmm9,xmm5,238
+	xor	esi,ebp
+	movdqa	xmm13,xmm8
+	paddd	xmm3,xmm8
+	mov	edi,ebx
+	add	eax,DWORD[16+rsp]
+	punpcklqdq	xmm9,xmm6
 	xor	ecx,edx
-	mov	esi,eax
-	rol	eax,5
-	pxor	xmm5,xmm9
+	rol	ebx,5
+	add	eax,esi
+	psrldq	xmm13,4
 	and	edi,ecx
 	xor	ecx,edx
-	movdqa	XMMWORD[rsp],xmm10
-	xor	edi,edx
-	add	ebp,eax
-	movdqa	xmm8,xmm5
-	movdqa	xmm9,xmm5
+	pxor	xmm9,xmm5
+	add	eax,ebx
 	ror	ebx,7
+	movups	xmm0,XMMWORD[((-32))+r15]
+DB	102,15,56,220,209
+	pxor	xmm13,xmm7
+	xor	edi,edx
+	mov	esi,eax
+	add	ebp,DWORD[20+rsp]
+	pxor	xmm9,xmm13
+	xor	ebx,ecx
+	rol	eax,5
+	movdqa	XMMWORD[rsp],xmm3
 	add	ebp,edi
-	add	edx,DWORD[24+rsp]
-	xor	ebx,ecx
-	pslldq	xmm8,12
-	paddd	xmm5,xmm5
-	mov	edi,ebp
-	rol	ebp,5
 	and	esi,ebx
+	movdqa	xmm12,xmm9
 	xor	ebx,ecx
-	psrld	xmm9,31
-	xor	esi,ecx
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[96+r15]
-	add	edx,ebp
-	movdqa	xmm10,xmm8
+	add	ebp,eax
 	ror	eax,7
-	add	edx,esi
-	psrld	xmm8,30
-	por	xmm5,xmm9
-	add	ecx,DWORD[28+rsp]
+	movdqa	xmm13,xmm9
+	xor	esi,ecx
+	pslldq	xmm12,12
+	paddd	xmm9,xmm9
+	mov	edi,ebp
+	add	edx,DWORD[24+rsp]
+	psrld	xmm13,31
 	xor	eax,ebx
-	mov	esi,edx
-	rol	edx,5
-	pslld	xmm10,2
-	pxor	xmm5,xmm8
+	rol	ebp,5
+	add	edx,esi
+	movups	xmm1,XMMWORD[((-16))+r15]
+DB	102,15,56,220,208
+	movdqa	xmm3,xmm12
 	and	edi,eax
 	xor	eax,ebx
-	movdqa	xmm8,XMMWORD[16+r11]
-	xor	edi,ebx
-	add	ecx,edx
-	pxor	xmm5,xmm10
+	psrld	xmm12,30
+	add	edx,ebp
 	ror	ebp,7
+	por	xmm9,xmm13
+	xor	edi,ebx
+	mov	esi,edx
+	add	ecx,DWORD[28+rsp]
+	pslld	xmm3,2
+	pxor	xmm9,xmm12
+	xor	ebp,eax
+	movdqa	xmm12,XMMWORD[16+r11]
+	rol	edx,5
 	add	ecx,edi
-	movdqa	xmm6,xmm3
-	add	ebx,DWORD[32+rsp]
-	xor	ebp,eax
-	movdqa	xmm10,xmm5
-DB	102,15,58,15,242,8
-	mov	edi,ecx
-	rol	ecx,5
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[112+r15]
-	paddd	xmm8,xmm5
 	and	esi,ebp
+	pxor	xmm9,xmm3
 	xor	ebp,eax
-	psrldq	xmm10,4
-	xor	esi,eax
-	add	ebx,ecx
-	pxor	xmm6,xmm2
+	add	ecx,edx
 	ror	edx,7
-	add	ebx,esi
-	pxor	xmm10,xmm4
-	add	eax,DWORD[36+rsp]
+	pshufd	xmm10,xmm6,238
+	xor	esi,eax
+	movdqa	xmm3,xmm9
+	paddd	xmm12,xmm9
+	mov	edi,ecx
+	add	ebx,DWORD[32+rsp]
+	movups	xmm0,XMMWORD[r15]
+DB	102,15,56,220,209
+	punpcklqdq	xmm10,xmm7
 	xor	edx,ebp
-	mov	esi,ebx
-	rol	ebx,5
-	pxor	xmm6,xmm10
+	rol	ecx,5
+	add	ebx,esi
+	psrldq	xmm3,4
 	and	edi,edx
 	xor	edx,ebp
-	movdqa	XMMWORD[16+rsp],xmm8
-	xor	edi,ebp
-	add	eax,ebx
-	movdqa	xmm9,xmm6
-	movdqa	xmm10,xmm6
+	pxor	xmm10,xmm6
+	add	ebx,ecx
 	ror	ecx,7
+	pxor	xmm3,xmm8
+	xor	edi,ebp
+	mov	esi,ebx
+	add	eax,DWORD[36+rsp]
+	pxor	xmm10,xmm3
+	xor	ecx,edx
+	rol	ebx,5
+	movdqa	XMMWORD[16+rsp],xmm12
 	add	eax,edi
-	add	ebp,DWORD[40+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[128+r15]
-	xor	ecx,edx
-	pslldq	xmm9,12
-	paddd	xmm6,xmm6
-	mov	edi,eax
-	rol	eax,5
 	and	esi,ecx
+	movdqa	xmm13,xmm10
 	xor	ecx,edx
-	psrld	xmm10,31
-	xor	esi,edx
-	add	ebp,eax
-	movdqa	xmm8,xmm9
+	add	eax,ebx
 	ror	ebx,7
-	add	ebp,esi
-	psrld	xmm9,30
-	por	xmm6,xmm10
-	add	edx,DWORD[44+rsp]
+	movups	xmm1,XMMWORD[16+r15]
+DB	102,15,56,220,208
+	movdqa	xmm3,xmm10
+	xor	esi,edx
+	pslldq	xmm13,12
+	paddd	xmm10,xmm10
+	mov	edi,eax
+	add	ebp,DWORD[40+rsp]
+	psrld	xmm3,31
 	xor	ebx,ecx
-	mov	esi,ebp
-	rol	ebp,5
-	pslld	xmm8,2
-	pxor	xmm6,xmm9
+	rol	eax,5
+	add	ebp,esi
+	movdqa	xmm12,xmm13
 	and	edi,ebx
 	xor	ebx,ecx
-	movdqa	xmm9,XMMWORD[16+r11]
-	xor	edi,ecx
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[144+r15]
-	add	edx,ebp
-	pxor	xmm6,xmm8
+	psrld	xmm13,30
+	add	ebp,eax
 	ror	eax,7
+	por	xmm10,xmm3
+	xor	edi,ecx
+	mov	esi,ebp
+	add	edx,DWORD[44+rsp]
+	pslld	xmm12,2
+	pxor	xmm10,xmm13
+	xor	eax,ebx
+	movdqa	xmm13,XMMWORD[16+r11]
+	rol	ebp,5
 	add	edx,edi
-	movdqa	xmm7,xmm4
-	add	ecx,DWORD[48+rsp]
-	xor	eax,ebx
-	movdqa	xmm8,xmm6
-DB	102,15,58,15,251,8
-	mov	edi,edx
-	rol	edx,5
-	paddd	xmm9,xmm6
+	movups	xmm0,XMMWORD[32+r15]
+DB	102,15,56,220,209
 	and	esi,eax
+	pxor	xmm10,xmm12
 	xor	eax,ebx
-	psrldq	xmm8,4
-	xor	esi,ebx
-	add	ecx,edx
-	pxor	xmm7,xmm3
+	add	edx,ebp
 	ror	ebp,7
-	add	ecx,esi
-	pxor	xmm8,xmm5
-	add	ebx,DWORD[52+rsp]
+	pshufd	xmm11,xmm7,238
+	xor	esi,ebx
+	movdqa	xmm12,xmm10
+	paddd	xmm13,xmm10
+	mov	edi,edx
+	add	ecx,DWORD[48+rsp]
+	punpcklqdq	xmm11,xmm8
 	xor	ebp,eax
-	mov	esi,ecx
-	rol	ecx,5
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[160+r15]
-	pxor	xmm7,xmm8
+	rol	edx,5
+	add	ecx,esi
+	psrldq	xmm12,4
 	and	edi,ebp
 	xor	ebp,eax
-	movdqa	XMMWORD[32+rsp],xmm9
-	xor	edi,eax
-	add	ebx,ecx
-	movdqa	xmm10,xmm7
-	movdqa	xmm8,xmm7
+	pxor	xmm11,xmm7
+	add	ecx,edx
 	ror	edx,7
+	pxor	xmm12,xmm9
+	xor	edi,eax
+	mov	esi,ecx
+	add	ebx,DWORD[52+rsp]
+	movups	xmm1,XMMWORD[48+r15]
+DB	102,15,56,220,208
+	pxor	xmm11,xmm12
+	xor	edx,ebp
+	rol	ecx,5
+	movdqa	XMMWORD[32+rsp],xmm13
 	add	ebx,edi
-	add	eax,DWORD[56+rsp]
-	xor	edx,ebp
-	pslldq	xmm10,12
-	paddd	xmm7,xmm7
-	mov	edi,ebx
-	rol	ebx,5
 	and	esi,edx
+	movdqa	xmm3,xmm11
 	xor	edx,ebp
-	psrld	xmm8,31
-	xor	esi,ebp
-	add	eax,ebx
-	movdqa	xmm9,xmm10
+	add	ebx,ecx
 	ror	ecx,7
+	movdqa	xmm12,xmm11
+	xor	esi,ebp
+	pslldq	xmm3,12
+	paddd	xmm11,xmm11
+	mov	edi,ebx
+	add	eax,DWORD[56+rsp]
+	psrld	xmm12,31
+	xor	ecx,edx
+	rol	ebx,5
 	add	eax,esi
-	psrld	xmm10,30
-	por	xmm7,xmm8
-	add	ebp,DWORD[60+rsp]
+	movdqa	xmm13,xmm3
+	and	edi,ecx
+	xor	ecx,edx
+	psrld	xmm3,30
+	add	eax,ebx
+	ror	ebx,7
 	cmp	r8d,11
 	jb	NEAR $L$aesenclast1
-	movups	xmm14,XMMWORD[176+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[192+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[64+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+r15]
+DB	102,15,56,220,208
 	je	NEAR $L$aesenclast1
-	movups	xmm14,XMMWORD[208+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[224+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[96+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+r15]
+DB	102,15,56,220,208
 $L$aesenclast1:
-DB	102,69,15,56,221,223
-	movups	xmm14,XMMWORD[16+r15]
-	xor	ecx,edx
-	mov	esi,eax
-	rol	eax,5
-	pslld	xmm9,2
-	pxor	xmm7,xmm10
-	and	edi,ecx
-	xor	ecx,edx
-	movdqa	xmm10,XMMWORD[16+r11]
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+r15]
+	por	xmm11,xmm12
 	xor	edi,edx
-	add	ebp,eax
-	pxor	xmm7,xmm9
-	ror	ebx,7
+	mov	esi,eax
+	add	ebp,DWORD[60+rsp]
+	pslld	xmm13,2
+	pxor	xmm11,xmm3
+	xor	ebx,ecx
+	movdqa	xmm3,XMMWORD[16+r11]
+	rol	eax,5
 	add	ebp,edi
-	movdqa	xmm9,xmm7
-	add	edx,DWORD[rsp]
-	pxor	xmm0,xmm4
-DB	102,68,15,58,15,206,8
-	xor	ebx,ecx
-	mov	edi,ebp
-	rol	ebp,5
-	pxor	xmm0,xmm1
 	and	esi,ebx
+	pxor	xmm11,xmm13
+	pshufd	xmm13,xmm10,238
 	xor	ebx,ecx
-	movdqa	xmm8,xmm10
-	paddd	xmm10,xmm7
-	xor	esi,ecx
-	movups	xmm12,XMMWORD[16+r12]
-	xorps	xmm12,xmm13
-	movups	XMMWORD[r12*1+r13],xmm11
-	xorps	xmm11,xmm12
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[32+r15]
-	add	edx,ebp
-	pxor	xmm0,xmm9
+	add	ebp,eax
 	ror	eax,7
+	pxor	xmm4,xmm8
+	xor	esi,ecx
+	mov	edi,ebp
+	add	edx,DWORD[rsp]
+	punpcklqdq	xmm13,xmm11
+	xor	eax,ebx
+	rol	ebp,5
+	pxor	xmm4,xmm5
 	add	edx,esi
-	add	ecx,DWORD[4+rsp]
-	xor	eax,ebx
-	movdqa	xmm9,xmm0
-	movdqa	XMMWORD[48+rsp],xmm10
-	mov	esi,edx
-	rol	edx,5
+	movups	xmm14,XMMWORD[16+r12]
+	xorps	xmm14,xmm15
+	movups	XMMWORD[r13*1+r12],xmm2
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+r15]
+DB	102,15,56,220,208
 	and	edi,eax
+	movdqa	xmm12,xmm3
 	xor	eax,ebx
-	pslld	xmm0,2
-	xor	edi,ebx
-	add	ecx,edx
-	psrld	xmm9,30
+	paddd	xmm3,xmm11
+	add	edx,ebp
+	pxor	xmm4,xmm13
 	ror	ebp,7
-	add	ecx,edi
-	add	ebx,DWORD[8+rsp]
+	xor	edi,ebx
+	mov	esi,edx
+	add	ecx,DWORD[4+rsp]
+	movdqa	xmm13,xmm4
 	xor	ebp,eax
-	mov	edi,ecx
-	rol	ecx,5
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[48+r15]
-	por	xmm0,xmm9
+	rol	edx,5
+	movdqa	XMMWORD[48+rsp],xmm3
+	add	ecx,edi
 	and	esi,ebp
 	xor	ebp,eax
-	movdqa	xmm10,xmm0
-	xor	esi,eax
-	add	ebx,ecx
-	ror	edx,7
-	add	ebx,esi
-	add	eax,DWORD[12+rsp]
-	xor	edx,ebp
-	mov	esi,ebx
-	rol	ebx,5
-	and	edi,edx
-	xor	edx,ebp
-	xor	edi,ebp
-	add	eax,ebx
-	ror	ecx,7
-	add	eax,edi
-	add	ebp,DWORD[16+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[64+r15]
-	pxor	xmm1,xmm5
-DB	102,68,15,58,15,215,8
-	xor	esi,edx
-	mov	edi,eax
-	rol	eax,5
-	pxor	xmm1,xmm2
-	xor	esi,ecx
-	add	ebp,eax
-	movdqa	xmm9,xmm8
-	paddd	xmm8,xmm0
-	ror	ebx,7
-	add	ebp,esi
-	pxor	xmm1,xmm10
-	add	edx,DWORD[20+rsp]
-	xor	edi,ecx
-	mov	esi,ebp
-	rol	ebp,5
-	movdqa	xmm10,xmm1
-	movdqa	XMMWORD[rsp],xmm8
-	xor	edi,ebx
-	add	edx,ebp
-	ror	eax,7
-	add	edx,edi
-	pslld	xmm1,2
-	add	ecx,DWORD[24+rsp]
-	xor	esi,ebx
-	psrld	xmm10,30
-	mov	edi,edx
-	rol	edx,5
-	xor	esi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[80+r15]
+	pslld	xmm4,2
 	add	ecx,edx
-	ror	ebp,7
-	add	ecx,esi
-	por	xmm1,xmm10
-	add	ebx,DWORD[28+rsp]
-	xor	edi,eax
-	movdqa	xmm8,xmm1
-	mov	esi,ecx
-	rol	ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
 	ror	edx,7
-	add	ebx,edi
-	add	eax,DWORD[32+rsp]
-	pxor	xmm2,xmm6
-DB	102,68,15,58,15,192,8
-	xor	esi,ebp
-	mov	edi,ebx
-	rol	ebx,5
-	pxor	xmm2,xmm3
-	xor	esi,edx
-	add	eax,ebx
-	movdqa	xmm10,XMMWORD[32+r11]
-	paddd	xmm9,xmm1
-	ror	ecx,7
-	add	eax,esi
-	pxor	xmm2,xmm8
-	add	ebp,DWORD[36+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[96+r15]
-	xor	edi,edx
-	mov	esi,eax
-	rol	eax,5
-	movdqa	xmm8,xmm2
-	movdqa	XMMWORD[16+rsp],xmm9
-	xor	edi,ecx
-	add	ebp,eax
-	ror	ebx,7
-	add	ebp,edi
-	pslld	xmm2,2
-	add	edx,DWORD[40+rsp]
-	xor	esi,ecx
-	psrld	xmm8,30
-	mov	edi,ebp
-	rol	ebp,5
-	xor	esi,ebx
-	add	edx,ebp
-	ror	eax,7
-	add	edx,esi
-	por	xmm2,xmm8
-	add	ecx,DWORD[44+rsp]
-	xor	edi,ebx
-	movdqa	xmm9,xmm2
-	mov	esi,edx
-	rol	edx,5
-	xor	edi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[112+r15]
-	add	ecx,edx
-	ror	ebp,7
-	add	ecx,edi
-	add	ebx,DWORD[48+rsp]
-	pxor	xmm3,xmm7
-DB	102,68,15,58,15,201,8
+	psrld	xmm13,30
 	xor	esi,eax
 	mov	edi,ecx
+	add	ebx,DWORD[8+rsp]
+	movups	xmm0,XMMWORD[((-64))+r15]
+DB	102,15,56,220,209
+	por	xmm4,xmm13
+	xor	edx,ebp
 	rol	ecx,5
-	pxor	xmm3,xmm4
-	xor	esi,ebp
-	add	ebx,ecx
-	movdqa	xmm8,xmm10
-	paddd	xmm10,xmm2
-	ror	edx,7
+	pshufd	xmm3,xmm11,238
 	add	ebx,esi
-	pxor	xmm3,xmm9
-	add	eax,DWORD[52+rsp]
+	and	edi,edx
+	xor	edx,ebp
+	add	ebx,ecx
+	add	eax,DWORD[12+rsp]
 	xor	edi,ebp
 	mov	esi,ebx
 	rol	ebx,5
-	movdqa	xmm9,xmm3
-	movdqa	XMMWORD[32+rsp],xmm10
-	xor	edi,edx
-	add	eax,ebx
-	ror	ecx,7
 	add	eax,edi
-	pslld	xmm3,2
-	add	ebp,DWORD[56+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[128+r15]
 	xor	esi,edx
-	psrld	xmm9,30
+	ror	ecx,7
+	add	eax,ebx
+	pxor	xmm5,xmm9
+	add	ebp,DWORD[16+rsp]
+	movups	xmm1,XMMWORD[((-48))+r15]
+DB	102,15,56,220,208
+	xor	esi,ecx
+	punpcklqdq	xmm3,xmm4
 	mov	edi,eax
 	rol	eax,5
-	xor	esi,ecx
-	add	ebp,eax
-	ror	ebx,7
+	pxor	xmm5,xmm6
 	add	ebp,esi
-	por	xmm3,xmm9
-	add	edx,DWORD[60+rsp]
 	xor	edi,ecx
-	movdqa	xmm10,xmm3
+	movdqa	xmm13,xmm12
+	ror	ebx,7
+	paddd	xmm12,xmm4
+	add	ebp,eax
+	pxor	xmm5,xmm3
+	add	edx,DWORD[20+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	rol	ebp,5
-	xor	edi,ebx
-	add	edx,ebp
-	ror	eax,7
+	movdqa	xmm3,xmm5
 	add	edx,edi
-	add	ecx,DWORD[rsp]
-	pxor	xmm4,xmm0
-DB	102,68,15,58,15,210,8
 	xor	esi,ebx
-	mov	edi,edx
-	rol	edx,5
-	pxor	xmm4,xmm5
+	movdqa	XMMWORD[rsp],xmm12
+	ror	eax,7
+	add	edx,ebp
+	add	ecx,DWORD[24+rsp]
+	pslld	xmm5,2
 	xor	esi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[144+r15]
-	add	ecx,edx
-	movdqa	xmm9,xmm8
-	paddd	xmm8,xmm3
-	ror	ebp,7
+	mov	edi,edx
+	psrld	xmm3,30
+	rol	edx,5
 	add	ecx,esi
-	pxor	xmm4,xmm10
-	add	ebx,DWORD[4+rsp]
+	movups	xmm0,XMMWORD[((-32))+r15]
+DB	102,15,56,220,209
 	xor	edi,eax
+	ror	ebp,7
+	por	xmm5,xmm3
+	add	ecx,edx
+	add	ebx,DWORD[28+rsp]
+	pshufd	xmm12,xmm4,238
+	xor	edi,ebp
 	mov	esi,ecx
 	rol	ecx,5
-	movdqa	xmm10,xmm4
-	movdqa	XMMWORD[48+rsp],xmm8
-	xor	edi,ebp
-	add	ebx,ecx
-	ror	edx,7
 	add	ebx,edi
-	pslld	xmm4,2
-	add	eax,DWORD[8+rsp]
 	xor	esi,ebp
-	psrld	xmm10,30
+	ror	edx,7
+	add	ebx,ecx
+	pxor	xmm6,xmm10
+	add	eax,DWORD[32+rsp]
+	xor	esi,edx
+	punpcklqdq	xmm12,xmm5
 	mov	edi,ebx
 	rol	ebx,5
-	xor	esi,edx
-	add	eax,ebx
-	ror	ecx,7
+	pxor	xmm6,xmm7
 	add	eax,esi
-	por	xmm4,xmm10
-	add	ebp,DWORD[12+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[160+r15]
 	xor	edi,edx
-	movdqa	xmm8,xmm4
+	movdqa	xmm3,XMMWORD[32+r11]
+	ror	ecx,7
+	paddd	xmm13,xmm5
+	add	eax,ebx
+	pxor	xmm6,xmm12
+	add	ebp,DWORD[36+rsp]
+	movups	xmm1,XMMWORD[((-16))+r15]
+DB	102,15,56,220,208
+	xor	edi,ecx
 	mov	esi,eax
 	rol	eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	ror	ebx,7
+	movdqa	xmm12,xmm6
 	add	ebp,edi
-	add	edx,DWORD[16+rsp]
-	pxor	xmm5,xmm1
-DB	102,68,15,58,15,195,8
 	xor	esi,ecx
-	mov	edi,ebp
-	rol	ebp,5
-	pxor	xmm5,xmm6
+	movdqa	XMMWORD[16+rsp],xmm13
+	ror	ebx,7
+	add	ebp,eax
+	add	edx,DWORD[40+rsp]
+	pslld	xmm6,2
 	xor	esi,ebx
-	add	edx,ebp
-	movdqa	xmm10,xmm9
-	paddd	xmm9,xmm4
-	ror	eax,7
+	mov	edi,ebp
+	psrld	xmm12,30
+	rol	ebp,5
 	add	edx,esi
-	pxor	xmm5,xmm8
-	add	ecx,DWORD[20+rsp]
 	xor	edi,ebx
+	ror	eax,7
+	por	xmm6,xmm12
+	add	edx,ebp
+	add	ecx,DWORD[44+rsp]
+	pshufd	xmm13,xmm5,238
+	xor	edi,eax
 	mov	esi,edx
 	rol	edx,5
-	movdqa	xmm8,xmm5
-	movdqa	XMMWORD[rsp],xmm9
+	add	ecx,edi
+	movups	xmm0,XMMWORD[r15]
+DB	102,15,56,220,209
+	xor	esi,eax
+	ror	ebp,7
+	add	ecx,edx
+	pxor	xmm7,xmm11
+	add	ebx,DWORD[48+rsp]
+	xor	esi,ebp
+	punpcklqdq	xmm13,xmm6
+	mov	edi,ecx
+	rol	ecx,5
+	pxor	xmm7,xmm8
+	add	ebx,esi
+	xor	edi,ebp
+	movdqa	xmm12,xmm3
+	ror	edx,7
+	paddd	xmm3,xmm6
+	add	ebx,ecx
+	pxor	xmm7,xmm13
+	add	eax,DWORD[52+rsp]
+	xor	edi,edx
+	mov	esi,ebx
+	rol	ebx,5
+	movdqa	xmm13,xmm7
+	add	eax,edi
+	xor	esi,edx
+	movdqa	XMMWORD[32+rsp],xmm3
+	ror	ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[56+rsp]
+	movups	xmm1,XMMWORD[16+r15]
+DB	102,15,56,220,208
+	pslld	xmm7,2
+	xor	esi,ecx
+	mov	edi,eax
+	psrld	xmm13,30
+	rol	eax,5
+	add	ebp,esi
+	xor	edi,ecx
+	ror	ebx,7
+	por	xmm7,xmm13
+	add	ebp,eax
+	add	edx,DWORD[60+rsp]
+	pshufd	xmm3,xmm6,238
+	xor	edi,ebx
+	mov	esi,ebp
+	rol	ebp,5
+	add	edx,edi
+	xor	esi,ebx
+	ror	eax,7
+	add	edx,ebp
+	pxor	xmm8,xmm4
+	add	ecx,DWORD[rsp]
+	xor	esi,eax
+	punpcklqdq	xmm3,xmm7
+	mov	edi,edx
+	rol	edx,5
+	pxor	xmm8,xmm9
+	add	ecx,esi
+	movups	xmm0,XMMWORD[32+r15]
+DB	102,15,56,220,209
 	xor	edi,eax
+	movdqa	xmm13,xmm12
+	ror	ebp,7
+	paddd	xmm12,xmm7
+	add	ecx,edx
+	pxor	xmm8,xmm3
+	add	ebx,DWORD[4+rsp]
+	xor	edi,ebp
+	mov	esi,ecx
+	rol	ecx,5
+	movdqa	xmm3,xmm8
+	add	ebx,edi
+	xor	esi,ebp
+	movdqa	XMMWORD[48+rsp],xmm12
+	ror	edx,7
+	add	ebx,ecx
+	add	eax,DWORD[8+rsp]
+	pslld	xmm8,2
+	xor	esi,edx
+	mov	edi,ebx
+	psrld	xmm3,30
+	rol	ebx,5
+	add	eax,esi
+	xor	edi,edx
+	ror	ecx,7
+	por	xmm8,xmm3
+	add	eax,ebx
+	add	ebp,DWORD[12+rsp]
+	movups	xmm1,XMMWORD[48+r15]
+DB	102,15,56,220,208
+	pshufd	xmm12,xmm7,238
+	xor	edi,ecx
+	mov	esi,eax
+	rol	eax,5
+	add	ebp,edi
+	xor	esi,ecx
+	ror	ebx,7
+	add	ebp,eax
+	pxor	xmm9,xmm5
+	add	edx,DWORD[16+rsp]
+	xor	esi,ebx
+	punpcklqdq	xmm12,xmm8
+	mov	edi,ebp
+	rol	ebp,5
+	pxor	xmm9,xmm10
+	add	edx,esi
+	xor	edi,ebx
+	movdqa	xmm3,xmm13
+	ror	eax,7
+	paddd	xmm13,xmm8
+	add	edx,ebp
+	pxor	xmm9,xmm12
+	add	ecx,DWORD[20+rsp]
+	xor	edi,eax
+	mov	esi,edx
+	rol	edx,5
+	movdqa	xmm12,xmm9
+	add	ecx,edi
 	cmp	r8d,11
 	jb	NEAR $L$aesenclast2
-	movups	xmm14,XMMWORD[176+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[192+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[64+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+r15]
+DB	102,15,56,220,208
 	je	NEAR $L$aesenclast2
-	movups	xmm14,XMMWORD[208+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[224+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[96+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+r15]
+DB	102,15,56,220,208
 $L$aesenclast2:
-DB	102,69,15,56,221,223
-	movups	xmm14,XMMWORD[16+r15]
-	add	ecx,edx
-	ror	ebp,7
-	add	ecx,edi
-	pslld	xmm5,2
-	add	ebx,DWORD[24+rsp]
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+r15]
 	xor	esi,eax
-	psrld	xmm8,30
-	mov	edi,ecx
-	rol	ecx,5
+	movdqa	XMMWORD[rsp],xmm13
+	ror	ebp,7
+	add	ecx,edx
+	add	ebx,DWORD[24+rsp]
+	pslld	xmm9,2
 	xor	esi,ebp
-	add	ebx,ecx
-	ror	edx,7
+	mov	edi,ecx
+	psrld	xmm12,30
+	rol	ecx,5
 	add	ebx,esi
-	por	xmm5,xmm8
-	add	eax,DWORD[28+rsp]
 	xor	edi,ebp
-	movdqa	xmm9,xmm5
+	ror	edx,7
+	por	xmm9,xmm12
+	add	ebx,ecx
+	add	eax,DWORD[28+rsp]
+	pshufd	xmm13,xmm8,238
+	ror	ecx,7
 	mov	esi,ebx
-	rol	ebx,5
 	xor	edi,edx
-	add	eax,ebx
-	ror	ecx,7
+	rol	ebx,5
 	add	eax,edi
-	mov	edi,ecx
-	movups	xmm12,XMMWORD[32+r12]
-	xorps	xmm12,xmm13
-	movups	XMMWORD[16+r12*1+r13],xmm11
-	xorps	xmm11,xmm12
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[32+r15]
-	pxor	xmm6,xmm2
-DB	102,68,15,58,15,204,8
+	xor	esi,ecx
 	xor	ecx,edx
+	add	eax,ebx
+	pxor	xmm10,xmm6
 	add	ebp,DWORD[32+rsp]
-	and	edi,edx
-	pxor	xmm6,xmm7
+	movups	xmm14,XMMWORD[32+r12]
+	xorps	xmm14,xmm15
+	movups	XMMWORD[16+r12*1+r13],xmm2
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+r15]
+DB	102,15,56,220,208
 	and	esi,ecx
+	xor	ecx,edx
 	ror	ebx,7
-	movdqa	xmm8,xmm10
-	paddd	xmm10,xmm5
-	add	ebp,edi
+	punpcklqdq	xmm13,xmm9
 	mov	edi,eax
-	pxor	xmm6,xmm9
+	xor	esi,ecx
+	pxor	xmm10,xmm11
 	rol	eax,5
 	add	ebp,esi
-	xor	ecx,edx
-	add	ebp,eax
-	movdqa	xmm9,xmm6
-	movdqa	XMMWORD[16+rsp],xmm10
-	mov	esi,ebx
+	movdqa	xmm12,xmm3
+	xor	edi,ebx
+	paddd	xmm3,xmm9
 	xor	ebx,ecx
+	pxor	xmm10,xmm13
+	add	ebp,eax
 	add	edx,DWORD[36+rsp]
-	and	esi,ecx
-	pslld	xmm6,2
 	and	edi,ebx
-	ror	eax,7
-	psrld	xmm9,30
-	add	edx,esi
-	mov	esi,ebp
-	rol	ebp,5
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[48+r15]
-	add	edx,edi
 	xor	ebx,ecx
-	add	edx,ebp
-	por	xmm6,xmm9
-	mov	edi,eax
+	ror	eax,7
+	movdqa	xmm13,xmm10
+	mov	esi,ebp
+	xor	edi,ebx
+	movdqa	XMMWORD[16+rsp],xmm3
+	rol	ebp,5
+	add	edx,edi
+	movups	xmm0,XMMWORD[((-64))+r15]
+DB	102,15,56,220,209
+	xor	esi,eax
+	pslld	xmm10,2
 	xor	eax,ebx
-	movdqa	xmm10,xmm6
+	add	edx,ebp
+	psrld	xmm13,30
 	add	ecx,DWORD[40+rsp]
-	and	edi,ebx
 	and	esi,eax
-	ror	ebp,7
-	add	ecx,edi
-	mov	edi,edx
-	rol	edx,5
-	add	ecx,esi
 	xor	eax,ebx
-	add	ecx,edx
-	mov	esi,ebp
+	por	xmm10,xmm13
+	ror	ebp,7
+	mov	edi,edx
+	xor	esi,eax
+	rol	edx,5
+	pshufd	xmm3,xmm9,238
+	add	ecx,esi
+	xor	edi,ebp
 	xor	ebp,eax
+	add	ecx,edx
 	add	ebx,DWORD[44+rsp]
-	and	esi,eax
 	and	edi,ebp
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[64+r15]
+	xor	ebp,eax
 	ror	edx,7
-	add	ebx,esi
+	movups	xmm1,XMMWORD[((-48))+r15]
+DB	102,15,56,220,208
 	mov	esi,ecx
+	xor	edi,ebp
 	rol	ecx,5
 	add	ebx,edi
-	xor	ebp,eax
-	add	ebx,ecx
-	mov	edi,edx
-	pxor	xmm7,xmm3
-DB	102,68,15,58,15,213,8
+	xor	esi,edx
 	xor	edx,ebp
+	add	ebx,ecx
+	pxor	xmm11,xmm7
 	add	eax,DWORD[48+rsp]
-	and	edi,ebp
-	pxor	xmm7,xmm0
 	and	esi,edx
+	xor	edx,ebp
 	ror	ecx,7
-	movdqa	xmm9,XMMWORD[48+r11]
-	paddd	xmm8,xmm6
-	add	eax,edi
+	punpcklqdq	xmm3,xmm10
 	mov	edi,ebx
-	pxor	xmm7,xmm10
+	xor	esi,edx
+	pxor	xmm11,xmm4
 	rol	ebx,5
 	add	eax,esi
-	xor	edx,ebp
-	add	eax,ebx
-	movdqa	xmm10,xmm7
-	movdqa	XMMWORD[32+rsp],xmm8
-	mov	esi,ecx
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[80+r15]
+	movdqa	xmm13,XMMWORD[48+r11]
+	xor	edi,ecx
+	paddd	xmm12,xmm10
 	xor	ecx,edx
+	pxor	xmm11,xmm3
+	add	eax,ebx
 	add	ebp,DWORD[52+rsp]
-	and	esi,edx
-	pslld	xmm7,2
+	movups	xmm0,XMMWORD[((-32))+r15]
+DB	102,15,56,220,209
 	and	edi,ecx
+	xor	ecx,edx
 	ror	ebx,7
-	psrld	xmm10,30
-	add	ebp,esi
+	movdqa	xmm3,xmm11
 	mov	esi,eax
+	xor	edi,ecx
+	movdqa	XMMWORD[32+rsp],xmm12
 	rol	eax,5
 	add	ebp,edi
-	xor	ecx,edx
-	add	ebp,eax
-	por	xmm7,xmm10
-	mov	edi,ebx
+	xor	esi,ebx
+	pslld	xmm11,2
 	xor	ebx,ecx
-	movdqa	xmm8,xmm7
+	add	ebp,eax
+	psrld	xmm3,30
 	add	edx,DWORD[56+rsp]
-	and	edi,ecx
 	and	esi,ebx
-	ror	eax,7
-	add	edx,edi
-	mov	edi,ebp
-	rol	ebp,5
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[96+r15]
-	add	edx,esi
 	xor	ebx,ecx
-	add	edx,ebp
-	mov	esi,eax
+	por	xmm11,xmm3
+	ror	eax,7
+	mov	edi,ebp
+	xor	esi,ebx
+	rol	ebp,5
+	pshufd	xmm12,xmm10,238
+	add	edx,esi
+	movups	xmm1,XMMWORD[((-16))+r15]
+DB	102,15,56,220,208
+	xor	edi,eax
 	xor	eax,ebx
+	add	edx,ebp
 	add	ecx,DWORD[60+rsp]
-	and	esi,ebx
 	and	edi,eax
+	xor	eax,ebx
 	ror	ebp,7
-	add	ecx,esi
 	mov	esi,edx
+	xor	edi,eax
 	rol	edx,5
 	add	ecx,edi
-	xor	eax,ebx
-	add	ecx,edx
-	mov	edi,ebp
-	pxor	xmm0,xmm4
-DB	102,68,15,58,15,198,8
+	xor	esi,ebp
 	xor	ebp,eax
+	add	ecx,edx
+	pxor	xmm4,xmm8
 	add	ebx,DWORD[rsp]
-	and	edi,eax
-	pxor	xmm0,xmm1
 	and	esi,ebp
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[112+r15]
+	xor	ebp,eax
 	ror	edx,7
-	movdqa	xmm10,xmm9
-	paddd	xmm9,xmm7
-	add	ebx,edi
+	movups	xmm0,XMMWORD[r15]
+DB	102,15,56,220,209
+	punpcklqdq	xmm12,xmm11
 	mov	edi,ecx
-	pxor	xmm0,xmm8
+	xor	esi,ebp
+	pxor	xmm4,xmm5
 	rol	ecx,5
 	add	ebx,esi
-	xor	ebp,eax
-	add	ebx,ecx
-	movdqa	xmm8,xmm0
-	movdqa	XMMWORD[48+rsp],xmm9
-	mov	esi,edx
+	movdqa	xmm3,xmm13
+	xor	edi,edx
+	paddd	xmm13,xmm11
 	xor	edx,ebp
+	pxor	xmm4,xmm12
+	add	ebx,ecx
 	add	eax,DWORD[4+rsp]
-	and	esi,ebp
-	pslld	xmm0,2
 	and	edi,edx
+	xor	edx,ebp
 	ror	ecx,7
-	psrld	xmm8,30
-	add	eax,esi
+	movdqa	xmm12,xmm4
 	mov	esi,ebx
+	xor	edi,edx
+	movdqa	XMMWORD[48+rsp],xmm13
 	rol	ebx,5
 	add	eax,edi
-	xor	edx,ebp
+	xor	esi,ecx
+	pslld	xmm4,2
+	xor	ecx,edx
 	add	eax,ebx
-	por	xmm0,xmm8
-	mov	edi,ecx
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[128+r15]
-	xor	ecx,edx
-	movdqa	xmm9,xmm0
+	psrld	xmm12,30
 	add	ebp,DWORD[8+rsp]
-	and	edi,edx
+	movups	xmm1,XMMWORD[16+r15]
+DB	102,15,56,220,208
 	and	esi,ecx
-	ror	ebx,7
-	add	ebp,edi
-	mov	edi,eax
-	rol	eax,5
-	add	ebp,esi
 	xor	ecx,edx
-	add	ebp,eax
-	mov	esi,ebx
-	xor	ebx,ecx
-	add	edx,DWORD[12+rsp]
-	and	esi,ecx
-	and	edi,ebx
-	ror	eax,7
-	add	edx,esi
-	mov	esi,ebp
-	rol	ebp,5
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[144+r15]
-	add	edx,edi
-	xor	ebx,ecx
-	add	edx,ebp
+	por	xmm4,xmm12
+	ror	ebx,7
 	mov	edi,eax
-	pxor	xmm1,xmm5
-DB	102,68,15,58,15,207,8
-	xor	eax,ebx
-	add	ecx,DWORD[16+rsp]
+	xor	esi,ecx
+	rol	eax,5
+	pshufd	xmm13,xmm11,238
+	add	ebp,esi
+	xor	edi,ebx
+	xor	ebx,ecx
+	add	ebp,eax
+	add	edx,DWORD[12+rsp]
 	and	edi,ebx
-	pxor	xmm1,xmm2
+	xor	ebx,ecx
+	ror	eax,7
+	mov	esi,ebp
+	xor	edi,ebx
+	rol	ebp,5
+	add	edx,edi
+	movups	xmm0,XMMWORD[32+r15]
+DB	102,15,56,220,209
+	xor	esi,eax
+	xor	eax,ebx
+	add	edx,ebp
+	pxor	xmm5,xmm9
+	add	ecx,DWORD[16+rsp]
 	and	esi,eax
+	xor	eax,ebx
 	ror	ebp,7
-	movdqa	xmm8,xmm10
-	paddd	xmm10,xmm0
-	add	ecx,edi
+	punpcklqdq	xmm13,xmm4
 	mov	edi,edx
-	pxor	xmm1,xmm9
+	xor	esi,eax
+	pxor	xmm5,xmm6
 	rol	edx,5
 	add	ecx,esi
-	xor	eax,ebx
-	add	ecx,edx
-	movdqa	xmm9,xmm1
-	movdqa	XMMWORD[rsp],xmm10
-	mov	esi,ebp
+	movdqa	xmm12,xmm3
+	xor	edi,ebp
+	paddd	xmm3,xmm4
 	xor	ebp,eax
+	pxor	xmm5,xmm13
+	add	ecx,edx
 	add	ebx,DWORD[20+rsp]
-	and	esi,eax
-	pslld	xmm1,2
 	and	edi,ebp
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[160+r15]
+	xor	ebp,eax
 	ror	edx,7
-	psrld	xmm9,30
-	add	ebx,esi
+	movups	xmm1,XMMWORD[48+r15]
+DB	102,15,56,220,208
+	movdqa	xmm13,xmm5
 	mov	esi,ecx
+	xor	edi,ebp
+	movdqa	XMMWORD[rsp],xmm3
 	rol	ecx,5
 	add	ebx,edi
-	xor	ebp,eax
+	xor	esi,edx
+	pslld	xmm5,2
+	xor	edx,ebp
 	add	ebx,ecx
-	por	xmm1,xmm9
-	mov	edi,edx
-	xor	edx,ebp
-	movdqa	xmm10,xmm1
+	psrld	xmm13,30
 	add	eax,DWORD[24+rsp]
-	and	edi,ebp
 	and	esi,edx
-	ror	ecx,7
-	add	eax,edi
-	mov	edi,ebx
-	rol	ebx,5
-	add	eax,esi
 	xor	edx,ebp
+	por	xmm5,xmm13
+	ror	ecx,7
+	mov	edi,ebx
+	xor	esi,edx
+	rol	ebx,5
+	pshufd	xmm3,xmm4,238
+	add	eax,esi
+	xor	edi,ecx
+	xor	ecx,edx
 	add	eax,ebx
-	mov	esi,ecx
+	add	ebp,DWORD[28+rsp]
 	cmp	r8d,11
 	jb	NEAR $L$aesenclast3
-	movups	xmm14,XMMWORD[176+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[192+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[64+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+r15]
+DB	102,15,56,220,208
 	je	NEAR $L$aesenclast3
-	movups	xmm14,XMMWORD[208+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[224+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[96+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+r15]
+DB	102,15,56,220,208
 $L$aesenclast3:
-DB	102,69,15,56,221,223
-	movups	xmm14,XMMWORD[16+r15]
-	xor	ecx,edx
-	add	ebp,DWORD[28+rsp]
-	and	esi,edx
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+r15]
 	and	edi,ecx
+	xor	ecx,edx
 	ror	ebx,7
-	add	ebp,esi
 	mov	esi,eax
+	xor	edi,ecx
 	rol	eax,5
 	add	ebp,edi
-	xor	ecx,edx
+	xor	esi,ebx
+	xor	ebx,ecx
 	add	ebp,eax
-	mov	edi,ebx
-	pxor	xmm2,xmm6
-DB	102,68,15,58,15,208,8
-	xor	ebx,ecx
+	pxor	xmm6,xmm10
 	add	edx,DWORD[32+rsp]
-	and	edi,ecx
-	pxor	xmm2,xmm3
 	and	esi,ebx
-	ror	eax,7
-	movdqa	xmm9,xmm8
-	paddd	xmm8,xmm1
-	add	edx,edi
-	mov	edi,ebp
-	pxor	xmm2,xmm10
-	rol	ebp,5
-	movups	xmm12,XMMWORD[48+r12]
-	xorps	xmm12,xmm13
-	movups	XMMWORD[32+r12*1+r13],xmm11
-	xorps	xmm11,xmm12
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[32+r15]
-	add	edx,esi
 	xor	ebx,ecx
-	add	edx,ebp
-	movdqa	xmm10,xmm2
-	movdqa	XMMWORD[16+rsp],xmm8
-	mov	esi,eax
+	ror	eax,7
+	punpcklqdq	xmm3,xmm5
+	mov	edi,ebp
+	xor	esi,ebx
+	pxor	xmm6,xmm7
+	rol	ebp,5
+	add	edx,esi
+	movups	xmm14,XMMWORD[48+r12]
+	xorps	xmm14,xmm15
+	movups	XMMWORD[32+r12*1+r13],xmm2
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+r15]
+DB	102,15,56,220,208
+	movdqa	xmm13,xmm12
+	xor	edi,eax
+	paddd	xmm12,xmm5
 	xor	eax,ebx
+	pxor	xmm6,xmm3
+	add	edx,ebp
 	add	ecx,DWORD[36+rsp]
-	and	esi,ebx
-	pslld	xmm2,2
 	and	edi,eax
+	xor	eax,ebx
 	ror	ebp,7
-	psrld	xmm10,30
-	add	ecx,esi
+	movdqa	xmm3,xmm6
 	mov	esi,edx
+	xor	edi,eax
+	movdqa	XMMWORD[16+rsp],xmm12
 	rol	edx,5
 	add	ecx,edi
-	xor	eax,ebx
+	xor	esi,ebp
+	pslld	xmm6,2
+	xor	ebp,eax
 	add	ecx,edx
-	por	xmm2,xmm10
-	mov	edi,ebp
-	xor	ebp,eax
-	movdqa	xmm8,xmm2
+	psrld	xmm3,30
 	add	ebx,DWORD[40+rsp]
-	and	edi,eax
 	and	esi,ebp
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[48+r15]
-	ror	edx,7
-	add	ebx,edi
-	mov	edi,ecx
-	rol	ecx,5
-	add	ebx,esi
 	xor	ebp,eax
-	add	ebx,ecx
-	mov	esi,edx
+	por	xmm6,xmm3
+	ror	edx,7
+	movups	xmm0,XMMWORD[((-64))+r15]
+DB	102,15,56,220,209
+	mov	edi,ecx
+	xor	esi,ebp
+	rol	ecx,5
+	pshufd	xmm12,xmm5,238
+	add	ebx,esi
+	xor	edi,edx
 	xor	edx,ebp
+	add	ebx,ecx
 	add	eax,DWORD[44+rsp]
-	and	esi,ebp
 	and	edi,edx
+	xor	edx,ebp
 	ror	ecx,7
-	add	eax,esi
 	mov	esi,ebx
+	xor	edi,edx
 	rol	ebx,5
 	add	eax,edi
-	xor	edx,ebp
-	add	eax,ebx
-	add	ebp,DWORD[48+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[64+r15]
-	pxor	xmm3,xmm7
-DB	102,68,15,58,15,193,8
 	xor	esi,edx
+	add	eax,ebx
+	pxor	xmm7,xmm11
+	add	ebp,DWORD[48+rsp]
+	movups	xmm1,XMMWORD[((-48))+r15]
+DB	102,15,56,220,208
+	xor	esi,ecx
+	punpcklqdq	xmm12,xmm6
 	mov	edi,eax
 	rol	eax,5
-	pxor	xmm3,xmm4
-	xor	esi,ecx
-	add	ebp,eax
-	movdqa	xmm10,xmm9
-	paddd	xmm9,xmm2
-	ror	ebx,7
+	pxor	xmm7,xmm8
 	add	ebp,esi
-	pxor	xmm3,xmm8
-	add	edx,DWORD[52+rsp]
 	xor	edi,ecx
+	movdqa	xmm3,xmm13
+	ror	ebx,7
+	paddd	xmm13,xmm6
+	add	ebp,eax
+	pxor	xmm7,xmm12
+	add	edx,DWORD[52+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	rol	ebp,5
-	movdqa	xmm8,xmm3
-	movdqa	XMMWORD[32+rsp],xmm9
-	xor	edi,ebx
-	add	edx,ebp
-	ror	eax,7
+	movdqa	xmm12,xmm7
 	add	edx,edi
-	pslld	xmm3,2
-	add	ecx,DWORD[56+rsp]
 	xor	esi,ebx
-	psrld	xmm8,30
-	mov	edi,edx
-	rol	edx,5
+	movdqa	XMMWORD[32+rsp],xmm13
+	ror	eax,7
+	add	edx,ebp
+	add	ecx,DWORD[56+rsp]
+	pslld	xmm7,2
 	xor	esi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[80+r15]
-	add	ecx,edx
-	ror	ebp,7
+	mov	edi,edx
+	psrld	xmm12,30
+	rol	edx,5
 	add	ecx,esi
-	por	xmm3,xmm8
-	add	ebx,DWORD[60+rsp]
+	movups	xmm0,XMMWORD[((-32))+r15]
+DB	102,15,56,220,209
 	xor	edi,eax
+	ror	ebp,7
+	por	xmm7,xmm12
+	add	ecx,edx
+	add	ebx,DWORD[60+rsp]
+	xor	edi,ebp
 	mov	esi,ecx
 	rol	ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
-	ror	edx,7
 	add	ebx,edi
-	add	eax,DWORD[rsp]
-	paddd	xmm10,xmm3
 	xor	esi,ebp
+	ror	edx,7
+	add	ebx,ecx
+	add	eax,DWORD[rsp]
+	xor	esi,edx
 	mov	edi,ebx
 	rol	ebx,5
-	xor	esi,edx
-	movdqa	XMMWORD[48+rsp],xmm10
-	add	eax,ebx
-	ror	ecx,7
+	paddd	xmm3,xmm7
 	add	eax,esi
-	add	ebp,DWORD[4+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[96+r15]
 	xor	edi,edx
+	movdqa	XMMWORD[48+rsp],xmm3
+	ror	ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[4+rsp]
+	movups	xmm1,XMMWORD[((-16))+r15]
+DB	102,15,56,220,208
+	xor	edi,ecx
 	mov	esi,eax
 	rol	eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	ror	ebx,7
 	add	ebp,edi
-	add	edx,DWORD[8+rsp]
 	xor	esi,ecx
+	ror	ebx,7
+	add	ebp,eax
+	add	edx,DWORD[8+rsp]
+	xor	esi,ebx
 	mov	edi,ebp
 	rol	ebp,5
-	xor	esi,ebx
-	add	edx,ebp
-	ror	eax,7
 	add	edx,esi
-	add	ecx,DWORD[12+rsp]
 	xor	edi,ebx
+	ror	eax,7
+	add	edx,ebp
+	add	ecx,DWORD[12+rsp]
+	xor	edi,eax
 	mov	esi,edx
 	rol	edx,5
-	xor	edi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[112+r15]
-	add	ecx,edx
-	ror	ebp,7
 	add	ecx,edi
+	movups	xmm0,XMMWORD[r15]
+DB	102,15,56,220,209
+	xor	esi,eax
+	ror	ebp,7
+	add	ecx,edx
 	cmp	r10,r14
 	je	NEAR $L$done_ssse3
-	movdqa	xmm6,XMMWORD[64+r11]
-	movdqa	xmm9,XMMWORD[r11]
-	movdqu	xmm0,XMMWORD[r10]
-	movdqu	xmm1,XMMWORD[16+r10]
-	movdqu	xmm2,XMMWORD[32+r10]
-	movdqu	xmm3,XMMWORD[48+r10]
-DB	102,15,56,0,198
+	movdqa	xmm3,XMMWORD[64+r11]
+	movdqa	xmm13,XMMWORD[r11]
+	movdqu	xmm4,XMMWORD[r10]
+	movdqu	xmm5,XMMWORD[16+r10]
+	movdqu	xmm6,XMMWORD[32+r10]
+	movdqu	xmm7,XMMWORD[48+r10]
+DB	102,15,56,0,227
 	add	r10,64
 	add	ebx,DWORD[16+rsp]
-	xor	esi,eax
-DB	102,15,56,0,206
-	mov	edi,ecx
-	rol	ecx,5
-	paddd	xmm0,xmm9
 	xor	esi,ebp
-	add	ebx,ecx
-	ror	edx,7
+	mov	edi,ecx
+DB	102,15,56,0,235
+	rol	ecx,5
 	add	ebx,esi
-	movdqa	XMMWORD[rsp],xmm0
-	add	eax,DWORD[20+rsp]
 	xor	edi,ebp
-	psubd	xmm0,xmm9
-	mov	esi,ebx
-	rol	ebx,5
+	ror	edx,7
+	paddd	xmm4,xmm13
+	add	ebx,ecx
+	add	eax,DWORD[20+rsp]
 	xor	edi,edx
-	add	eax,ebx
-	ror	ecx,7
+	mov	esi,ebx
+	movdqa	XMMWORD[rsp],xmm4
+	rol	ebx,5
 	add	eax,edi
-	add	ebp,DWORD[24+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[128+r15]
 	xor	esi,edx
+	ror	ecx,7
+	psubd	xmm4,xmm13
+	add	eax,ebx
+	add	ebp,DWORD[24+rsp]
+	movups	xmm1,XMMWORD[16+r15]
+DB	102,15,56,220,208
+	xor	esi,ecx
 	mov	edi,eax
 	rol	eax,5
-	xor	esi,ecx
-	add	ebp,eax
-	ror	ebx,7
 	add	ebp,esi
-	add	edx,DWORD[28+rsp]
 	xor	edi,ecx
+	ror	ebx,7
+	add	ebp,eax
+	add	edx,DWORD[28+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	rol	ebp,5
-	xor	edi,ebx
-	add	edx,ebp
-	ror	eax,7
 	add	edx,edi
-	add	ecx,DWORD[32+rsp]
 	xor	esi,ebx
-DB	102,15,56,0,214
-	mov	edi,edx
-	rol	edx,5
-	paddd	xmm1,xmm9
+	ror	eax,7
+	add	edx,ebp
+	add	ecx,DWORD[32+rsp]
 	xor	esi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[144+r15]
-	add	ecx,edx
-	ror	ebp,7
+	mov	edi,edx
+DB	102,15,56,0,243
+	rol	edx,5
 	add	ecx,esi
-	movdqa	XMMWORD[16+rsp],xmm1
-	add	ebx,DWORD[36+rsp]
+	movups	xmm0,XMMWORD[32+r15]
+DB	102,15,56,220,209
 	xor	edi,eax
-	psubd	xmm1,xmm9
-	mov	esi,ecx
-	rol	ecx,5
+	ror	ebp,7
+	paddd	xmm5,xmm13
+	add	ecx,edx
+	add	ebx,DWORD[36+rsp]
 	xor	edi,ebp
-	add	ebx,ecx
-	ror	edx,7
+	mov	esi,ecx
+	movdqa	XMMWORD[16+rsp],xmm5
+	rol	ecx,5
 	add	ebx,edi
-	add	eax,DWORD[40+rsp]
 	xor	esi,ebp
+	ror	edx,7
+	psubd	xmm5,xmm13
+	add	ebx,ecx
+	add	eax,DWORD[40+rsp]
+	xor	esi,edx
 	mov	edi,ebx
 	rol	ebx,5
-	xor	esi,edx
-	add	eax,ebx
-	ror	ecx,7
 	add	eax,esi
-	add	ebp,DWORD[44+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[160+r15]
 	xor	edi,edx
+	ror	ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[44+rsp]
+	movups	xmm1,XMMWORD[48+r15]
+DB	102,15,56,220,208
+	xor	edi,ecx
 	mov	esi,eax
 	rol	eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	ror	ebx,7
 	add	ebp,edi
-	add	edx,DWORD[48+rsp]
 	xor	esi,ecx
-DB	102,15,56,0,222
-	mov	edi,ebp
-	rol	ebp,5
-	paddd	xmm2,xmm9
+	ror	ebx,7
+	add	ebp,eax
+	add	edx,DWORD[48+rsp]
 	xor	esi,ebx
-	add	edx,ebp
-	ror	eax,7
+	mov	edi,ebp
+DB	102,15,56,0,251
+	rol	ebp,5
 	add	edx,esi
-	movdqa	XMMWORD[32+rsp],xmm2
-	add	ecx,DWORD[52+rsp]
 	xor	edi,ebx
-	psubd	xmm2,xmm9
-	mov	esi,edx
-	rol	edx,5
+	ror	eax,7
+	paddd	xmm6,xmm13
+	add	edx,ebp
+	add	ecx,DWORD[52+rsp]
 	xor	edi,eax
+	mov	esi,edx
+	movdqa	XMMWORD[32+rsp],xmm6
+	rol	edx,5
+	add	ecx,edi
 	cmp	r8d,11
 	jb	NEAR $L$aesenclast4
-	movups	xmm14,XMMWORD[176+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[192+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[64+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+r15]
+DB	102,15,56,220,208
 	je	NEAR $L$aesenclast4
-	movups	xmm14,XMMWORD[208+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[224+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[96+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+r15]
+DB	102,15,56,220,208
 $L$aesenclast4:
-DB	102,69,15,56,221,223
-	movups	xmm14,XMMWORD[16+r15]
-	add	ecx,edx
-	ror	ebp,7
-	add	ecx,edi
-	add	ebx,DWORD[56+rsp]
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+r15]
 	xor	esi,eax
+	ror	ebp,7
+	psubd	xmm6,xmm13
+	add	ecx,edx
+	add	ebx,DWORD[56+rsp]
+	xor	esi,ebp
 	mov	edi,ecx
 	rol	ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	ror	edx,7
 	add	ebx,esi
-	add	eax,DWORD[60+rsp]
 	xor	edi,ebp
+	ror	edx,7
+	add	ebx,ecx
+	add	eax,DWORD[60+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	rol	ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	ror	ecx,7
 	add	eax,edi
-	movups	XMMWORD[48+r12*1+r13],xmm11
+	ror	ecx,7
+	add	eax,ebx
+	movups	XMMWORD[48+r12*1+r13],xmm2
 	lea	r12,[64+r12]
 
 	add	eax,DWORD[r9]
@@ -1268,129 +1252,130 @@ DB	102,69,15,56,221,223
 	mov	DWORD[4+r9],esi
 	mov	ebx,esi
 	mov	DWORD[8+r9],ecx
+	mov	edi,ecx
 	mov	DWORD[12+r9],edx
+	xor	edi,edx
 	mov	DWORD[16+r9],ebp
+	and	esi,edi
 	jmp	NEAR $L$oop_ssse3
 
-ALIGN	16
 $L$done_ssse3:
 	add	ebx,DWORD[16+rsp]
-	xor	esi,eax
+	xor	esi,ebp
 	mov	edi,ecx
 	rol	ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	ror	edx,7
 	add	ebx,esi
-	add	eax,DWORD[20+rsp]
 	xor	edi,ebp
+	ror	edx,7
+	add	ebx,ecx
+	add	eax,DWORD[20+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	rol	ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	ror	ecx,7
 	add	eax,edi
-	add	ebp,DWORD[24+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[128+r15]
 	xor	esi,edx
+	ror	ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[24+rsp]
+	movups	xmm1,XMMWORD[16+r15]
+DB	102,15,56,220,208
+	xor	esi,ecx
 	mov	edi,eax
 	rol	eax,5
-	xor	esi,ecx
-	add	ebp,eax
-	ror	ebx,7
 	add	ebp,esi
-	add	edx,DWORD[28+rsp]
 	xor	edi,ecx
+	ror	ebx,7
+	add	ebp,eax
+	add	edx,DWORD[28+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	rol	ebp,5
-	xor	edi,ebx
-	add	edx,ebp
-	ror	eax,7
 	add	edx,edi
-	add	ecx,DWORD[32+rsp]
 	xor	esi,ebx
+	ror	eax,7
+	add	edx,ebp
+	add	ecx,DWORD[32+rsp]
+	xor	esi,eax
 	mov	edi,edx
 	rol	edx,5
-	xor	esi,eax
-DB	102,69,15,56,220,223
-	movups	xmm14,XMMWORD[144+r15]
-	add	ecx,edx
-	ror	ebp,7
 	add	ecx,esi
-	add	ebx,DWORD[36+rsp]
+	movups	xmm0,XMMWORD[32+r15]
+DB	102,15,56,220,209
 	xor	edi,eax
+	ror	ebp,7
+	add	ecx,edx
+	add	ebx,DWORD[36+rsp]
+	xor	edi,ebp
 	mov	esi,ecx
 	rol	ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
-	ror	edx,7
 	add	ebx,edi
-	add	eax,DWORD[40+rsp]
 	xor	esi,ebp
+	ror	edx,7
+	add	ebx,ecx
+	add	eax,DWORD[40+rsp]
+	xor	esi,edx
 	mov	edi,ebx
 	rol	ebx,5
-	xor	esi,edx
-	add	eax,ebx
-	ror	ecx,7
 	add	eax,esi
-	add	ebp,DWORD[44+rsp]
-DB	102,69,15,56,220,222
-	movups	xmm15,XMMWORD[160+r15]
 	xor	edi,edx
+	ror	ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[44+rsp]
+	movups	xmm1,XMMWORD[48+r15]
+DB	102,15,56,220,208
+	xor	edi,ecx
 	mov	esi,eax
 	rol	eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	ror	ebx,7
 	add	ebp,edi
-	add	edx,DWORD[48+rsp]
 	xor	esi,ecx
+	ror	ebx,7
+	add	ebp,eax
+	add	edx,DWORD[48+rsp]
+	xor	esi,ebx
 	mov	edi,ebp
 	rol	ebp,5
-	xor	esi,ebx
-	add	edx,ebp
-	ror	eax,7
 	add	edx,esi
-	add	ecx,DWORD[52+rsp]
 	xor	edi,ebx
+	ror	eax,7
+	add	edx,ebp
+	add	ecx,DWORD[52+rsp]
+	xor	edi,eax
 	mov	esi,edx
 	rol	edx,5
-	xor	edi,eax
+	add	ecx,edi
 	cmp	r8d,11
 	jb	NEAR $L$aesenclast5
-	movups	xmm14,XMMWORD[176+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[192+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[64+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+r15]
+DB	102,15,56,220,208
 	je	NEAR $L$aesenclast5
-	movups	xmm14,XMMWORD[208+r15]
-DB	102,69,15,56,220,223
-	movups	xmm15,XMMWORD[224+r15]
-DB	102,69,15,56,220,222
+	movups	xmm0,XMMWORD[96+r15]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+r15]
+DB	102,15,56,220,208
 $L$aesenclast5:
-DB	102,69,15,56,221,223
-	movups	xmm14,XMMWORD[16+r15]
-	add	ecx,edx
-	ror	ebp,7
-	add	ecx,edi
-	add	ebx,DWORD[56+rsp]
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+r15]
 	xor	esi,eax
+	ror	ebp,7
+	add	ecx,edx
+	add	ebx,DWORD[56+rsp]
+	xor	esi,ebp
 	mov	edi,ecx
 	rol	ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	ror	edx,7
 	add	ebx,esi
-	add	eax,DWORD[60+rsp]
 	xor	edi,ebp
+	ror	edx,7
+	add	ebx,ecx
+	add	eax,DWORD[60+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	rol	ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	ror	ecx,7
 	add	eax,edi
-	movups	XMMWORD[48+r12*1+r13],xmm11
+	ror	ecx,7
+	add	eax,ebx
+	movups	XMMWORD[48+r12*1+r13],xmm2
 	mov	r8,QWORD[88+rsp]
 
 	add	eax,DWORD[r9]
@@ -1403,7 +1388,7 @@ DB	102,69,15,56,221,223
 	mov	DWORD[8+r9],ecx
 	mov	DWORD[12+r9],edx
 	mov	DWORD[16+r9],ebp
-	movups	XMMWORD[r8],xmm11
+	movups	XMMWORD[r8],xmm2
 	movaps	xmm6,XMMWORD[((96+0))+rsp]
 	movaps	xmm7,XMMWORD[((96+16))+rsp]
 	movaps	xmm8,XMMWORD[((96+32))+rsp]
@@ -1428,7 +1413,7 @@ $L$epilogue_ssse3:
 	DB	0F3h,0C3h		;repret
 $L$SEH_end_aesni_cbc_sha1_enc_ssse3:
 
-ALIGN	16
+ALIGN	32
 aesni_cbc_sha1_enc_avx:
 	mov	QWORD[8+rsp],rdi	;WIN64 prologue
 	mov	QWORD[16+rsp],rsi
@@ -1469,13 +1454,12 @@ $L$prologue_avx:
 	mov	r12,rdi
 	mov	r13,rsi
 	mov	r14,rdx
-	mov	r15,rcx
-	vmovdqu	xmm11,XMMWORD[r8]
+	lea	r15,[112+rcx]
+	vmovdqu	xmm12,XMMWORD[r8]
 	mov	QWORD[88+rsp],r8
 	shl	r14,6
 	sub	r13,r12
-	mov	r8d,DWORD[240+r15]
-	add	r15,112
+	mov	r8d,DWORD[((240-112))+r15]
 	add	r14,r10
 
 	lea	r11,[K_XX_XX]
@@ -1485,9 +1469,12 @@ $L$prologue_avx:
 	mov	edx,DWORD[12+r9]
 	mov	esi,ebx
 	mov	ebp,DWORD[16+r9]
+	mov	edi,ecx
+	xor	edi,edx
+	and	esi,edi
 
 	vmovdqa	xmm6,XMMWORD[64+r11]
-	vmovdqa	xmm9,XMMWORD[r11]
+	vmovdqa	xmm10,XMMWORD[r11]
 	vmovdqu	xmm0,XMMWORD[r10]
 	vmovdqu	xmm1,XMMWORD[16+r10]
 	vmovdqu	xmm2,XMMWORD[32+r10]
@@ -1497,1137 +1484,1094 @@ $L$prologue_avx:
 	vpshufb	xmm1,xmm1,xmm6
 	vpshufb	xmm2,xmm2,xmm6
 	vpshufb	xmm3,xmm3,xmm6
-	vpaddd	xmm4,xmm0,xmm9
-	vpaddd	xmm5,xmm1,xmm9
-	vpaddd	xmm6,xmm2,xmm9
+	vpaddd	xmm4,xmm0,xmm10
+	vpaddd	xmm5,xmm1,xmm10
+	vpaddd	xmm6,xmm2,xmm10
 	vmovdqa	XMMWORD[rsp],xmm4
 	vmovdqa	XMMWORD[16+rsp],xmm5
 	vmovdqa	XMMWORD[32+rsp],xmm6
-	vmovups	xmm13,XMMWORD[((-112))+r15]
+	vmovups	xmm15,XMMWORD[((-112))+r15]
 	vmovups	xmm14,XMMWORD[((16-112))+r15]
 	jmp	NEAR $L$oop_avx
-ALIGN	16
+ALIGN	32
 $L$oop_avx:
-	add	ebp,DWORD[rsp]
-	vmovups	xmm12,XMMWORD[r12]
-	vxorps	xmm12,xmm12,xmm13
-	vxorps	xmm11,xmm11,xmm12
-	vaesenc	xmm11,xmm11,xmm14
+	shrd	ebx,ebx,2
+	vmovdqu	xmm13,XMMWORD[r12]
+	vpxor	xmm13,xmm13,xmm15
+	vpxor	xmm12,xmm12,xmm13
+	vaesenc	xmm12,xmm12,xmm14
 	vmovups	xmm15,XMMWORD[((-80))+r15]
-	xor	ecx,edx
+	xor	esi,edx
 	vpalignr	xmm4,xmm1,xmm0,8
 	mov	edi,eax
+	add	ebp,DWORD[rsp]
+	vpaddd	xmm9,xmm10,xmm3
+	xor	ebx,ecx
 	shld	eax,eax,5
-	vpaddd	xmm9,xmm9,xmm3
-	and	esi,ecx
-	xor	ecx,edx
 	vpsrldq	xmm8,xmm3,4
-	xor	esi,edx
-	add	ebp,eax
-	vpxor	xmm4,xmm4,xmm0
-	shrd	ebx,ebx,2
 	add	ebp,esi
-	vpxor	xmm8,xmm8,xmm2
-	add	edx,DWORD[4+rsp]
-	xor	ebx,ecx
-	mov	esi,ebp
-	shld	ebp,ebp,5
-	vpxor	xmm4,xmm4,xmm8
 	and	edi,ebx
+	vpxor	xmm4,xmm4,xmm0
 	xor	ebx,ecx
-	vmovdqa	XMMWORD[48+rsp],xmm9
-	xor	edi,ecx
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-64))+r15]
-	add	edx,ebp
-	vpsrld	xmm8,xmm4,31
+	add	ebp,eax
+	vpxor	xmm8,xmm8,xmm2
 	shrd	eax,eax,7
-	add	edx,edi
-	add	ecx,DWORD[8+rsp]
+	xor	edi,ecx
+	mov	esi,ebp
+	add	edx,DWORD[4+rsp]
+	vpxor	xmm4,xmm4,xmm8
 	xor	eax,ebx
-	vpslldq	xmm10,xmm4,12
+	shld	ebp,ebp,5
+	vmovdqa	XMMWORD[48+rsp],xmm9
+	add	edx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-64))+r15]
+	and	esi,eax
+	vpsrld	xmm8,xmm4,31
+	xor	eax,ebx
+	add	edx,ebp
+	shrd	ebp,ebp,7
+	xor	esi,ebx
+	vpslldq	xmm9,xmm4,12
 	vpaddd	xmm4,xmm4,xmm4
 	mov	edi,edx
-	shld	edx,edx,5
-	and	esi,eax
-	xor	eax,ebx
-	vpsrld	xmm9,xmm10,30
-	vpor	xmm4,xmm4,xmm8
-	xor	esi,ebx
-	add	ecx,edx
-	shrd	ebp,ebp,7
-	add	ecx,esi
-	vpslld	xmm10,xmm10,2
-	vpxor	xmm4,xmm4,xmm9
-	add	ebx,DWORD[12+rsp]
+	add	ecx,DWORD[8+rsp]
 	xor	ebp,eax
-	mov	esi,ecx
-	shld	ecx,ecx,5
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-48))+r15]
-	vpxor	xmm4,xmm4,xmm10
+	shld	edx,edx,5
+	vpor	xmm4,xmm4,xmm8
+	vpsrld	xmm8,xmm9,30
+	add	ecx,esi
 	and	edi,ebp
 	xor	ebp,eax
-	vmovdqa	xmm10,XMMWORD[r11]
-	xor	edi,eax
-	add	ebx,ecx
+	add	ecx,edx
+	vpslld	xmm9,xmm9,2
+	vpxor	xmm4,xmm4,xmm8
 	shrd	edx,edx,7
-	add	ebx,edi
-	add	eax,DWORD[16+rsp]
+	xor	edi,eax
+	mov	esi,ecx
+	add	ebx,DWORD[12+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-48))+r15]
+	vpxor	xmm4,xmm4,xmm9
 	xor	edx,ebp
-	vpalignr	xmm5,xmm2,xmm1,8
-	mov	edi,ebx
-	shld	ebx,ebx,5
-	vpaddd	xmm10,xmm10,xmm4
+	shld	ecx,ecx,5
+	add	ebx,edi
 	and	esi,edx
 	xor	edx,ebp
-	vpsrldq	xmm9,xmm4,4
-	xor	esi,ebp
-	add	eax,ebx
-	vpxor	xmm5,xmm5,xmm1
+	add	ebx,ecx
 	shrd	ecx,ecx,7
+	xor	esi,ebp
+	vpalignr	xmm5,xmm2,xmm1,8
+	mov	edi,ebx
+	add	eax,DWORD[16+rsp]
+	vpaddd	xmm9,xmm10,xmm4
+	xor	ecx,edx
+	shld	ebx,ebx,5
+	vpsrldq	xmm8,xmm4,4
 	add	eax,esi
-	vpxor	xmm9,xmm9,xmm3
-	add	ebp,DWORD[20+rsp]
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-32))+r15]
-	xor	ecx,edx
-	mov	esi,eax
-	shld	eax,eax,5
-	vpxor	xmm5,xmm5,xmm9
 	and	edi,ecx
+	vpxor	xmm5,xmm5,xmm1
 	xor	ecx,edx
-	vmovdqa	XMMWORD[rsp],xmm10
-	xor	edi,edx
-	add	ebp,eax
-	vpsrld	xmm9,xmm5,31
+	add	eax,ebx
+	vpxor	xmm8,xmm8,xmm3
 	shrd	ebx,ebx,7
-	add	ebp,edi
-	add	edx,DWORD[24+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-32))+r15]
+	xor	edi,edx
+	mov	esi,eax
+	add	ebp,DWORD[20+rsp]
+	vpxor	xmm5,xmm5,xmm8
 	xor	ebx,ecx
-	vpslldq	xmm8,xmm5,12
+	shld	eax,eax,5
+	vmovdqa	XMMWORD[rsp],xmm9
+	add	ebp,edi
+	and	esi,ebx
+	vpsrld	xmm8,xmm5,31
+	xor	ebx,ecx
+	add	ebp,eax
+	shrd	eax,eax,7
+	xor	esi,ecx
+	vpslldq	xmm9,xmm5,12
 	vpaddd	xmm5,xmm5,xmm5
 	mov	edi,ebp
-	shld	ebp,ebp,5
-	and	esi,ebx
-	xor	ebx,ecx
-	vpsrld	xmm10,xmm8,30
-	vpor	xmm5,xmm5,xmm9
-	xor	esi,ecx
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-16))+r15]
-	add	edx,ebp
-	shrd	eax,eax,7
-	add	edx,esi
-	vpslld	xmm8,xmm8,2
-	vpxor	xmm5,xmm5,xmm10
-	add	ecx,DWORD[28+rsp]
+	add	edx,DWORD[24+rsp]
 	xor	eax,ebx
-	mov	esi,edx
-	shld	edx,edx,5
-	vpxor	xmm5,xmm5,xmm8
+	shld	ebp,ebp,5
+	vpor	xmm5,xmm5,xmm8
+	vpsrld	xmm8,xmm9,30
+	add	edx,esi
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-16))+r15]
 	and	edi,eax
 	xor	eax,ebx
-	vmovdqa	xmm8,XMMWORD[16+r11]
-	xor	edi,ebx
-	add	ecx,edx
+	add	edx,ebp
+	vpslld	xmm9,xmm9,2
+	vpxor	xmm5,xmm5,xmm8
 	shrd	ebp,ebp,7
-	add	ecx,edi
-	add	ebx,DWORD[32+rsp]
+	xor	edi,ebx
+	mov	esi,edx
+	add	ecx,DWORD[28+rsp]
+	vpxor	xmm5,xmm5,xmm9
 	xor	ebp,eax
-	vpalignr	xmm6,xmm3,xmm2,8
-	mov	edi,ecx
-	shld	ecx,ecx,5
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[r15]
-	vpaddd	xmm8,xmm8,xmm5
+	shld	edx,edx,5
+	vmovdqa	xmm10,XMMWORD[16+r11]
+	add	ecx,edi
 	and	esi,ebp
 	xor	ebp,eax
-	vpsrldq	xmm10,xmm5,4
-	xor	esi,eax
-	add	ebx,ecx
-	vpxor	xmm6,xmm6,xmm2
+	add	ecx,edx
 	shrd	edx,edx,7
+	xor	esi,eax
+	vpalignr	xmm6,xmm3,xmm2,8
+	mov	edi,ecx
+	add	ebx,DWORD[32+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[r15]
+	vpaddd	xmm9,xmm10,xmm5
+	xor	edx,ebp
+	shld	ecx,ecx,5
+	vpsrldq	xmm8,xmm5,4
 	add	ebx,esi
-	vpxor	xmm10,xmm10,xmm4
-	add	eax,DWORD[36+rsp]
-	xor	edx,ebp
-	mov	esi,ebx
-	shld	ebx,ebx,5
-	vpxor	xmm6,xmm6,xmm10
 	and	edi,edx
+	vpxor	xmm6,xmm6,xmm2
 	xor	edx,ebp
-	vmovdqa	XMMWORD[16+rsp],xmm8
-	xor	edi,ebp
-	add	eax,ebx
-	vpsrld	xmm10,xmm6,31
+	add	ebx,ecx
+	vpxor	xmm8,xmm8,xmm4
 	shrd	ecx,ecx,7
-	add	eax,edi
-	add	ebp,DWORD[40+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[16+r15]
+	xor	edi,ebp
+	mov	esi,ebx
+	add	eax,DWORD[36+rsp]
+	vpxor	xmm6,xmm6,xmm8
 	xor	ecx,edx
+	shld	ebx,ebx,5
+	vmovdqa	XMMWORD[16+rsp],xmm9
+	add	eax,edi
+	and	esi,ecx
+	vpsrld	xmm8,xmm6,31
+	xor	ecx,edx
+	add	eax,ebx
+	shrd	ebx,ebx,7
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[16+r15]
+	xor	esi,edx
 	vpslldq	xmm9,xmm6,12
 	vpaddd	xmm6,xmm6,xmm6
 	mov	edi,eax
-	shld	eax,eax,5
-	and	esi,ecx
-	xor	ecx,edx
-	vpsrld	xmm8,xmm9,30
-	vpor	xmm6,xmm6,xmm10
-	xor	esi,edx
-	add	ebp,eax
-	shrd	ebx,ebx,7
-	add	ebp,esi
-	vpslld	xmm9,xmm9,2
-	vpxor	xmm6,xmm6,xmm8
-	add	edx,DWORD[44+rsp]
+	add	ebp,DWORD[40+rsp]
 	xor	ebx,ecx
-	mov	esi,ebp
-	shld	ebp,ebp,5
-	vpxor	xmm6,xmm6,xmm9
+	shld	eax,eax,5
+	vpor	xmm6,xmm6,xmm8
+	vpsrld	xmm8,xmm9,30
+	add	ebp,esi
 	and	edi,ebx
 	xor	ebx,ecx
-	vmovdqa	xmm9,XMMWORD[16+r11]
-	xor	edi,ecx
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[32+r15]
-	add	edx,ebp
+	add	ebp,eax
+	vpslld	xmm9,xmm9,2
+	vpxor	xmm6,xmm6,xmm8
 	shrd	eax,eax,7
-	add	edx,edi
-	add	ecx,DWORD[48+rsp]
+	xor	edi,ecx
+	mov	esi,ebp
+	add	edx,DWORD[44+rsp]
+	vpxor	xmm6,xmm6,xmm9
 	xor	eax,ebx
-	vpalignr	xmm7,xmm4,xmm3,8
-	mov	edi,edx
-	shld	edx,edx,5
-	vpaddd	xmm9,xmm9,xmm6
+	shld	ebp,ebp,5
+	add	edx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[32+r15]
 	and	esi,eax
 	xor	eax,ebx
-	vpsrldq	xmm8,xmm6,4
-	xor	esi,ebx
-	add	ecx,edx
-	vpxor	xmm7,xmm7,xmm3
+	add	edx,ebp
 	shrd	ebp,ebp,7
-	add	ecx,esi
-	vpxor	xmm8,xmm8,xmm5
-	add	ebx,DWORD[52+rsp]
+	xor	esi,ebx
+	vpalignr	xmm7,xmm4,xmm3,8
+	mov	edi,edx
+	add	ecx,DWORD[48+rsp]
+	vpaddd	xmm9,xmm10,xmm6
 	xor	ebp,eax
+	shld	edx,edx,5
+	vpsrldq	xmm8,xmm6,4
+	add	ecx,esi
+	and	edi,ebp
+	vpxor	xmm7,xmm7,xmm3
+	xor	ebp,eax
+	add	ecx,edx
+	vpxor	xmm8,xmm8,xmm5
+	shrd	edx,edx,7
+	xor	edi,eax
 	mov	esi,ecx
-	shld	ecx,ecx,5
-	vaesenc	xmm11,xmm11,xmm14
+	add	ebx,DWORD[52+rsp]
+	vaesenc	xmm12,xmm12,xmm14
 	vmovups	xmm15,XMMWORD[48+r15]
 	vpxor	xmm7,xmm7,xmm8
-	and	edi,ebp
-	xor	ebp,eax
-	vmovdqa	XMMWORD[32+rsp],xmm9
-	xor	edi,eax
-	add	ebx,ecx
-	vpsrld	xmm8,xmm7,31
-	shrd	edx,edx,7
-	add	ebx,edi
-	add	eax,DWORD[56+rsp]
 	xor	edx,ebp
-	vpslldq	xmm10,xmm7,12
+	shld	ecx,ecx,5
+	vmovdqa	XMMWORD[32+rsp],xmm9
+	add	ebx,edi
+	and	esi,edx
+	vpsrld	xmm8,xmm7,31
+	xor	edx,ebp
+	add	ebx,ecx
+	shrd	ecx,ecx,7
+	xor	esi,ebp
+	vpslldq	xmm9,xmm7,12
 	vpaddd	xmm7,xmm7,xmm7
 	mov	edi,ebx
-	shld	ebx,ebx,5
-	and	esi,edx
-	xor	edx,ebp
-	vpsrld	xmm9,xmm10,30
-	vpor	xmm7,xmm7,xmm8
-	xor	esi,ebp
-	add	eax,ebx
-	shrd	ecx,ecx,7
-	add	eax,esi
-	vpslld	xmm10,xmm10,2
-	vpxor	xmm7,xmm7,xmm9
-	add	ebp,DWORD[60+rsp]
-	cmp	r8d,11
-	jb	NEAR $L$vaesenclast1
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[64+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[80+r15]
-	je	NEAR $L$vaesenclast1
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[96+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[112+r15]
-$L$vaesenclast1:
-	vaesenclast	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((16-112))+r15]
+	add	eax,DWORD[56+rsp]
 	xor	ecx,edx
-	mov	esi,eax
-	shld	eax,eax,5
-	vpxor	xmm7,xmm7,xmm10
+	shld	ebx,ebx,5
+	vpor	xmm7,xmm7,xmm8
+	vpsrld	xmm8,xmm9,30
+	add	eax,esi
 	and	edi,ecx
 	xor	ecx,edx
-	vmovdqa	xmm10,XMMWORD[16+r11]
-	xor	edi,edx
-	add	ebp,eax
+	add	eax,ebx
+	vpslld	xmm9,xmm9,2
+	vpxor	xmm7,xmm7,xmm8
 	shrd	ebx,ebx,7
-	add	ebp,edi
-	vpalignr	xmm9,xmm7,xmm6,8
-	vpxor	xmm0,xmm0,xmm4
-	add	edx,DWORD[rsp]
+	cmp	r8d,11
+	jb	NEAR $L$vaesenclast6
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[64+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[80+r15]
+	je	NEAR $L$vaesenclast6
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[96+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[112+r15]
+$L$vaesenclast6:
+	vaesenclast	xmm12,xmm12,xmm15
+	vmovups	xmm15,XMMWORD[((-112))+r15]
+	vmovups	xmm14,XMMWORD[((16-112))+r15]
+	xor	edi,edx
+	mov	esi,eax
+	add	ebp,DWORD[60+rsp]
+	vpxor	xmm7,xmm7,xmm9
 	xor	ebx,ecx
-	mov	edi,ebp
-	shld	ebp,ebp,5
-	vpxor	xmm0,xmm0,xmm1
+	shld	eax,eax,5
+	add	ebp,edi
 	and	esi,ebx
 	xor	ebx,ecx
-	vmovdqa	xmm8,xmm10
-	vpaddd	xmm10,xmm10,xmm7
-	xor	esi,ecx
-	vmovups	xmm12,XMMWORD[16+r12]
-	vxorps	xmm12,xmm12,xmm13
-	vmovups	XMMWORD[r12*1+r13],xmm11
-	vxorps	xmm11,xmm11,xmm12
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-80))+r15]
-	add	edx,ebp
-	vpxor	xmm0,xmm0,xmm9
+	add	ebp,eax
+	vpalignr	xmm8,xmm7,xmm6,8
+	vpxor	xmm0,xmm0,xmm4
 	shrd	eax,eax,7
+	xor	esi,ecx
+	mov	edi,ebp
+	add	edx,DWORD[rsp]
+	vpxor	xmm0,xmm0,xmm1
+	xor	eax,ebx
+	shld	ebp,ebp,5
+	vpaddd	xmm9,xmm10,xmm7
 	add	edx,esi
-	add	ecx,DWORD[4+rsp]
-	xor	eax,ebx
-	vpsrld	xmm9,xmm0,30
-	vmovdqa	XMMWORD[48+rsp],xmm10
-	mov	esi,edx
-	shld	edx,edx,5
+	vmovdqu	xmm13,XMMWORD[16+r12]
+	vpxor	xmm13,xmm13,xmm15
+	vmovups	XMMWORD[r13*1+r12],xmm12
+	vpxor	xmm12,xmm12,xmm13
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-80))+r15]
 	and	edi,eax
+	vpxor	xmm0,xmm0,xmm8
 	xor	eax,ebx
-	vpslld	xmm0,xmm0,2
-	xor	edi,ebx
-	add	ecx,edx
+	add	edx,ebp
 	shrd	ebp,ebp,7
-	add	ecx,edi
-	add	ebx,DWORD[8+rsp]
+	xor	edi,ebx
+	vpsrld	xmm8,xmm0,30
+	vmovdqa	XMMWORD[48+rsp],xmm9
+	mov	esi,edx
+	add	ecx,DWORD[4+rsp]
 	xor	ebp,eax
-	mov	edi,ecx
-	shld	ecx,ecx,5
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-64))+r15]
-	vpor	xmm0,xmm0,xmm9
+	shld	edx,edx,5
+	vpslld	xmm0,xmm0,2
+	add	ecx,edi
 	and	esi,ebp
 	xor	ebp,eax
-	vmovdqa	xmm10,xmm0
-	xor	esi,eax
-	add	ebx,ecx
+	add	ecx,edx
 	shrd	edx,edx,7
-	add	ebx,esi
-	add	eax,DWORD[12+rsp]
+	xor	esi,eax
+	mov	edi,ecx
+	add	ebx,DWORD[8+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-64))+r15]
+	vpor	xmm0,xmm0,xmm8
 	xor	edx,ebp
-	mov	esi,ebx
-	shld	ebx,ebx,5
+	shld	ecx,ecx,5
+	add	ebx,esi
 	and	edi,edx
 	xor	edx,ebp
+	add	ebx,ecx
+	add	eax,DWORD[12+rsp]
 	xor	edi,ebp
-	add	eax,ebx
-	shrd	ecx,ecx,7
+	mov	esi,ebx
+	shld	ebx,ebx,5
 	add	eax,edi
-	vpalignr	xmm10,xmm0,xmm7,8
+	xor	esi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	vpalignr	xmm8,xmm0,xmm7,8
 	vpxor	xmm1,xmm1,xmm5
 	add	ebp,DWORD[16+rsp]
-	vaesenc	xmm11,xmm11,xmm14
+	vaesenc	xmm12,xmm12,xmm14
 	vmovups	xmm15,XMMWORD[((-48))+r15]
-	xor	esi,edx
+	xor	esi,ecx
 	mov	edi,eax
 	shld	eax,eax,5
 	vpxor	xmm1,xmm1,xmm2
-	xor	esi,ecx
-	add	ebp,eax
-	vmovdqa	xmm9,xmm8
-	vpaddd	xmm8,xmm8,xmm0
-	shrd	ebx,ebx,7
 	add	ebp,esi
-	vpxor	xmm1,xmm1,xmm10
-	add	edx,DWORD[20+rsp]
 	xor	edi,ecx
+	vpaddd	xmm9,xmm10,xmm0
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	vpxor	xmm1,xmm1,xmm8
+	add	edx,DWORD[20+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	shld	ebp,ebp,5
-	vpsrld	xmm10,xmm1,30
-	vmovdqa	XMMWORD[rsp],xmm8
-	xor	edi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
+	vpsrld	xmm8,xmm1,30
+	vmovdqa	XMMWORD[rsp],xmm9
 	add	edx,edi
+	xor	esi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
 	vpslld	xmm1,xmm1,2
 	add	ecx,DWORD[24+rsp]
-	xor	esi,ebx
+	xor	esi,eax
 	mov	edi,edx
 	shld	edx,edx,5
-	xor	esi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-32))+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,esi
-	vpor	xmm1,xmm1,xmm10
-	add	ebx,DWORD[28+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-32))+r15]
 	xor	edi,eax
-	vmovdqa	xmm8,xmm1
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	vpor	xmm1,xmm1,xmm8
+	add	ebx,DWORD[28+rsp]
+	xor	edi,ebp
 	mov	esi,ecx
 	shld	ecx,ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,edi
+	xor	esi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
 	vpalignr	xmm8,xmm1,xmm0,8
 	vpxor	xmm2,xmm2,xmm6
 	add	eax,DWORD[32+rsp]
-	xor	esi,ebp
+	xor	esi,edx
 	mov	edi,ebx
 	shld	ebx,ebx,5
 	vpxor	xmm2,xmm2,xmm3
-	xor	esi,edx
-	add	eax,ebx
-	vmovdqa	xmm10,XMMWORD[32+r11]
-	vpaddd	xmm9,xmm9,xmm1
-	shrd	ecx,ecx,7
 	add	eax,esi
+	xor	edi,edx
+	vpaddd	xmm9,xmm10,xmm1
+	vmovdqa	xmm10,XMMWORD[32+r11]
+	shrd	ecx,ecx,7
+	add	eax,ebx
 	vpxor	xmm2,xmm2,xmm8
 	add	ebp,DWORD[36+rsp]
-	vaesenc	xmm11,xmm11,xmm14
+	vaesenc	xmm12,xmm12,xmm14
 	vmovups	xmm15,XMMWORD[((-16))+r15]
-	xor	edi,edx
+	xor	edi,ecx
 	mov	esi,eax
 	shld	eax,eax,5
 	vpsrld	xmm8,xmm2,30
 	vmovdqa	XMMWORD[16+rsp],xmm9
-	xor	edi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,edi
+	xor	esi,ecx
+	shrd	ebx,ebx,7
+	add	ebp,eax
 	vpslld	xmm2,xmm2,2
 	add	edx,DWORD[40+rsp]
-	xor	esi,ecx
+	xor	esi,ebx
 	mov	edi,ebp
 	shld	ebp,ebp,5
-	xor	esi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,esi
+	xor	edi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
 	vpor	xmm2,xmm2,xmm8
 	add	ecx,DWORD[44+rsp]
-	xor	edi,ebx
-	vmovdqa	xmm9,xmm2
+	xor	edi,eax
 	mov	esi,edx
 	shld	edx,edx,5
-	xor	edi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,edi
-	vpalignr	xmm9,xmm2,xmm1,8
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[r15]
+	xor	esi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	vpalignr	xmm8,xmm2,xmm1,8
 	vpxor	xmm3,xmm3,xmm7
 	add	ebx,DWORD[48+rsp]
-	xor	esi,eax
+	xor	esi,ebp
 	mov	edi,ecx
 	shld	ecx,ecx,5
 	vpxor	xmm3,xmm3,xmm4
-	xor	esi,ebp
-	add	ebx,ecx
-	vmovdqa	xmm8,xmm10
-	vpaddd	xmm10,xmm10,xmm2
-	shrd	edx,edx,7
 	add	ebx,esi
-	vpxor	xmm3,xmm3,xmm9
-	add	eax,DWORD[52+rsp]
 	xor	edi,ebp
+	vpaddd	xmm9,xmm10,xmm2
+	shrd	edx,edx,7
+	add	ebx,ecx
+	vpxor	xmm3,xmm3,xmm8
+	add	eax,DWORD[52+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	shld	ebx,ebx,5
-	vpsrld	xmm9,xmm3,30
-	vmovdqa	XMMWORD[32+rsp],xmm10
-	xor	edi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
+	vpsrld	xmm8,xmm3,30
+	vmovdqa	XMMWORD[32+rsp],xmm9
 	add	eax,edi
+	xor	esi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
 	vpslld	xmm3,xmm3,2
 	add	ebp,DWORD[56+rsp]
-	vaesenc	xmm11,xmm11,xmm14
+	vaesenc	xmm12,xmm12,xmm14
 	vmovups	xmm15,XMMWORD[16+r15]
-	xor	esi,edx
+	xor	esi,ecx
 	mov	edi,eax
 	shld	eax,eax,5
-	xor	esi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,esi
-	vpor	xmm3,xmm3,xmm9
-	add	edx,DWORD[60+rsp]
 	xor	edi,ecx
-	vmovdqa	xmm10,xmm3
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	vpor	xmm3,xmm3,xmm8
+	add	edx,DWORD[60+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	shld	ebp,ebp,5
-	xor	edi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,edi
-	vpalignr	xmm10,xmm3,xmm2,8
+	xor	esi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
+	vpalignr	xmm8,xmm3,xmm2,8
 	vpxor	xmm4,xmm4,xmm0
 	add	ecx,DWORD[rsp]
-	xor	esi,ebx
+	xor	esi,eax
 	mov	edi,edx
 	shld	edx,edx,5
 	vpxor	xmm4,xmm4,xmm5
-	xor	esi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[32+r15]
-	add	ecx,edx
-	vmovdqa	xmm9,xmm8
-	vpaddd	xmm8,xmm8,xmm3
-	shrd	ebp,ebp,7
 	add	ecx,esi
-	vpxor	xmm4,xmm4,xmm10
-	add	ebx,DWORD[4+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[32+r15]
 	xor	edi,eax
+	vpaddd	xmm9,xmm10,xmm3
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	vpxor	xmm4,xmm4,xmm8
+	add	ebx,DWORD[4+rsp]
+	xor	edi,ebp
 	mov	esi,ecx
 	shld	ecx,ecx,5
-	vpsrld	xmm10,xmm4,30
-	vmovdqa	XMMWORD[48+rsp],xmm8
-	xor	edi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
+	vpsrld	xmm8,xmm4,30
+	vmovdqa	XMMWORD[48+rsp],xmm9
 	add	ebx,edi
+	xor	esi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
 	vpslld	xmm4,xmm4,2
 	add	eax,DWORD[8+rsp]
-	xor	esi,ebp
+	xor	esi,edx
 	mov	edi,ebx
 	shld	ebx,ebx,5
-	xor	esi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,esi
-	vpor	xmm4,xmm4,xmm10
-	add	ebp,DWORD[12+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[48+r15]
 	xor	edi,edx
-	vmovdqa	xmm8,xmm4
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	vpor	xmm4,xmm4,xmm8
+	add	ebp,DWORD[12+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[48+r15]
+	xor	edi,ecx
 	mov	esi,eax
 	shld	eax,eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,edi
+	xor	esi,ecx
+	shrd	ebx,ebx,7
+	add	ebp,eax
 	vpalignr	xmm8,xmm4,xmm3,8
 	vpxor	xmm5,xmm5,xmm1
 	add	edx,DWORD[16+rsp]
-	xor	esi,ecx
+	xor	esi,ebx
 	mov	edi,ebp
 	shld	ebp,ebp,5
 	vpxor	xmm5,xmm5,xmm6
-	xor	esi,ebx
-	add	edx,ebp
-	vmovdqa	xmm10,xmm9
-	vpaddd	xmm9,xmm9,xmm4
-	shrd	eax,eax,7
 	add	edx,esi
+	xor	edi,ebx
+	vpaddd	xmm9,xmm10,xmm4
+	shrd	eax,eax,7
+	add	edx,ebp
 	vpxor	xmm5,xmm5,xmm8
 	add	ecx,DWORD[20+rsp]
-	xor	edi,ebx
+	xor	edi,eax
 	mov	esi,edx
 	shld	edx,edx,5
 	vpsrld	xmm8,xmm5,30
 	vmovdqa	XMMWORD[rsp],xmm9
-	xor	edi,eax
-	cmp	r8d,11
-	jb	NEAR $L$vaesenclast2
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[64+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[80+r15]
-	je	NEAR $L$vaesenclast2
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[96+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[112+r15]
-$L$vaesenclast2:
-	vaesenclast	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((16-112))+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,edi
+	cmp	r8d,11
+	jb	NEAR $L$vaesenclast7
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[64+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[80+r15]
+	je	NEAR $L$vaesenclast7
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[96+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[112+r15]
+$L$vaesenclast7:
+	vaesenclast	xmm12,xmm12,xmm15
+	vmovups	xmm15,XMMWORD[((-112))+r15]
+	vmovups	xmm14,XMMWORD[((16-112))+r15]
+	xor	esi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
 	vpslld	xmm5,xmm5,2
 	add	ebx,DWORD[24+rsp]
-	xor	esi,eax
+	xor	esi,ebp
 	mov	edi,ecx
 	shld	ecx,ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,esi
+	xor	edi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
 	vpor	xmm5,xmm5,xmm8
 	add	eax,DWORD[28+rsp]
-	xor	edi,ebp
-	vmovdqa	xmm9,xmm5
-	mov	esi,ebx
-	shld	ebx,ebx,5
-	xor	edi,edx
-	add	eax,ebx
 	shrd	ecx,ecx,7
+	mov	esi,ebx
+	xor	edi,edx
+	shld	ebx,ebx,5
 	add	eax,edi
-	vpalignr	xmm9,xmm5,xmm4,8
-	vpxor	xmm6,xmm6,xmm2
-	mov	edi,ecx
-	vmovups	xmm12,XMMWORD[32+r12]
-	vxorps	xmm12,xmm12,xmm13
-	vmovups	XMMWORD[16+r12*1+r13],xmm11
-	vxorps	xmm11,xmm11,xmm12
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-80))+r15]
+	xor	esi,ecx
 	xor	ecx,edx
+	add	eax,ebx
+	vpalignr	xmm8,xmm5,xmm4,8
+	vpxor	xmm6,xmm6,xmm2
 	add	ebp,DWORD[32+rsp]
-	and	edi,edx
-	vpxor	xmm6,xmm6,xmm7
+	vmovdqu	xmm13,XMMWORD[32+r12]
+	vpxor	xmm13,xmm13,xmm15
+	vmovups	XMMWORD[16+r12*1+r13],xmm12
+	vpxor	xmm12,xmm12,xmm13
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-80))+r15]
 	and	esi,ecx
+	xor	ecx,edx
 	shrd	ebx,ebx,7
-	vmovdqa	xmm8,xmm10
-	vpaddd	xmm10,xmm10,xmm5
-	add	ebp,edi
+	vpxor	xmm6,xmm6,xmm7
 	mov	edi,eax
-	vpxor	xmm6,xmm6,xmm9
+	xor	esi,ecx
+	vpaddd	xmm9,xmm10,xmm5
 	shld	eax,eax,5
 	add	ebp,esi
-	xor	ecx,edx
+	vpxor	xmm6,xmm6,xmm8
+	xor	edi,ebx
+	xor	ebx,ecx
 	add	ebp,eax
-	vpsrld	xmm9,xmm6,30
-	vmovdqa	XMMWORD[16+rsp],xmm10
-	mov	esi,ebx
-	xor	ebx,ecx
 	add	edx,DWORD[36+rsp]
-	and	esi,ecx
-	vpslld	xmm6,xmm6,2
+	vpsrld	xmm8,xmm6,30
+	vmovdqa	XMMWORD[16+rsp],xmm9
 	and	edi,ebx
-	shrd	eax,eax,7
-	add	edx,esi
-	mov	esi,ebp
-	shld	ebp,ebp,5
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-64))+r15]
-	add	edx,edi
 	xor	ebx,ecx
-	add	edx,ebp
-	vpor	xmm6,xmm6,xmm9
-	mov	edi,eax
+	shrd	eax,eax,7
+	mov	esi,ebp
+	vpslld	xmm6,xmm6,2
+	xor	edi,ebx
+	shld	ebp,ebp,5
+	add	edx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-64))+r15]
+	xor	esi,eax
 	xor	eax,ebx
-	vmovdqa	xmm10,xmm6
+	add	edx,ebp
 	add	ecx,DWORD[40+rsp]
-	and	edi,ebx
 	and	esi,eax
+	vpor	xmm6,xmm6,xmm8
+	xor	eax,ebx
 	shrd	ebp,ebp,7
-	add	ecx,edi
 	mov	edi,edx
+	xor	esi,eax
 	shld	edx,edx,5
 	add	ecx,esi
-	xor	eax,ebx
-	add	ecx,edx
-	mov	esi,ebp
+	xor	edi,ebp
 	xor	ebp,eax
+	add	ecx,edx
 	add	ebx,DWORD[44+rsp]
-	and	esi,eax
 	and	edi,ebp
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-48))+r15]
+	xor	ebp,eax
 	shrd	edx,edx,7
-	add	ebx,esi
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-48))+r15]
 	mov	esi,ecx
+	xor	edi,ebp
 	shld	ecx,ecx,5
 	add	ebx,edi
-	xor	ebp,eax
-	add	ebx,ecx
-	vpalignr	xmm10,xmm6,xmm5,8
-	vpxor	xmm7,xmm7,xmm3
-	mov	edi,edx
+	xor	esi,edx
 	xor	edx,ebp
+	add	ebx,ecx
+	vpalignr	xmm8,xmm6,xmm5,8
+	vpxor	xmm7,xmm7,xmm3
 	add	eax,DWORD[48+rsp]
-	and	edi,ebp
-	vpxor	xmm7,xmm7,xmm0
 	and	esi,edx
+	xor	edx,ebp
 	shrd	ecx,ecx,7
-	vmovdqa	xmm9,XMMWORD[48+r11]
-	vpaddd	xmm8,xmm8,xmm6
-	add	eax,edi
+	vpxor	xmm7,xmm7,xmm0
 	mov	edi,ebx
-	vpxor	xmm7,xmm7,xmm10
+	xor	esi,edx
+	vpaddd	xmm9,xmm10,xmm6
+	vmovdqa	xmm10,XMMWORD[48+r11]
 	shld	ebx,ebx,5
 	add	eax,esi
-	xor	edx,ebp
-	add	eax,ebx
-	vpsrld	xmm10,xmm7,30
-	vmovdqa	XMMWORD[32+rsp],xmm8
-	mov	esi,ecx
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-32))+r15]
+	vpxor	xmm7,xmm7,xmm8
+	xor	edi,ecx
 	xor	ecx,edx
+	add	eax,ebx
 	add	ebp,DWORD[52+rsp]
-	and	esi,edx
-	vpslld	xmm7,xmm7,2
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-32))+r15]
+	vpsrld	xmm8,xmm7,30
+	vmovdqa	XMMWORD[32+rsp],xmm9
 	and	edi,ecx
+	xor	ecx,edx
 	shrd	ebx,ebx,7
-	add	ebp,esi
 	mov	esi,eax
+	vpslld	xmm7,xmm7,2
+	xor	edi,ecx
 	shld	eax,eax,5
 	add	ebp,edi
-	xor	ecx,edx
+	xor	esi,ebx
+	xor	ebx,ecx
 	add	ebp,eax
-	vpor	xmm7,xmm7,xmm10
-	mov	edi,ebx
-	xor	ebx,ecx
-	vmovdqa	xmm8,xmm7
 	add	edx,DWORD[56+rsp]
-	and	edi,ecx
 	and	esi,ebx
-	shrd	eax,eax,7
-	add	edx,edi
-	mov	edi,ebp
-	shld	ebp,ebp,5
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-16))+r15]
-	add	edx,esi
+	vpor	xmm7,xmm7,xmm8
 	xor	ebx,ecx
-	add	edx,ebp
-	mov	esi,eax
+	shrd	eax,eax,7
+	mov	edi,ebp
+	xor	esi,ebx
+	shld	ebp,ebp,5
+	add	edx,esi
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-16))+r15]
+	xor	edi,eax
 	xor	eax,ebx
+	add	edx,ebp
 	add	ecx,DWORD[60+rsp]
-	and	esi,ebx
 	and	edi,eax
+	xor	eax,ebx
 	shrd	ebp,ebp,7
-	add	ecx,esi
 	mov	esi,edx
+	xor	edi,eax
 	shld	edx,edx,5
 	add	ecx,edi
-	xor	eax,ebx
+	xor	esi,ebp
+	xor	ebp,eax
 	add	ecx,edx
 	vpalignr	xmm8,xmm7,xmm6,8
 	vpxor	xmm0,xmm0,xmm4
-	mov	edi,ebp
-	xor	ebp,eax
 	add	ebx,DWORD[rsp]
-	and	edi,eax
-	vpxor	xmm0,xmm0,xmm1
 	and	esi,ebp
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[r15]
+	xor	ebp,eax
 	shrd	edx,edx,7
-	vmovdqa	xmm10,xmm9
-	vpaddd	xmm9,xmm9,xmm7
-	add	ebx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[r15]
+	vpxor	xmm0,xmm0,xmm1
 	mov	edi,ecx
-	vpxor	xmm0,xmm0,xmm8
+	xor	esi,ebp
+	vpaddd	xmm9,xmm10,xmm7
 	shld	ecx,ecx,5
 	add	ebx,esi
-	xor	ebp,eax
+	vpxor	xmm0,xmm0,xmm8
+	xor	edi,edx
+	xor	edx,ebp
 	add	ebx,ecx
+	add	eax,DWORD[4+rsp]
 	vpsrld	xmm8,xmm0,30
 	vmovdqa	XMMWORD[48+rsp],xmm9
-	mov	esi,edx
+	and	edi,edx
 	xor	edx,ebp
-	add	eax,DWORD[4+rsp]
-	and	esi,ebp
+	shrd	ecx,ecx,7
+	mov	esi,ebx
 	vpslld	xmm0,xmm0,2
-	and	edi,edx
-	shrd	ecx,ecx,7
-	add	eax,esi
-	mov	esi,ebx
+	xor	edi,edx
 	shld	ebx,ebx,5
 	add	eax,edi
-	xor	edx,ebp
-	add	eax,ebx
-	vpor	xmm0,xmm0,xmm8
-	mov	edi,ecx
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[16+r15]
+	xor	esi,ecx
 	xor	ecx,edx
-	vmovdqa	xmm9,xmm0
+	add	eax,ebx
 	add	ebp,DWORD[8+rsp]
-	and	edi,edx
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[16+r15]
 	and	esi,ecx
+	vpor	xmm0,xmm0,xmm8
+	xor	ecx,edx
 	shrd	ebx,ebx,7
-	add	ebp,edi
 	mov	edi,eax
+	xor	esi,ecx
 	shld	eax,eax,5
 	add	ebp,esi
-	xor	ecx,edx
-	add	ebp,eax
-	mov	esi,ebx
+	xor	edi,ebx
 	xor	ebx,ecx
+	add	ebp,eax
 	add	edx,DWORD[12+rsp]
-	and	esi,ecx
 	and	edi,ebx
-	shrd	eax,eax,7
-	add	edx,esi
-	mov	esi,ebp
-	shld	ebp,ebp,5
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[32+r15]
-	add	edx,edi
 	xor	ebx,ecx
-	add	edx,ebp
-	vpalignr	xmm9,xmm0,xmm7,8
-	vpxor	xmm1,xmm1,xmm5
-	mov	edi,eax
+	shrd	eax,eax,7
+	mov	esi,ebp
+	xor	edi,ebx
+	shld	ebp,ebp,5
+	add	edx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[32+r15]
+	xor	esi,eax
 	xor	eax,ebx
+	add	edx,ebp
+	vpalignr	xmm8,xmm0,xmm7,8
+	vpxor	xmm1,xmm1,xmm5
 	add	ecx,DWORD[16+rsp]
-	and	edi,ebx
-	vpxor	xmm1,xmm1,xmm2
 	and	esi,eax
+	xor	eax,ebx
 	shrd	ebp,ebp,7
-	vmovdqa	xmm8,xmm10
-	vpaddd	xmm10,xmm10,xmm0
-	add	ecx,edi
+	vpxor	xmm1,xmm1,xmm2
 	mov	edi,edx
-	vpxor	xmm1,xmm1,xmm9
+	xor	esi,eax
+	vpaddd	xmm9,xmm10,xmm0
 	shld	edx,edx,5
 	add	ecx,esi
-	xor	eax,ebx
-	add	ecx,edx
-	vpsrld	xmm9,xmm1,30
-	vmovdqa	XMMWORD[rsp],xmm10
-	mov	esi,ebp
+	vpxor	xmm1,xmm1,xmm8
+	xor	edi,ebp
 	xor	ebp,eax
+	add	ecx,edx
 	add	ebx,DWORD[20+rsp]
-	and	esi,eax
-	vpslld	xmm1,xmm1,2
+	vpsrld	xmm8,xmm1,30
+	vmovdqa	XMMWORD[rsp],xmm9
 	and	edi,ebp
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[48+r15]
+	xor	ebp,eax
 	shrd	edx,edx,7
-	add	ebx,esi
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[48+r15]
 	mov	esi,ecx
+	vpslld	xmm1,xmm1,2
+	xor	edi,ebp
 	shld	ecx,ecx,5
 	add	ebx,edi
-	xor	ebp,eax
-	add	ebx,ecx
-	vpor	xmm1,xmm1,xmm9
-	mov	edi,edx
+	xor	esi,edx
 	xor	edx,ebp
-	vmovdqa	xmm10,xmm1
+	add	ebx,ecx
 	add	eax,DWORD[24+rsp]
-	and	edi,ebp
 	and	esi,edx
+	vpor	xmm1,xmm1,xmm8
+	xor	edx,ebp
 	shrd	ecx,ecx,7
-	add	eax,edi
 	mov	edi,ebx
+	xor	esi,edx
 	shld	ebx,ebx,5
 	add	eax,esi
-	xor	edx,ebp
-	add	eax,ebx
-	mov	esi,ecx
-	cmp	r8d,11
-	jb	NEAR $L$vaesenclast3
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[64+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[80+r15]
-	je	NEAR $L$vaesenclast3
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[96+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[112+r15]
-$L$vaesenclast3:
-	vaesenclast	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((16-112))+r15]
+	xor	edi,ecx
 	xor	ecx,edx
+	add	eax,ebx
 	add	ebp,DWORD[28+rsp]
-	and	esi,edx
+	cmp	r8d,11
+	jb	NEAR $L$vaesenclast8
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[64+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[80+r15]
+	je	NEAR $L$vaesenclast8
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[96+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[112+r15]
+$L$vaesenclast8:
+	vaesenclast	xmm12,xmm12,xmm15
+	vmovups	xmm15,XMMWORD[((-112))+r15]
+	vmovups	xmm14,XMMWORD[((16-112))+r15]
 	and	edi,ecx
+	xor	ecx,edx
 	shrd	ebx,ebx,7
-	add	ebp,esi
 	mov	esi,eax
+	xor	edi,ecx
 	shld	eax,eax,5
 	add	ebp,edi
-	xor	ecx,edx
+	xor	esi,ebx
+	xor	ebx,ecx
 	add	ebp,eax
-	vpalignr	xmm10,xmm1,xmm0,8
+	vpalignr	xmm8,xmm1,xmm0,8
 	vpxor	xmm2,xmm2,xmm6
-	mov	edi,ebx
-	xor	ebx,ecx
 	add	edx,DWORD[32+rsp]
-	and	edi,ecx
-	vpxor	xmm2,xmm2,xmm3
 	and	esi,ebx
-	shrd	eax,eax,7
-	vmovdqa	xmm9,xmm8
-	vpaddd	xmm8,xmm8,xmm1
-	add	edx,edi
-	mov	edi,ebp
-	vpxor	xmm2,xmm2,xmm10
-	shld	ebp,ebp,5
-	vmovups	xmm12,XMMWORD[48+r12]
-	vxorps	xmm12,xmm12,xmm13
-	vmovups	XMMWORD[32+r12*1+r13],xmm11
-	vxorps	xmm11,xmm11,xmm12
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-80))+r15]
-	add	edx,esi
 	xor	ebx,ecx
-	add	edx,ebp
-	vpsrld	xmm10,xmm2,30
-	vmovdqa	XMMWORD[16+rsp],xmm8
-	mov	esi,eax
+	shrd	eax,eax,7
+	vpxor	xmm2,xmm2,xmm3
+	mov	edi,ebp
+	xor	esi,ebx
+	vpaddd	xmm9,xmm10,xmm1
+	shld	ebp,ebp,5
+	add	edx,esi
+	vmovdqu	xmm13,XMMWORD[48+r12]
+	vpxor	xmm13,xmm13,xmm15
+	vmovups	XMMWORD[32+r12*1+r13],xmm12
+	vpxor	xmm12,xmm12,xmm13
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-80))+r15]
+	vpxor	xmm2,xmm2,xmm8
+	xor	edi,eax
 	xor	eax,ebx
+	add	edx,ebp
 	add	ecx,DWORD[36+rsp]
-	and	esi,ebx
-	vpslld	xmm2,xmm2,2
+	vpsrld	xmm8,xmm2,30
+	vmovdqa	XMMWORD[16+rsp],xmm9
 	and	edi,eax
+	xor	eax,ebx
 	shrd	ebp,ebp,7
-	add	ecx,esi
 	mov	esi,edx
+	vpslld	xmm2,xmm2,2
+	xor	edi,eax
 	shld	edx,edx,5
 	add	ecx,edi
-	xor	eax,ebx
-	add	ecx,edx
-	vpor	xmm2,xmm2,xmm10
-	mov	edi,ebp
+	xor	esi,ebp
 	xor	ebp,eax
-	vmovdqa	xmm8,xmm2
+	add	ecx,edx
 	add	ebx,DWORD[40+rsp]
-	and	edi,eax
 	and	esi,ebp
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-64))+r15]
+	vpor	xmm2,xmm2,xmm8
+	xor	ebp,eax
 	shrd	edx,edx,7
-	add	ebx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-64))+r15]
 	mov	edi,ecx
+	xor	esi,ebp
 	shld	ecx,ecx,5
 	add	ebx,esi
-	xor	ebp,eax
-	add	ebx,ecx
-	mov	esi,edx
+	xor	edi,edx
 	xor	edx,ebp
+	add	ebx,ecx
 	add	eax,DWORD[44+rsp]
-	and	esi,ebp
 	and	edi,edx
+	xor	edx,ebp
 	shrd	ecx,ecx,7
-	add	eax,esi
 	mov	esi,ebx
+	xor	edi,edx
 	shld	ebx,ebx,5
 	add	eax,edi
-	xor	edx,ebp
+	xor	esi,edx
 	add	eax,ebx
 	vpalignr	xmm8,xmm2,xmm1,8
 	vpxor	xmm3,xmm3,xmm7
 	add	ebp,DWORD[48+rsp]
-	vaesenc	xmm11,xmm11,xmm14
+	vaesenc	xmm12,xmm12,xmm14
 	vmovups	xmm15,XMMWORD[((-48))+r15]
-	xor	esi,edx
+	xor	esi,ecx
 	mov	edi,eax
 	shld	eax,eax,5
 	vpxor	xmm3,xmm3,xmm4
-	xor	esi,ecx
-	add	ebp,eax
-	vmovdqa	xmm10,xmm9
-	vpaddd	xmm9,xmm9,xmm2
-	shrd	ebx,ebx,7
 	add	ebp,esi
+	xor	edi,ecx
+	vpaddd	xmm9,xmm10,xmm2
+	shrd	ebx,ebx,7
+	add	ebp,eax
 	vpxor	xmm3,xmm3,xmm8
 	add	edx,DWORD[52+rsp]
-	xor	edi,ecx
+	xor	edi,ebx
 	mov	esi,ebp
 	shld	ebp,ebp,5
 	vpsrld	xmm8,xmm3,30
 	vmovdqa	XMMWORD[32+rsp],xmm9
-	xor	edi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,edi
+	xor	esi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
 	vpslld	xmm3,xmm3,2
 	add	ecx,DWORD[56+rsp]
-	xor	esi,ebx
+	xor	esi,eax
 	mov	edi,edx
 	shld	edx,edx,5
-	xor	esi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((-32))+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,esi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[((-32))+r15]
+	xor	edi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
 	vpor	xmm3,xmm3,xmm8
 	add	ebx,DWORD[60+rsp]
-	xor	edi,eax
+	xor	edi,ebp
 	mov	esi,ecx
 	shld	ecx,ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,edi
-	add	eax,DWORD[rsp]
-	vpaddd	xmm10,xmm10,xmm3
 	xor	esi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	add	eax,DWORD[rsp]
+	vpaddd	xmm9,xmm10,xmm3
+	xor	esi,edx
 	mov	edi,ebx
 	shld	ebx,ebx,5
-	xor	esi,edx
-	movdqa	XMMWORD[48+rsp],xmm10
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,esi
-	add	ebp,DWORD[4+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[((-16))+r15]
+	vmovdqa	XMMWORD[48+rsp],xmm9
 	xor	edi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[4+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[((-16))+r15]
+	xor	edi,ecx
 	mov	esi,eax
 	shld	eax,eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,edi
-	add	edx,DWORD[8+rsp]
 	xor	esi,ecx
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	add	edx,DWORD[8+rsp]
+	xor	esi,ebx
 	mov	edi,ebp
 	shld	ebp,ebp,5
-	xor	esi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,esi
-	add	ecx,DWORD[12+rsp]
 	xor	edi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
+	add	ecx,DWORD[12+rsp]
+	xor	edi,eax
 	mov	esi,edx
 	shld	edx,edx,5
-	xor	edi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,edi
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[r15]
+	xor	esi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
 	cmp	r10,r14
 	je	NEAR $L$done_avx
-	vmovdqa	xmm6,XMMWORD[64+r11]
-	vmovdqa	xmm9,XMMWORD[r11]
+	vmovdqa	xmm9,XMMWORD[64+r11]
+	vmovdqa	xmm10,XMMWORD[r11]
 	vmovdqu	xmm0,XMMWORD[r10]
 	vmovdqu	xmm1,XMMWORD[16+r10]
 	vmovdqu	xmm2,XMMWORD[32+r10]
 	vmovdqu	xmm3,XMMWORD[48+r10]
-	vpshufb	xmm0,xmm0,xmm6
+	vpshufb	xmm0,xmm0,xmm9
 	add	r10,64
 	add	ebx,DWORD[16+rsp]
-	xor	esi,eax
-	vpshufb	xmm1,xmm1,xmm6
+	xor	esi,ebp
+	vpshufb	xmm1,xmm1,xmm9
 	mov	edi,ecx
 	shld	ecx,ecx,5
-	vpaddd	xmm4,xmm0,xmm9
-	xor	esi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
+	vpaddd	xmm8,xmm0,xmm10
 	add	ebx,esi
-	vmovdqa	XMMWORD[rsp],xmm4
-	add	eax,DWORD[20+rsp]
 	xor	edi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	vmovdqa	XMMWORD[rsp],xmm8
+	add	eax,DWORD[20+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	shld	ebx,ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,edi
-	add	ebp,DWORD[24+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[16+r15]
 	xor	esi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[24+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[16+r15]
+	xor	esi,ecx
 	mov	edi,eax
 	shld	eax,eax,5
-	xor	esi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,esi
-	add	edx,DWORD[28+rsp]
 	xor	edi,ecx
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	add	edx,DWORD[28+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	shld	ebp,ebp,5
-	xor	edi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,edi
-	add	ecx,DWORD[32+rsp]
 	xor	esi,ebx
-	vpshufb	xmm2,xmm2,xmm6
+	shrd	eax,eax,7
+	add	edx,ebp
+	add	ecx,DWORD[32+rsp]
+	xor	esi,eax
+	vpshufb	xmm2,xmm2,xmm9
 	mov	edi,edx
 	shld	edx,edx,5
-	vpaddd	xmm5,xmm1,xmm9
-	xor	esi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[32+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
+	vpaddd	xmm8,xmm1,xmm10
 	add	ecx,esi
-	vmovdqa	XMMWORD[16+rsp],xmm5
-	add	ebx,DWORD[36+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[32+r15]
 	xor	edi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	vmovdqa	XMMWORD[16+rsp],xmm8
+	add	ebx,DWORD[36+rsp]
+	xor	edi,ebp
 	mov	esi,ecx
 	shld	ecx,ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,edi
-	add	eax,DWORD[40+rsp]
 	xor	esi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	add	eax,DWORD[40+rsp]
+	xor	esi,edx
 	mov	edi,ebx
 	shld	ebx,ebx,5
-	xor	esi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,esi
-	add	ebp,DWORD[44+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[48+r15]
 	xor	edi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[44+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[48+r15]
+	xor	edi,ecx
 	mov	esi,eax
 	shld	eax,eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,edi
-	add	edx,DWORD[48+rsp]
 	xor	esi,ecx
-	vpshufb	xmm3,xmm3,xmm6
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	add	edx,DWORD[48+rsp]
+	xor	esi,ebx
+	vpshufb	xmm3,xmm3,xmm9
 	mov	edi,ebp
 	shld	ebp,ebp,5
-	vpaddd	xmm6,xmm2,xmm9
-	xor	esi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
+	vpaddd	xmm8,xmm2,xmm10
 	add	edx,esi
-	vmovdqa	XMMWORD[32+rsp],xmm6
-	add	ecx,DWORD[52+rsp]
 	xor	edi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
+	vmovdqa	XMMWORD[32+rsp],xmm8
+	add	ecx,DWORD[52+rsp]
+	xor	edi,eax
 	mov	esi,edx
 	shld	edx,edx,5
-	xor	edi,eax
-	cmp	r8d,11
-	jb	NEAR $L$vaesenclast4
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[64+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[80+r15]
-	je	NEAR $L$vaesenclast4
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[96+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[112+r15]
-$L$vaesenclast4:
-	vaesenclast	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((16-112))+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,edi
-	add	ebx,DWORD[56+rsp]
+	cmp	r8d,11
+	jb	NEAR $L$vaesenclast9
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[64+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[80+r15]
+	je	NEAR $L$vaesenclast9
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[96+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[112+r15]
+$L$vaesenclast9:
+	vaesenclast	xmm12,xmm12,xmm15
+	vmovups	xmm15,XMMWORD[((-112))+r15]
+	vmovups	xmm14,XMMWORD[((16-112))+r15]
 	xor	esi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	add	ebx,DWORD[56+rsp]
+	xor	esi,ebp
 	mov	edi,ecx
 	shld	ecx,ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,esi
-	add	eax,DWORD[60+rsp]
 	xor	edi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	add	eax,DWORD[60+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	shld	ebx,ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,edi
-	vmovups	XMMWORD[48+r12*1+r13],xmm11
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	vmovups	XMMWORD[48+r12*1+r13],xmm12
 	lea	r12,[64+r12]
 
 	add	eax,DWORD[r9]
@@ -2639,129 +2583,131 @@ $L$vaesenclast4:
 	mov	DWORD[4+r9],esi
 	mov	ebx,esi
 	mov	DWORD[8+r9],ecx
+	mov	edi,ecx
 	mov	DWORD[12+r9],edx
+	xor	edi,edx
 	mov	DWORD[16+r9],ebp
+	and	esi,edi
 	jmp	NEAR $L$oop_avx
 
-ALIGN	16
 $L$done_avx:
 	add	ebx,DWORD[16+rsp]
-	xor	esi,eax
+	xor	esi,ebp
 	mov	edi,ecx
 	shld	ecx,ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,esi
-	add	eax,DWORD[20+rsp]
 	xor	edi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	add	eax,DWORD[20+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	shld	ebx,ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,edi
-	add	ebp,DWORD[24+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[16+r15]
 	xor	esi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[24+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[16+r15]
+	xor	esi,ecx
 	mov	edi,eax
 	shld	eax,eax,5
-	xor	esi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,esi
-	add	edx,DWORD[28+rsp]
 	xor	edi,ecx
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	add	edx,DWORD[28+rsp]
+	xor	edi,ebx
 	mov	esi,ebp
 	shld	ebp,ebp,5
-	xor	edi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,edi
-	add	ecx,DWORD[32+rsp]
 	xor	esi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
+	add	ecx,DWORD[32+rsp]
+	xor	esi,eax
 	mov	edi,edx
 	shld	edx,edx,5
-	xor	esi,eax
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[32+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,esi
-	add	ebx,DWORD[36+rsp]
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[32+r15]
 	xor	edi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	add	ebx,DWORD[36+rsp]
+	xor	edi,ebp
 	mov	esi,ecx
 	shld	ecx,ecx,5
-	xor	edi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,edi
-	add	eax,DWORD[40+rsp]
 	xor	esi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	add	eax,DWORD[40+rsp]
+	xor	esi,edx
 	mov	edi,ebx
 	shld	ebx,ebx,5
-	xor	esi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,esi
-	add	ebp,DWORD[44+rsp]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[48+r15]
 	xor	edi,edx
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	add	ebp,DWORD[44+rsp]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[48+r15]
+	xor	edi,ecx
 	mov	esi,eax
 	shld	eax,eax,5
-	xor	edi,ecx
-	add	ebp,eax
-	shrd	ebx,ebx,7
 	add	ebp,edi
-	add	edx,DWORD[48+rsp]
 	xor	esi,ecx
+	shrd	ebx,ebx,7
+	add	ebp,eax
+	add	edx,DWORD[48+rsp]
+	xor	esi,ebx
 	mov	edi,ebp
 	shld	ebp,ebp,5
-	xor	esi,ebx
-	add	edx,ebp
-	shrd	eax,eax,7
 	add	edx,esi
-	add	ecx,DWORD[52+rsp]
 	xor	edi,ebx
+	shrd	eax,eax,7
+	add	edx,ebp
+	add	ecx,DWORD[52+rsp]
+	xor	edi,eax
 	mov	esi,edx
 	shld	edx,edx,5
-	xor	edi,eax
-	cmp	r8d,11
-	jb	NEAR $L$vaesenclast5
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[64+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[80+r15]
-	je	NEAR $L$vaesenclast5
-	vaesenc	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[96+r15]
-	vaesenc	xmm11,xmm11,xmm14
-	vmovups	xmm15,XMMWORD[112+r15]
-$L$vaesenclast5:
-	vaesenclast	xmm11,xmm11,xmm15
-	vmovups	xmm14,XMMWORD[((16-112))+r15]
-	add	ecx,edx
-	shrd	ebp,ebp,7
 	add	ecx,edi
-	add	ebx,DWORD[56+rsp]
+	cmp	r8d,11
+	jb	NEAR $L$vaesenclast10
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[64+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[80+r15]
+	je	NEAR $L$vaesenclast10
+	vaesenc	xmm12,xmm12,xmm15
+	vmovups	xmm14,XMMWORD[96+r15]
+	vaesenc	xmm12,xmm12,xmm14
+	vmovups	xmm15,XMMWORD[112+r15]
+$L$vaesenclast10:
+	vaesenclast	xmm12,xmm12,xmm15
+	vmovups	xmm15,XMMWORD[((-112))+r15]
+	vmovups	xmm14,XMMWORD[((16-112))+r15]
 	xor	esi,eax
+	shrd	ebp,ebp,7
+	add	ecx,edx
+	add	ebx,DWORD[56+rsp]
+	xor	esi,ebp
 	mov	edi,ecx
 	shld	ecx,ecx,5
-	xor	esi,ebp
-	add	ebx,ecx
-	shrd	edx,edx,7
 	add	ebx,esi
-	add	eax,DWORD[60+rsp]
 	xor	edi,ebp
+	shrd	edx,edx,7
+	add	ebx,ecx
+	add	eax,DWORD[60+rsp]
+	xor	edi,edx
 	mov	esi,ebx
 	shld	ebx,ebx,5
-	xor	edi,edx
-	add	eax,ebx
-	shrd	ecx,ecx,7
 	add	eax,edi
-	vmovups	XMMWORD[48+r12*1+r13],xmm11
+	shrd	ecx,ecx,7
+	add	eax,ebx
+	vmovups	XMMWORD[48+r12*1+r13],xmm12
 	mov	r8,QWORD[88+rsp]
 
 	add	eax,DWORD[r9]
@@ -2774,7 +2720,7 @@ $L$vaesenclast5:
 	mov	DWORD[8+r9],ecx
 	mov	DWORD[12+r9],edx
 	mov	DWORD[16+r9],ebp
-	vmovups	XMMWORD[r8],xmm11
+	vmovups	XMMWORD[r8],xmm12
 	vzeroall
 	movaps	xmm6,XMMWORD[((96+0))+rsp]
 	movaps	xmm7,XMMWORD[((96+16))+rsp]
@@ -2801,11 +2747,12 @@ $L$epilogue_avx:
 $L$SEH_end_aesni_cbc_sha1_enc_avx:
 ALIGN	64
 K_XX_XX:
-	DD	0x5a827999,0x5a827999,0x5a827999,0x5a827999	
-	DD	0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1	
-	DD	0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc	
-	DD	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6	
-	DD	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f	
+	DD	0x5a827999,0x5a827999,0x5a827999,0x5a827999
+	DD	0x6ed9eba1,0x6ed9eba1,0x6ed9eba1,0x6ed9eba1
+	DD	0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc,0x8f1bbcdc
+	DD	0xca62c1d6,0xca62c1d6,0xca62c1d6,0xca62c1d6
+	DD	0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f
+DB	0xf,0xe,0xd,0xc,0xb,0xa,0x9,0x8,0x7,0x6,0x5,0x4,0x3,0x2,0x1,0x0
 
 DB	65,69,83,78,73,45,67,66,67,43,83,72,65,49,32,115
 DB	116,105,116,99,104,32,102,111,114,32,120,56,54,95,54,52
@@ -2813,6 +2760,345 @@ DB	44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32
 DB	60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111
 DB	114,103,62,0
 ALIGN	64
+
+ALIGN	32
+aesni_cbc_sha1_enc_shaext:
+	mov	QWORD[8+rsp],rdi	;WIN64 prologue
+	mov	QWORD[16+rsp],rsi
+	mov	rax,rsp
+$L$SEH_begin_aesni_cbc_sha1_enc_shaext:
+	mov	rdi,rcx
+	mov	rsi,rdx
+	mov	rdx,r8
+	mov	rcx,r9
+	mov	r8,QWORD[40+rsp]
+	mov	r9,QWORD[48+rsp]
+
+
+	mov	r10,QWORD[56+rsp]
+	lea	rsp,[((-168))+rsp]
+	movaps	XMMWORD[(-8-160)+rax],xmm6
+	movaps	XMMWORD[(-8-144)+rax],xmm7
+	movaps	XMMWORD[(-8-128)+rax],xmm8
+	movaps	XMMWORD[(-8-112)+rax],xmm9
+	movaps	XMMWORD[(-8-96)+rax],xmm10
+	movaps	XMMWORD[(-8-80)+rax],xmm11
+	movaps	XMMWORD[(-8-64)+rax],xmm12
+	movaps	XMMWORD[(-8-48)+rax],xmm13
+	movaps	XMMWORD[(-8-32)+rax],xmm14
+	movaps	XMMWORD[(-8-16)+rax],xmm15
+$L$prologue_shaext:
+	movdqu	xmm8,XMMWORD[r9]
+	movd	xmm9,DWORD[16+r9]
+	movdqa	xmm7,XMMWORD[((K_XX_XX+80))]
+
+	mov	r11d,DWORD[240+rcx]
+	sub	rsi,rdi
+	movups	xmm15,XMMWORD[rcx]
+	movups	xmm0,XMMWORD[16+rcx]
+	lea	rcx,[112+rcx]
+
+	pshufd	xmm8,xmm8,27
+	pshufd	xmm9,xmm9,27
+	jmp	NEAR $L$oop_shaext
+
+ALIGN	16
+$L$oop_shaext:
+	movups	xmm14,XMMWORD[rdi]
+	xorps	xmm14,xmm15
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+rcx]
+DB	102,15,56,220,208
+	movdqu	xmm3,XMMWORD[r10]
+	movdqa	xmm12,xmm9
+DB	102,15,56,0,223
+	movdqu	xmm4,XMMWORD[16+r10]
+	movdqa	xmm11,xmm8
+	movups	xmm0,XMMWORD[((-64))+rcx]
+DB	102,15,56,220,209
+DB	102,15,56,0,231
+
+	paddd	xmm9,xmm3
+	movdqu	xmm5,XMMWORD[32+r10]
+	lea	r10,[64+r10]
+	pxor	xmm3,xmm12
+	movups	xmm1,XMMWORD[((-48))+rcx]
+DB	102,15,56,220,208
+	pxor	xmm3,xmm12
+	movdqa	xmm10,xmm8
+DB	102,15,56,0,239
+DB	69,15,58,204,193,0
+DB	68,15,56,200,212
+	movups	xmm0,XMMWORD[((-32))+rcx]
+DB	102,15,56,220,209
+DB	15,56,201,220
+	movdqu	xmm6,XMMWORD[((-16))+r10]
+	movdqa	xmm9,xmm8
+DB	102,15,56,0,247
+	movups	xmm1,XMMWORD[((-16))+rcx]
+DB	102,15,56,220,208
+DB	69,15,58,204,194,0
+DB	68,15,56,200,205
+	pxor	xmm3,xmm5
+DB	15,56,201,229
+	movups	xmm0,XMMWORD[rcx]
+DB	102,15,56,220,209
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,0
+DB	68,15,56,200,214
+	movups	xmm1,XMMWORD[16+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,222
+	pxor	xmm4,xmm6
+DB	15,56,201,238
+	movups	xmm0,XMMWORD[32+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,0
+DB	68,15,56,200,203
+	movups	xmm1,XMMWORD[48+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,227
+	pxor	xmm5,xmm3
+DB	15,56,201,243
+	cmp	r11d,11
+	jb	NEAR $L$aesenclast11
+	movups	xmm0,XMMWORD[64+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+rcx]
+DB	102,15,56,220,208
+	je	NEAR $L$aesenclast11
+	movups	xmm0,XMMWORD[96+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+rcx]
+DB	102,15,56,220,208
+$L$aesenclast11:
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+rcx]
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,0
+DB	68,15,56,200,212
+	movups	xmm14,XMMWORD[16+rdi]
+	xorps	xmm14,xmm15
+	movups	XMMWORD[rdi*1+rsi],xmm2
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,236
+	pxor	xmm6,xmm4
+DB	15,56,201,220
+	movups	xmm0,XMMWORD[((-64))+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,1
+DB	68,15,56,200,205
+	movups	xmm1,XMMWORD[((-48))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,245
+	pxor	xmm3,xmm5
+DB	15,56,201,229
+	movups	xmm0,XMMWORD[((-32))+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,1
+DB	68,15,56,200,214
+	movups	xmm1,XMMWORD[((-16))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,222
+	pxor	xmm4,xmm6
+DB	15,56,201,238
+	movups	xmm0,XMMWORD[rcx]
+DB	102,15,56,220,209
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,1
+DB	68,15,56,200,203
+	movups	xmm1,XMMWORD[16+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,227
+	pxor	xmm5,xmm3
+DB	15,56,201,243
+	movups	xmm0,XMMWORD[32+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,1
+DB	68,15,56,200,212
+	movups	xmm1,XMMWORD[48+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,236
+	pxor	xmm6,xmm4
+DB	15,56,201,220
+	cmp	r11d,11
+	jb	NEAR $L$aesenclast12
+	movups	xmm0,XMMWORD[64+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+rcx]
+DB	102,15,56,220,208
+	je	NEAR $L$aesenclast12
+	movups	xmm0,XMMWORD[96+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+rcx]
+DB	102,15,56,220,208
+$L$aesenclast12:
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+rcx]
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,1
+DB	68,15,56,200,205
+	movups	xmm14,XMMWORD[32+rdi]
+	xorps	xmm14,xmm15
+	movups	XMMWORD[16+rdi*1+rsi],xmm2
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,245
+	pxor	xmm3,xmm5
+DB	15,56,201,229
+	movups	xmm0,XMMWORD[((-64))+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,2
+DB	68,15,56,200,214
+	movups	xmm1,XMMWORD[((-48))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,222
+	pxor	xmm4,xmm6
+DB	15,56,201,238
+	movups	xmm0,XMMWORD[((-32))+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,2
+DB	68,15,56,200,203
+	movups	xmm1,XMMWORD[((-16))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,227
+	pxor	xmm5,xmm3
+DB	15,56,201,243
+	movups	xmm0,XMMWORD[rcx]
+DB	102,15,56,220,209
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,2
+DB	68,15,56,200,212
+	movups	xmm1,XMMWORD[16+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,236
+	pxor	xmm6,xmm4
+DB	15,56,201,220
+	movups	xmm0,XMMWORD[32+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,2
+DB	68,15,56,200,205
+	movups	xmm1,XMMWORD[48+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,245
+	pxor	xmm3,xmm5
+DB	15,56,201,229
+	cmp	r11d,11
+	jb	NEAR $L$aesenclast13
+	movups	xmm0,XMMWORD[64+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+rcx]
+DB	102,15,56,220,208
+	je	NEAR $L$aesenclast13
+	movups	xmm0,XMMWORD[96+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+rcx]
+DB	102,15,56,220,208
+$L$aesenclast13:
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+rcx]
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,2
+DB	68,15,56,200,214
+	movups	xmm14,XMMWORD[48+rdi]
+	xorps	xmm14,xmm15
+	movups	XMMWORD[32+rdi*1+rsi],xmm2
+	xorps	xmm2,xmm14
+	movups	xmm1,XMMWORD[((-80))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,222
+	pxor	xmm4,xmm6
+DB	15,56,201,238
+	movups	xmm0,XMMWORD[((-64))+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,3
+DB	68,15,56,200,203
+	movups	xmm1,XMMWORD[((-48))+rcx]
+DB	102,15,56,220,208
+DB	15,56,202,227
+	pxor	xmm5,xmm3
+DB	15,56,201,243
+	movups	xmm0,XMMWORD[((-32))+rcx]
+DB	102,15,56,220,209
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,3
+DB	68,15,56,200,212
+DB	15,56,202,236
+	pxor	xmm6,xmm4
+	movups	xmm1,XMMWORD[((-16))+rcx]
+DB	102,15,56,220,208
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,3
+DB	68,15,56,200,205
+DB	15,56,202,245
+	movups	xmm0,XMMWORD[rcx]
+DB	102,15,56,220,209
+	movdqa	xmm5,xmm12
+	movdqa	xmm10,xmm8
+DB	69,15,58,204,193,3
+DB	68,15,56,200,214
+	movups	xmm1,XMMWORD[16+rcx]
+DB	102,15,56,220,208
+	movdqa	xmm9,xmm8
+DB	69,15,58,204,194,3
+DB	68,15,56,200,205
+	movups	xmm0,XMMWORD[32+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[48+rcx]
+DB	102,15,56,220,208
+	cmp	r11d,11
+	jb	NEAR $L$aesenclast14
+	movups	xmm0,XMMWORD[64+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[80+rcx]
+DB	102,15,56,220,208
+	je	NEAR $L$aesenclast14
+	movups	xmm0,XMMWORD[96+rcx]
+DB	102,15,56,220,209
+	movups	xmm1,XMMWORD[112+rcx]
+DB	102,15,56,220,208
+$L$aesenclast14:
+DB	102,15,56,221,209
+	movups	xmm0,XMMWORD[((16-112))+rcx]
+	dec	rdx
+
+	paddd	xmm8,xmm11
+	movups	XMMWORD[48+rdi*1+rsi],xmm2
+	lea	rdi,[64+rdi]
+	jnz	NEAR $L$oop_shaext
+
+	pshufd	xmm8,xmm8,27
+	pshufd	xmm9,xmm9,27
+	movups	XMMWORD[r8],xmm2
+	movdqu	XMMWORD[r9],xmm8
+	movd	DWORD[16+r9],xmm9
+	movaps	xmm6,XMMWORD[((-8-160))+rax]
+	movaps	xmm7,XMMWORD[((-8-144))+rax]
+	movaps	xmm8,XMMWORD[((-8-128))+rax]
+	movaps	xmm9,XMMWORD[((-8-112))+rax]
+	movaps	xmm10,XMMWORD[((-8-96))+rax]
+	movaps	xmm11,XMMWORD[((-8-80))+rax]
+	movaps	xmm12,XMMWORD[((-8-64))+rax]
+	movaps	xmm13,XMMWORD[((-8-48))+rax]
+	movaps	xmm14,XMMWORD[((-8-32))+rax]
+	movaps	xmm15,XMMWORD[((-8-16))+rax]
+	mov	rsp,rax
+$L$epilogue_shaext:
+	mov	rdi,QWORD[8+rsp]	;WIN64 epilogue
+	mov	rsi,QWORD[16+rsp]
+	DB	0F3h,0C3h		;repret
+$L$SEH_end_aesni_cbc_sha1_enc_shaext:
 EXTERN	__imp_RtlVirtualUnwind
 
 ALIGN	16
@@ -2845,11 +3131,21 @@ ssse3_handler:
 	lea	r10,[r10*1+rsi]
 	cmp	rbx,r10
 	jae	NEAR $L$common_seh_tail
+	lea	r10,[aesni_cbc_sha1_enc_shaext]
+	cmp	rbx,r10
+	jb	NEAR $L$seh_no_shaext
 
+	lea	rsi,[rax]
+	lea	rdi,[512+r8]
+	mov	ecx,20
+	DD	0xa548f3fc
+	lea	rax,[168+rax]
+	jmp	NEAR $L$common_seh_tail
+$L$seh_no_shaext:
 	lea	rsi,[96+rax]
 	lea	rdi,[512+r8]
 	mov	ecx,20
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 	lea	rax,[264+rax]
 
 	mov	r15,QWORD[rax]
@@ -2876,7 +3172,7 @@ $L$common_seh_tail:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx
@@ -2914,13 +3210,20 @@ ALIGN	4
 	DD	$L$SEH_begin_aesni_cbc_sha1_enc_avx wrt ..imagebase
 	DD	$L$SEH_end_aesni_cbc_sha1_enc_avx wrt ..imagebase
 	DD	$L$SEH_info_aesni_cbc_sha1_enc_avx wrt ..imagebase
+	DD	$L$SEH_begin_aesni_cbc_sha1_enc_shaext wrt ..imagebase
+	DD	$L$SEH_end_aesni_cbc_sha1_enc_shaext wrt ..imagebase
+	DD	$L$SEH_info_aesni_cbc_sha1_enc_shaext wrt ..imagebase
 section	.xdata rdata align=8
 ALIGN	8
 $L$SEH_info_aesni_cbc_sha1_enc_ssse3:
 DB	9,0,0,0
 	DD	ssse3_handler wrt ..imagebase
-	DD	$L$prologue_ssse3 wrt ..imagebase,$L$epilogue_ssse3 wrt ..imagebase	
+	DD	$L$prologue_ssse3 wrt ..imagebase,$L$epilogue_ssse3 wrt ..imagebase
 $L$SEH_info_aesni_cbc_sha1_enc_avx:
 DB	9,0,0,0
 	DD	ssse3_handler wrt ..imagebase
-	DD	$L$prologue_avx wrt ..imagebase,$L$epilogue_avx wrt ..imagebase		
+	DD	$L$prologue_avx wrt ..imagebase,$L$epilogue_avx wrt ..imagebase
+$L$SEH_info_aesni_cbc_sha1_enc_shaext:
+DB	9,0,0,0
+	DD	ssse3_handler wrt ..imagebase
+	DD	$L$prologue_shaext wrt ..imagebase,$L$epilogue_shaext wrt ..imagebase

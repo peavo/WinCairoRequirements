@@ -1,12 +1,14 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 EXTERN	OPENSSL_cpuid_setup
 
 section	.CRT$XCU rdata align=8
 		DQ	OPENSSL_cpuid_setup
 
 
-common	OPENSSL_ia32cap_P 8
+common	OPENSSL_ia32cap_P 16
 
 section	.text code align=64
 
@@ -17,11 +19,11 @@ ALIGN	16
 OPENSSL_atomic_add:
 	mov	eax,DWORD[rcx]
 $L$spin:	lea	r8,[rax*1+rdx]
-DB	0xf0		
+DB	0xf0
 	cmpxchg	DWORD[rcx],r8d
 	jne	NEAR $L$spin
 	mov	eax,r8d
-DB	0x48,0x98	
+DB	0x48,0x98
 	DB	0F3h,0C3h		;repret
 
 
@@ -39,9 +41,17 @@ global	OPENSSL_ia32_cpuid
 
 ALIGN	16
 OPENSSL_ia32_cpuid:
+	mov	QWORD[8+rsp],rdi	;WIN64 prologue
+	mov	QWORD[16+rsp],rsi
+	mov	rax,rsp
+$L$SEH_begin_OPENSSL_ia32_cpuid:
+	mov	rdi,rcx
+
+
 	mov	r8,rbx
 
 	xor	eax,eax
+	mov	DWORD[8+rdi],eax
 	cpuid
 	mov	r11d,eax
 
@@ -109,6 +119,14 @@ $L$intel:
 	shr	r10d,14
 	and	r10d,0xfff
 
+	cmp	r11d,7
+	jb	NEAR $L$nocacheinfo
+
+	mov	eax,7
+	xor	ecx,ecx
+	cpuid
+	mov	DWORD[8+rdi],ebx
+
 $L$nocacheinfo:
 	mov	eax,1
 	cpuid
@@ -141,20 +159,23 @@ $L$generic:
 	bt	r9d,27
 	jnc	NEAR $L$clear_avx
 	xor	ecx,ecx
-DB	0x0f,0x01,0xd0		
+DB	0x0f,0x01,0xd0
 	and	eax,6
 	cmp	eax,6
 	je	NEAR $L$done
 $L$clear_avx:
 	mov	eax,0xefffe7ff
 	and	r9d,eax
+	and	DWORD[8+rdi],0xffffffdf
 $L$done:
 	shl	r9,32
 	mov	eax,r10d
 	mov	rbx,r8
 	or	rax,r9
+	mov	rdi,QWORD[8+rsp]	;WIN64 epilogue
+	mov	rsi,QWORD[16+rsp]
 	DB	0F3h,0C3h		;repret
-
+$L$SEH_end_OPENSSL_ia32_cpuid:
 
 global	OPENSSL_cleanse
 
@@ -219,6 +240,21 @@ DB	72,15,199,240
 	jc	NEAR $L$break_rdrand
 	loop	$L$oop_rdrand
 $L$break_rdrand:
+	cmp	rax,0
+	cmove	rax,rcx
+	DB	0F3h,0C3h		;repret
+
+
+global	OPENSSL_ia32_rdseed
+
+ALIGN	16
+OPENSSL_ia32_rdseed:
+	mov	ecx,8
+$L$oop_rdseed:
+DB	72,15,199,248
+	jc	NEAR $L$break_rdseed
+	loop	$L$oop_rdseed
+$L$break_rdseed:
 	cmp	rax,0
 	cmove	rax,rcx
 	DB	0F3h,0C3h		;repret

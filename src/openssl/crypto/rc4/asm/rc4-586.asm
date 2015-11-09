@@ -35,8 +35,8 @@ L$_RC4_begin:
 	mov	ecx,DWORD [eax*4+edi]
 	and	edx,-4
 	jz	NEAR L$002loop1
-	test	edx,-8
 	mov	DWORD [32+esp],ebp
+	test	edx,-8
 	jz	NEAR L$003go4loop4
 	lea	ebp,[_OPENSSL_ia32cap_P]
 	bt	DWORD [ebp],26
@@ -371,4 +371,4 @@ db	80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114
 db	111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 align	64
 segment	.bss
-common	_OPENSSL_ia32cap_P 8
+common	_OPENSSL_ia32cap_P 16

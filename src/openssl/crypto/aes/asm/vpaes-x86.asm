@@ -76,33 +76,33 @@ __vpaes_encrypt_core:
 	movdqa	xmm1,xmm6
 	movdqa	xmm2,[ebp]
 	pandn	xmm1,xmm0
-	movdqu	xmm5,[edx]
-	psrld	xmm1,4
 	pand	xmm0,xmm6
+	movdqu	xmm5,[edx]
 db	102,15,56,0,208
 	movdqa	xmm0,[16+ebp]
-db	102,15,56,0,193
 	pxor	xmm2,xmm5
-	pxor	xmm0,xmm2
+	psrld	xmm1,4
 	add	edx,16
+db	102,15,56,0,193
 	lea	ebx,[192+ebp]
+	pxor	xmm0,xmm2
 	jmp	NEAR L$000enc_entry
 align	16
 L$001enc_loop:
 	movdqa	xmm4,[32+ebp]
-db	102,15,56,0,226
-	pxor	xmm4,xmm5
 	movdqa	xmm0,[48+ebp]
+db	102,15,56,0,226
 db	102,15,56,0,195
-	pxor	xmm0,xmm4
+	pxor	xmm4,xmm5
 	movdqa	xmm5,[64+ebp]
-db	102,15,56,0,234
+	pxor	xmm0,xmm4
 	movdqa	xmm1,[ecx*1+ebx-64]
+db	102,15,56,0,234
 	movdqa	xmm2,[80+ebp]
-db	102,15,56,0,211
-	pxor	xmm2,xmm5
 	movdqa	xmm4,[ecx*1+ebx]
+db	102,15,56,0,211
 	movdqa	xmm3,xmm0
+	pxor	xmm2,xmm5
 db	102,15,56,0,193
 	add	edx,16
 	pxor	xmm0,xmm2
@@ -111,28 +111,28 @@ db	102,15,56,0,220
 	pxor	xmm3,xmm0
 db	102,15,56,0,193
 	and	ecx,48
-	pxor	xmm0,xmm3
 	sub	eax,1
+	pxor	xmm0,xmm3
 L$000enc_entry:
 	movdqa	xmm1,xmm6
+	movdqa	xmm5,[ebp-32]
 	pandn	xmm1,xmm0
 	psrld	xmm1,4
 	pand	xmm0,xmm6
-	movdqa	xmm5,[ebp-32]
 db	102,15,56,0,232
+	movdqa	xmm3,xmm7
 	pxor	xmm0,xmm1
-	movdqa	xmm3,xmm7
 db	102,15,56,0,217
-	pxor	xmm3,xmm5
 	movdqa	xmm4,xmm7
+	pxor	xmm3,xmm5
 db	102,15,56,0,224
-	pxor	xmm4,xmm5
 	movdqa	xmm2,xmm7
+	pxor	xmm4,xmm5
 db	102,15,56,0,211
-	pxor	xmm2,xmm0
 	movdqa	xmm3,xmm7
-	movdqu	xmm5,[edx]
+	pxor	xmm2,xmm0
 db	102,15,56,0,220
+	movdqu	xmm5,[edx]
 	pxor	xmm3,xmm1
 	jnz	NEAR L$001enc_loop
 	movdqa	xmm4,[96+ebp]
@@ -146,8 +146,8 @@ db	102,15,56,0,193
 	ret
 align	16
 __vpaes_decrypt_core:
-	mov	eax,DWORD [240+edx]
 	lea	ebx,[608+ebp]
+	mov	eax,DWORD [240+edx]
 	movdqa	xmm1,xmm6
 	movdqa	xmm2,[ebx-64]
 	pandn	xmm1,xmm0
@@ -170,56 +170,56 @@ db	102,15,56,0,193
 align	16
 L$003dec_loop:
 	movdqa	xmm4,[ebx-32]
+	movdqa	xmm1,[ebx-16]
 db	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,[ebx-16]
-db	102,15,56,0,195
+db	102,15,56,0,203
+	pxor	xmm0,xmm4
+	movdqa	xmm4,[ebx]
+	pxor	xmm0,xmm1
+	movdqa	xmm1,[16+ebx]
+db	102,15,56,0,226
+db	102,15,56,0,197
+db	102,15,56,0,203
+	pxor	xmm0,xmm4
+	movdqa	xmm4,[32+ebx]
+	pxor	xmm0,xmm1
+	movdqa	xmm1,[48+ebx]
+db	102,15,56,0,226
+db	102,15,56,0,197
+db	102,15,56,0,203
+	pxor	xmm0,xmm4
+	movdqa	xmm4,[64+ebx]
+	pxor	xmm0,xmm1
+	movdqa	xmm1,[80+ebx]
+db	102,15,56,0,226
+db	102,15,56,0,197
+db	102,15,56,0,203
 	pxor	xmm0,xmm4
 	add	edx,16
-db	102,15,56,0,197
-	movdqa	xmm4,[ebx]
-db	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,[16+ebx]
-db	102,15,56,0,195
-	pxor	xmm0,xmm4
-	sub	eax,1
-db	102,15,56,0,197
-	movdqa	xmm4,[32+ebx]
-db	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,[48+ebx]
-db	102,15,56,0,195
-	pxor	xmm0,xmm4
-db	102,15,56,0,197
-	movdqa	xmm4,[64+ebx]
-db	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,[80+ebx]
-db	102,15,56,0,195
-	pxor	xmm0,xmm4
 db	102,15,58,15,237,12
+	pxor	xmm0,xmm1
+	sub	eax,1
 L$002dec_entry:
 	movdqa	xmm1,xmm6
-	pandn	xmm1,xmm0
-	psrld	xmm1,4
-	pand	xmm0,xmm6
 	movdqa	xmm2,[ebp-32]
+	pandn	xmm1,xmm0
+	pand	xmm0,xmm6
+	psrld	xmm1,4
 db	102,15,56,0,208
-	pxor	xmm0,xmm1
 	movdqa	xmm3,xmm7
+	pxor	xmm0,xmm1
 db	102,15,56,0,217
-	pxor	xmm3,xmm2
 	movdqa	xmm4,xmm7
+	pxor	xmm3,xmm2
 db	102,15,56,0,224
 	pxor	xmm4,xmm2
 	movdqa	xmm2,xmm7
 db	102,15,56,0,211
-	pxor	xmm2,xmm0
 	movdqa	xmm3,xmm7
+	pxor	xmm2,xmm0
 db	102,15,56,0,220
-	pxor	xmm3,xmm1
 	movdqu	xmm0,[edx]
+	pxor	xmm3,xmm1
 	jnz	NEAR L$003dec_loop
 	movdqa	xmm4,[96+ebx]
 db	102,15,56,0,226
@@ -324,12 +324,12 @@ L$013schedule_mangle_last_dec:
 	ret
 align	16
 __vpaes_schedule_192_smear:
-	pshufd	xmm0,xmm6,128
-	pxor	xmm6,xmm0
+	pshufd	xmm1,xmm6,128
 	pshufd	xmm0,xmm7,254
+	pxor	xmm6,xmm1
+	pxor	xmm1,xmm1
 	pxor	xmm6,xmm0
 	movdqa	xmm0,xmm6
-	pxor	xmm1,xmm1
 	movhlps	xmm6,xmm1
 	ret
 align	16

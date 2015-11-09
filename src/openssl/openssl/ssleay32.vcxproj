@@ -39,6 +39,8 @@
     <ClCompile Include="..\ssl\s23_clnt.c" />
     <ClCompile Include="..\ssl\s23_lib.c" />
     <ClCompile Include="..\ssl\s23_pkt.c" />
+    <ClCompile Include="..\ssl\ssl_conf.c" />
+    <ClCompile Include="..\ssl\t1_ext.c" />
     <ClCompile Include="..\ssl\t1_meth.c" />
     <ClCompile Include="..\ssl\t1_srvr.c" />
     <ClCompile Include="..\ssl\t1_clnt.c" />
@@ -50,7 +52,6 @@
     <ClCompile Include="..\ssl\d1_lib.c" />
     <ClCompile Include="..\ssl\d1_pkt.c" />
     <ClCompile Include="..\ssl\d1_both.c" />
-    <ClCompile Include="..\ssl\d1_enc.c" />
     <ClCompile Include="..\ssl\ssl_lib.c" />
     <ClCompile Include="..\ssl\ssl_err2.c" />
     <ClCompile Include="..\ssl\ssl_cert.c" />
@@ -65,6 +66,7 @@
     <ClCompile Include="..\ssl\ssl_err.c" />
     <ClCompile Include="..\ssl\kssl.c" />
     <ClCompile Include="..\ssl\t1_reneg.c" />
+    <ClCompile Include="..\ssl\t1_trce.c" />
     <ClCompile Include="..\ssl\tls_srp.c" />
   </ItemGroup>
   <ItemGroup>
@@ -152,7 +154,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x86.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -163,7 +165,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x64.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -175,7 +177,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x86.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -186,7 +188,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>wsock32.lib;crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName)_x64.def"</ModuleDefinitionFile>
+      <ModuleDefinitionFile>"$(ProjectDir)$(ProjectName).def"</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

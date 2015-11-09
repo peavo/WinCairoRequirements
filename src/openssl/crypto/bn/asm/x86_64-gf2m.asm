@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 
@@ -251,13 +253,13 @@ $L$body_mul_2x2:
 	mov	r8,0xf
 	mov	rax,rdx
 	mov	rbp,r9
-	call	_mul_1x1		
+	call	_mul_1x1
 	mov	QWORD[16+rsp],rax
 	mov	QWORD[24+rsp],rdx
 
 	mov	rax,QWORD[48+rsp]
 	mov	rbp,QWORD[64+rsp]
-	call	_mul_1x1		
+	call	_mul_1x1
 	mov	QWORD[rsp],rax
 	mov	QWORD[8+rsp],rdx
 
@@ -265,7 +267,7 @@ $L$body_mul_2x2:
 	mov	rbp,QWORD[56+rsp]
 	xor	rax,QWORD[48+rsp]
 	xor	rbp,QWORD[64+rsp]
-	call	_mul_1x1		
+	call	_mul_1x1
 	mov	rbx,QWORD[rsp]
 	mov	rcx,QWORD[8+rsp]
 	mov	rdi,QWORD[16+rsp]
@@ -347,7 +349,7 @@ $L$in_prologue:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx
@@ -390,7 +392,7 @@ section	.xdata rdata align=8
 ALIGN	8
 $L$SEH_info_1x1:
 DB	0x01,0x07,0x02,0x00
-DB	0x07,0x01,0x11,0x00	
+DB	0x07,0x01,0x11,0x00
 $L$SEH_info_2x2:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase

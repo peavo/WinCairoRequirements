@@ -1111,7 +1111,6 @@ EXPORTS
     ENGINE_load_private_key                 @2498
     ENGINE_load_public_key                  @2479
     ENGINE_load_rdrand                      @4640
-    ENGINE_load_rsax                        @4652
     ENGINE_load_ssl_client_cert             @4046
     ENGINE_new                              @2515
     ENGINE_pkey_asn1_find_str               @4282

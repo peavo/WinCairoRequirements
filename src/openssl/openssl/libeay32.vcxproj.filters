@@ -1664,9 +1664,6 @@
     <ClCompile Include="..\crypto\engine\eng_rdrand.c">
       <Filter>Source Files\engine</Filter>
     </ClCompile>
-    <ClCompile Include="..\crypto\engine\eng_rsax.c">
-      <Filter>Source Files\engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\crypto\asn1\ameth_lib.c">
       <Filter>Source Files\asn1</Filter>
     </ClCompile>
@@ -1695,9 +1692,6 @@
       <Filter>Source Files\evp</Filter>
     </ClCompile>
     <ClCompile Include="..\crypto\evp\m_sigver.c">
-      <Filter>Source Files\evp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\crypto\evp\evp_fips.c">
       <Filter>Source Files\evp</Filter>
     </ClCompile>
     <ClCompile Include="..\crypto\evp\e_aes_cbc_hmac_sha1.c">
@@ -2003,6 +1997,30 @@
     <ClCompile Include="..\crypto\evp\evp_cnf.c">
       <Filter>Source Files\evp</Filter>
     </ClCompile>
+    <ClCompile Include="..\crypto\modes\wrap128.c">
+      <Filter>Source Files\modes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\cms\cms_kari.c">
+      <Filter>Source Files\cms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\evp\e_aes_cbc_hmac_sha256.c">
+      <Filter>Source Files\evp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\x509v3\v3_scts.c">
+      <Filter>Source Files\x509v3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\ecdh\ech_kdf.c">
+      <Filter>Source Files\ecdh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\dh\dh_kdf.c">
+      <Filter>Source Files\dh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\dh\dh_rfc5114.c">
+      <Filter>Source Files\dh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\crypto\bn\rsaz_exp.c">
+      <Filter>Source Files\bn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\crypto\aes\aes.h">
@@ -2271,62 +2289,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="..\crypto\aes\asm\aesni-sha1-x86_64.asm">
-      <Filter>Source Files\aes</Filter>
-    </MASM>
-    <MASM Include="..\crypto\aes\asm\aesni-x86_64.asm">
-      <Filter>Source Files\aes</Filter>
-    </MASM>
-    <MASM Include="..\crypto\aes\asm\bsaes-x86_64.asm">
-      <Filter>Source Files\aes</Filter>
-    </MASM>
-    <MASM Include="..\crypto\md5\asm\md5-x86_64.asm">
-      <Filter>Source Files\md5</Filter>
-    </MASM>
-    <MASM Include="..\crypto\sha\asm\sha1-x86_64.asm">
-      <Filter>Source Files\sha</Filter>
-    </MASM>
-    <MASM Include="..\crypto\sha\asm\sha256-x86_64.asm">
-      <Filter>Source Files\sha</Filter>
-    </MASM>
-    <MASM Include="..\crypto\sha\asm\sha512-x86_64.asm">
-      <Filter>Source Files\sha</Filter>
-    </MASM>
-    <MASM Include="..\crypto\rc4\asm\rc4-x86_64.asm">
-      <Filter>Source Files\rc4</Filter>
-    </MASM>
-    <MASM Include="..\crypto\rc4\asm\rc4-md5-x86_64.asm">
-      <Filter>Source Files\rc4</Filter>
-    </MASM>
-    <MASM Include="..\crypto\aes\asm\vpaes-x86_64.asm">
-      <Filter>Source Files\aes</Filter>
-    </MASM>
-    <MASM Include="..\crypto\modes\asm\ghash-x86_64.asm">
-      <Filter>Source Files\modes</Filter>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\modexp512-x86_64.asm">
-      <Filter>Source Files\bn</Filter>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\x86_64-gf2m.asm">
-      <Filter>Source Files\bn</Filter>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\x86_64-mont.asm">
-      <Filter>Source Files\bn</Filter>
-    </MASM>
-    <MASM Include="..\crypto\bn\asm\x86_64-mont5.asm">
-      <Filter>Source Files\bn</Filter>
-    </MASM>
-    <MASM Include="..\crypto\whrlpool\asm\wp-x86_64.asm">
-      <Filter>Source Files\whrlpool</Filter>
-    </MASM>
-    <MASM Include="..\crypto\camellia\asm\cmll-x86_64.asm">
-      <Filter>Source Files\camellia</Filter>
-    </MASM>
-    <MASM Include="..\ms\x86_64cpuid.asm">
-      <Filter>Source Files</Filter>
-    </MASM>
-  </ItemGroup>
-  <ItemGroup>
     <NASM Include="..\ms\x86cpuid.asm">
       <Filter>Source Files</Filter>
     </NASM>
@@ -2395,6 +2357,78 @@
     </NASM>
     <NASM Include="..\ms\uptable.asm">
       <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-sha1-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\bsaes-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\vpaes-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\x86_64-gf2m.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\x86_64-mont.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\x86_64-mont5.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\camellia\asm\cmll-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\md5\asm\md5-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\modes\asm\ghash-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\rc4\asm\rc4-md5-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\rc4\asm\rc4-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\whrlpool\asm\wp-x86_64.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\ms\x86_64cpuid.asm">
+      <Filter>Source Files</Filter>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha1-x86_64.asm">
+      <Filter>Source Files\sha</Filter>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha256-x86_64.asm">
+      <Filter>Source Files\sha</Filter>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha512-x86_64.asm">
+      <Filter>Source Files\sha</Filter>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha1-mb-x86_64.asm">
+      <Filter>Source Files\sha</Filter>
+    </NASM>
+    <NASM Include="..\crypto\sha\asm\sha256-mb-x86_64.asm">
+      <Filter>Source Files\sha</Filter>
+    </NASM>
+    <NASM Include="..\crypto\modes\asm\aesni-gcm-x86_64.asm">
+      <Filter>Source Files\modes</Filter>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\rsaz-avx2.asm">
+      <Filter>Source Files\bn</Filter>
+    </NASM>
+    <NASM Include="..\crypto\bn\asm\rsaz-x86_64.asm">
+      <Filter>Source Files\bn</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-mb-x86_64.asm">
+      <Filter>Source Files\aes</Filter>
+    </NASM>
+    <NASM Include="..\crypto\aes\asm\aesni-sha256-x86_64.asm">
+      <Filter>Source Files\aes</Filter>
     </NASM>
   </ItemGroup>
 </Project>

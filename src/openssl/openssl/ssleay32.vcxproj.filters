@@ -27,9 +27,6 @@
     <ClCompile Include="..\ssl\d1_clnt.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\ssl\d1_enc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\ssl\d1_lib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -151,6 +148,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\ssl\s3_cbc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ssl\t1_ext.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ssl\ssl_conf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ssl\t1_trce.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

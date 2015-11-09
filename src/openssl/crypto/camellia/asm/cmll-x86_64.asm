@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 
@@ -281,7 +283,7 @@ $L$edone:
 	mov	r10d,ecx
 	mov	r11d,edx
 
-DB	0xf3,0xc3		
+DB	0xf3,0xc3
 
 
 
@@ -563,7 +565,7 @@ $L$ddone:
 	mov	r10d,eax
 	mov	r11d,ebx
 
-DB	0xf3,0xc3		
+DB	0xf3,0xc3
 
 global	Camellia_Ekeygen
 
@@ -585,7 +587,7 @@ $L$SEH_begin_Camellia_Ekeygen:
 	push	r15
 $L$key_prologue:
 
-	mov	r15,rdi
+	mov	r15d,edi
 	mov	r13,rdx
 
 	mov	r8d,DWORD[rsi]
@@ -1773,14 +1775,14 @@ $L$cbc_enc_pushf:
 	cld
 	mov	rsi,r12
 	lea	rdi,[((8+24))+rsp]
-	DD	0x9066A4F3		
+	DD	0x9066A4F3
 	popfq
 $L$cbc_enc_popf:
 
 	lea	r12,[24+rsp]
 	lea	rax,[((16+24))+rsp]
 	mov	QWORD[8+rsp],rax
-	jmp	NEAR $L$cbc_eloop		
+	jmp	NEAR $L$cbc_eloop
 
 ALIGN	16
 $L$CBC_DECRYPT:
@@ -1863,7 +1865,7 @@ $L$cbc_dec_pushf:
 	cld
 	lea	rsi,[((8+24))+rsp]
 	lea	rdi,[r13]
-	DD	0x9066A4F3		
+	DD	0x9066A4F3
 	popfq
 $L$cbc_dec_popf:
 
@@ -2025,7 +2027,7 @@ $L$common_seh_exit:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx
@@ -2078,15 +2080,15 @@ ALIGN	8
 $L$SEH_info_Camellia_EncryptBlock_Rounds:
 DB	9,0,0,0
 	DD	common_se_handler wrt ..imagebase
-	DD	$L$enc_prologue wrt ..imagebase,$L$enc_epilogue wrt ..imagebase	
+	DD	$L$enc_prologue wrt ..imagebase,$L$enc_epilogue wrt ..imagebase
 $L$SEH_info_Camellia_DecryptBlock_Rounds:
 DB	9,0,0,0
 	DD	common_se_handler wrt ..imagebase
-	DD	$L$dec_prologue wrt ..imagebase,$L$dec_epilogue wrt ..imagebase	
+	DD	$L$dec_prologue wrt ..imagebase,$L$dec_epilogue wrt ..imagebase
 $L$SEH_info_Camellia_Ekeygen:
 DB	9,0,0,0
 	DD	common_se_handler wrt ..imagebase
-	DD	$L$key_prologue wrt ..imagebase,$L$key_epilogue wrt ..imagebase	
+	DD	$L$key_prologue wrt ..imagebase,$L$key_epilogue wrt ..imagebase
 $L$SEH_info_Camellia_cbc_encrypt:
 DB	9,0,0,0
 	DD	cbc_se_handler wrt ..imagebase

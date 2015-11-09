@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 
@@ -34,8 +36,8 @@ DB	102,15,56,0,208
 	movdqa	xmm0,XMMWORD[(($L$k_ipt+16))]
 DB	102,15,56,0,193
 	pxor	xmm2,xmm5
-	pxor	xmm0,xmm2
 	add	r9,16
+	pxor	xmm0,xmm2
 	lea	r10,[$L$k_mc_backward]
 	jmp	NEAR $L$enc_entry
 
@@ -43,19 +45,19 @@ ALIGN	16
 $L$enc_loop:
 
 	movdqa	xmm4,xmm13
-DB	102,15,56,0,226
-	pxor	xmm4,xmm5
 	movdqa	xmm0,xmm12
+DB	102,15,56,0,226
 DB	102,15,56,0,195
-	pxor	xmm0,xmm4
+	pxor	xmm4,xmm5
 	movdqa	xmm5,xmm15
-DB	102,15,56,0,234
+	pxor	xmm0,xmm4
 	movdqa	xmm1,XMMWORD[((-64))+r10*1+r11]
+DB	102,15,56,0,234
+	movdqa	xmm4,XMMWORD[r10*1+r11]
 	movdqa	xmm2,xmm14
 DB	102,15,56,0,211
-	pxor	xmm2,xmm5
-	movdqa	xmm4,XMMWORD[r10*1+r11]
 	movdqa	xmm3,xmm0
+	pxor	xmm2,xmm5
 DB	102,15,56,0,193
 	add	r9,16
 	pxor	xmm0,xmm2
@@ -64,30 +66,30 @@ DB	102,15,56,0,220
 	pxor	xmm3,xmm0
 DB	102,15,56,0,193
 	and	r11,0x30
-	pxor	xmm0,xmm3
 	sub	rax,1
+	pxor	xmm0,xmm3
 
 $L$enc_entry:
 
 	movdqa	xmm1,xmm9
+	movdqa	xmm5,xmm11
 	pandn	xmm1,xmm0
 	psrld	xmm1,4
 	pand	xmm0,xmm9
-	movdqa	xmm5,xmm11
 DB	102,15,56,0,232
+	movdqa	xmm3,xmm10
 	pxor	xmm0,xmm1
-	movdqa	xmm3,xmm10
 DB	102,15,56,0,217
-	pxor	xmm3,xmm5
 	movdqa	xmm4,xmm10
+	pxor	xmm3,xmm5
 DB	102,15,56,0,224
-	pxor	xmm4,xmm5
 	movdqa	xmm2,xmm10
+	pxor	xmm4,xmm5
 DB	102,15,56,0,211
-	pxor	xmm2,xmm0
 	movdqa	xmm3,xmm10
-	movdqu	xmm5,XMMWORD[r9]
+	pxor	xmm2,xmm0
 DB	102,15,56,0,220
+	movdqu	xmm5,XMMWORD[r9]
 	pxor	xmm3,xmm1
 	jnz	NEAR $L$enc_loop
 
@@ -140,62 +142,61 @@ $L$dec_loop:
 
 
 	movdqa	xmm4,XMMWORD[((-32))+r10]
+	movdqa	xmm1,XMMWORD[((-16))+r10]
 DB	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,XMMWORD[((-16))+r10]
-DB	102,15,56,0,195
+DB	102,15,56,0,203
+	pxor	xmm0,xmm4
+	movdqa	xmm4,XMMWORD[r10]
+	pxor	xmm0,xmm1
+	movdqa	xmm1,XMMWORD[16+r10]
+
+DB	102,15,56,0,226
+DB	102,15,56,0,197
+DB	102,15,56,0,203
+	pxor	xmm0,xmm4
+	movdqa	xmm4,XMMWORD[32+r10]
+	pxor	xmm0,xmm1
+	movdqa	xmm1,XMMWORD[48+r10]
+
+DB	102,15,56,0,226
+DB	102,15,56,0,197
+DB	102,15,56,0,203
+	pxor	xmm0,xmm4
+	movdqa	xmm4,XMMWORD[64+r10]
+	pxor	xmm0,xmm1
+	movdqa	xmm1,XMMWORD[80+r10]
+
+DB	102,15,56,0,226
+DB	102,15,56,0,197
+DB	102,15,56,0,203
 	pxor	xmm0,xmm4
 	add	r9,16
-
-DB	102,15,56,0,197
-	movdqa	xmm4,XMMWORD[r10]
-DB	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,XMMWORD[16+r10]
-DB	102,15,56,0,195
-	pxor	xmm0,xmm4
-	sub	rax,1
-
-DB	102,15,56,0,197
-	movdqa	xmm4,XMMWORD[32+r10]
-DB	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,XMMWORD[48+r10]
-DB	102,15,56,0,195
-	pxor	xmm0,xmm4
-
-DB	102,15,56,0,197
-	movdqa	xmm4,XMMWORD[64+r10]
-DB	102,15,56,0,226
-	pxor	xmm4,xmm0
-	movdqa	xmm0,XMMWORD[80+r10]
-DB	102,15,56,0,195
-	pxor	xmm0,xmm4
-
 DB	102,15,58,15,237,12
+	pxor	xmm0,xmm1
+	sub	rax,1
 
 $L$dec_entry:
 
 	movdqa	xmm1,xmm9
 	pandn	xmm1,xmm0
+	movdqa	xmm2,xmm11
 	psrld	xmm1,4
 	pand	xmm0,xmm9
-	movdqa	xmm2,xmm11
 DB	102,15,56,0,208
-	pxor	xmm0,xmm1
 	movdqa	xmm3,xmm10
+	pxor	xmm0,xmm1
 DB	102,15,56,0,217
-	pxor	xmm3,xmm2
 	movdqa	xmm4,xmm10
+	pxor	xmm3,xmm2
 DB	102,15,56,0,224
 	pxor	xmm4,xmm2
 	movdqa	xmm2,xmm10
 DB	102,15,56,0,211
-	pxor	xmm2,xmm0
 	movdqa	xmm3,xmm10
+	pxor	xmm2,xmm0
 DB	102,15,56,0,220
-	pxor	xmm3,xmm1
 	movdqu	xmm0,XMMWORD[r9]
+	pxor	xmm3,xmm1
 	jnz	NEAR $L$dec_loop
 
 
@@ -223,7 +224,7 @@ _vpaes_schedule_core:
 
 
 
-	call	_vpaes_preheat		
+	call	_vpaes_preheat
 	movdqa	xmm8,XMMWORD[$L$k_rcon]
 	movdqu	xmm0,XMMWORD[rdi]
 
@@ -269,7 +270,7 @@ $L$oop_schedule_128:
 	call	_vpaes_schedule_round
 	dec	rsi
 	jz	NEAR $L$schedule_mangle_last
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	jmp	NEAR $L$oop_schedule_128
 
 
@@ -290,7 +291,7 @@ $L$oop_schedule_128:
 ALIGN	16
 $L$schedule_192:
 	movdqu	xmm0,XMMWORD[8+rdi]
-	call	_vpaes_schedule_transform	
+	call	_vpaes_schedule_transform
 	movdqa	xmm6,xmm0
 	pxor	xmm4,xmm4
 	movhlps	xmm6,xmm4
@@ -299,13 +300,13 @@ $L$schedule_192:
 $L$oop_schedule_192:
 	call	_vpaes_schedule_round
 DB	102,15,58,15,198,8
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	call	_vpaes_schedule_192_smear
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	call	_vpaes_schedule_round
 	dec	rsi
 	jz	NEAR $L$schedule_mangle_last
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	call	_vpaes_schedule_192_smear
 	jmp	NEAR $L$oop_schedule_192
 
@@ -322,18 +323,18 @@ DB	102,15,58,15,198,8
 ALIGN	16
 $L$schedule_256:
 	movdqu	xmm0,XMMWORD[16+rdi]
-	call	_vpaes_schedule_transform	
+	call	_vpaes_schedule_transform
 	mov	esi,7
 
 $L$oop_schedule_256:
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 	movdqa	xmm6,xmm0
 
 
 	call	_vpaes_schedule_round
 	dec	rsi
 	jz	NEAR $L$schedule_mangle_last
-	call	_vpaes_schedule_mangle	
+	call	_vpaes_schedule_mangle
 
 
 	pshufd	xmm0,xmm0,0xFF
@@ -371,7 +372,7 @@ DB	102,15,56,0,193
 $L$schedule_mangle_last_dec:
 	add	rdx,-16
 	pxor	xmm0,XMMWORD[$L$k_s63]
-	call	_vpaes_schedule_transform 
+	call	_vpaes_schedule_transform
 	movdqu	XMMWORD[rdx],xmm0
 
 
@@ -403,12 +404,12 @@ $L$schedule_mangle_last_dec:
 
 ALIGN	16
 _vpaes_schedule_192_smear:
-	pshufd	xmm0,xmm6,0x80
-	pxor	xmm6,xmm0
+	pshufd	xmm1,xmm6,0x80
 	pshufd	xmm0,xmm7,0xFE
+	pxor	xmm6,xmm1
+	pxor	xmm1,xmm1
 	pxor	xmm6,xmm0
 	movdqa	xmm0,xmm6
-	pxor	xmm1,xmm1
 	movhlps	xmm6,xmm1
 	DB	0F3h,0C3h		;repret
 
@@ -1047,7 +1048,7 @@ se_handler:
 	lea	rsi,[16+rax]
 	lea	rdi,[512+r8]
 	mov	ecx,20
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 	lea	rax,[184+rax]
 
 $L$in_prologue:
@@ -1060,7 +1061,7 @@ $L$in_prologue:
 	mov	rdi,QWORD[40+r9]
 	mov	rsi,r8
 	mov	ecx,154
-	DD	0xa548f3fc		
+	DD	0xa548f3fc
 
 	mov	rsi,r9
 	xor	rcx,rcx
@@ -1117,20 +1118,20 @@ ALIGN	8
 $L$SEH_info_vpaes_set_encrypt_key:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$enc_key_body wrt ..imagebase,$L$enc_key_epilogue wrt ..imagebase	
+	DD	$L$enc_key_body wrt ..imagebase,$L$enc_key_epilogue wrt ..imagebase
 $L$SEH_info_vpaes_set_decrypt_key:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$dec_key_body wrt ..imagebase,$L$dec_key_epilogue wrt ..imagebase	
+	DD	$L$dec_key_body wrt ..imagebase,$L$dec_key_epilogue wrt ..imagebase
 $L$SEH_info_vpaes_encrypt:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$enc_body wrt ..imagebase,$L$enc_epilogue wrt ..imagebase		
+	DD	$L$enc_body wrt ..imagebase,$L$enc_epilogue wrt ..imagebase
 $L$SEH_info_vpaes_decrypt:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$dec_body wrt ..imagebase,$L$dec_epilogue wrt ..imagebase		
+	DD	$L$dec_body wrt ..imagebase,$L$dec_epilogue wrt ..imagebase
 $L$SEH_info_vpaes_cbc_encrypt:
 DB	9,0,0,0
 	DD	se_handler wrt ..imagebase
-	DD	$L$cbc_body wrt ..imagebase,$L$cbc_epilogue wrt ..imagebase		
+	DD	$L$cbc_body wrt ..imagebase,$L$cbc_epilogue wrt ..imagebase

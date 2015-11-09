@@ -1,5 +1,7 @@
 default	rel
 %define XMMWORD
+%define YMMWORD
+%define ZMMWORD
 section	.text code align=64
 
 EXTERN	OPENSSL_Uplink
@@ -7,7 +9,7 @@ global	OPENSSL_UplinkTable
 
 ALIGN	16
 _lazy1:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -27,7 +29,7 @@ _lazy1_end:
 
 ALIGN	16
 _lazy2:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -47,7 +49,7 @@ _lazy2_end:
 
 ALIGN	16
 _lazy3:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -67,7 +69,7 @@ _lazy3_end:
 
 ALIGN	16
 _lazy4:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -87,7 +89,7 @@ _lazy4_end:
 
 ALIGN	16
 _lazy5:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -107,7 +109,7 @@ _lazy5_end:
 
 ALIGN	16
 _lazy6:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -127,7 +129,7 @@ _lazy6_end:
 
 ALIGN	16
 _lazy7:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -147,7 +149,7 @@ _lazy7_end:
 
 ALIGN	16
 _lazy8:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -167,7 +169,7 @@ _lazy8_end:
 
 ALIGN	16
 _lazy9:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -187,7 +189,7 @@ _lazy9_end:
 
 ALIGN	16
 _lazy10:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -207,7 +209,7 @@ _lazy10_end:
 
 ALIGN	16
 _lazy11:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -227,7 +229,7 @@ _lazy11_end:
 
 ALIGN	16
 _lazy12:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -247,7 +249,7 @@ _lazy12_end:
 
 ALIGN	16
 _lazy13:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -267,7 +269,7 @@ _lazy13_end:
 
 ALIGN	16
 _lazy14:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -287,7 +289,7 @@ _lazy14_end:
 
 ALIGN	16
 _lazy15:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -307,7 +309,7 @@ _lazy15_end:
 
 ALIGN	16
 _lazy16:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -327,7 +329,7 @@ _lazy16_end:
 
 ALIGN	16
 _lazy17:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -347,7 +349,7 @@ _lazy17_end:
 
 ALIGN	16
 _lazy18:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -367,7 +369,7 @@ _lazy18_end:
 
 ALIGN	16
 _lazy19:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -387,7 +389,7 @@ _lazy19_end:
 
 ALIGN	16
 _lazy20:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -407,7 +409,7 @@ _lazy20_end:
 
 ALIGN	16
 _lazy21:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
@@ -427,7 +429,7 @@ _lazy21_end:
 
 ALIGN	16
 _lazy22:
-DB	0x48,0x83,0xEC,0x28	
+DB	0x48,0x83,0xEC,0x28
 	mov	QWORD[48+rsp],rcx
 	mov	QWORD[56+rsp],rdx
 	mov	QWORD[64+rsp],r8
