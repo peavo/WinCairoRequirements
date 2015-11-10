@@ -554,7 +554,7 @@
 #endif
 
 /* VS2012 default target settings and minimum build target check. */
-#if defined(_MSC_VER) && (_MSC_VER >= 1700)
+#if defined(_MSC_VER) && (_MSC_VER >= 1700) && (_MSC_VER <= 1800)
 #  ifndef _WIN32_WINNT
 #    define _WIN32_WINNT VS2012_DEF_TARGET
 #  endif

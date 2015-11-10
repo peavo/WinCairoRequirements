@@ -55,6 +55,7 @@
     <Import Project="..\..\..\..\props\common.props" />
     <Import Project="..\..\..\..\props\dll.props" />
     <Import Project="..\..\..\..\props\debug.props" />
+    <Import Project="..\..\..\..\props\enable_rtti.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -62,6 +63,7 @@
     <Import Project="..\..\..\..\props\common.props" />
     <Import Project="..\..\..\..\props\dll.props" />
     <Import Project="..\..\..\..\props\release.props" />
+    <Import Project="..\..\..\..\props\enable_rtti.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -69,6 +71,7 @@
     <Import Project="..\..\..\..\props\common_x64.props" />
     <Import Project="..\..\..\..\props\dll.props" />
     <Import Project="..\..\..\..\props\release.props" />
+    <Import Project="..\..\..\..\props\enable_rtti.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -76,6 +79,7 @@
     <Import Project="..\..\..\..\props\common_x64.props" />
     <Import Project="..\..\..\..\props\dll.props" />
     <Import Project="..\..\..\..\props\release.props" />
+    <Import Project="..\..\..\..\props\enable_rtti.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
