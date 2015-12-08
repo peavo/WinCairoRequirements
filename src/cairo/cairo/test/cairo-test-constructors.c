@@ -58,7 +58,7 @@ extern void _register_caps_sub_paths (void);
 extern void _register_clear (void);
 extern void _register_clear_source (void);
 extern void _register_clip_all (void);
-extern void _register_clip_complex_bug61492 (void);
+extern void _register_clip_complex_bug61592 (void);
 extern void _register_clip_complex_shape_eo_mono (void);
 extern void _register_clip_complex_shape_eo_aa (void);
 extern void _register_clip_contexts (void);
@@ -626,7 +626,7 @@ _cairo_test_runner_register_tests (void)
     _register_clear ();
     _register_clear_source ();
     _register_clip_all ();
-    _register_clip_complex_bug61492 ();
+    _register_clip_complex_bug61592 ();
     _register_clip_complex_shape_eo_mono ();
     _register_clip_complex_shape_eo_aa ();
     _register_clip_contexts ();

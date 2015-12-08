@@ -8627,7 +8627,7 @@ uninstall-am:
 
 
 cairo-test-constructors.c: Makefile $(test_sources) make-cairo-test-constructors.sh
-	(cd $(srcdir) && sh ./make-cairo-test-constructors.sh $(test_sources)) > $@
+	(cd $(srcdir) && sh ./make-cairo-test-constructors.sh $(test_sources)) > $@ || (rm $@ ; exit 1)
 
 # A target to summarise the failures
 check-summary:

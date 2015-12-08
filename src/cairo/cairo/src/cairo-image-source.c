@@ -1354,8 +1354,18 @@ _pixman_image_for_surface (cairo_image_surface_t *dst,
 			+ sub->extents.y * source->stride;
             int width = sub->extents.width;
             int height = sub->extents.height;
+            if (sub->extents.x + width > source->width)
+            {
+                width = source->width - sub->extents.x;
+                if (width < 0)
+                    width = 0;
+            }
             if (sub->extents.y + height > source->height)
+            {
                 height = source->height - sub->extents.y;
+                if (height < 0)
+                    height = 0;
+            }
 		    pixman_image = pixman_image_create_bits (source->pixman_format,
 							     width,
 							     height,
