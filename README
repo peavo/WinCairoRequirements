@@ -3,7 +3,7 @@ Current versions:
 Cairo 	        1.14.4
 cURL            7.45.0
 ICU             4.6.1 (With Apple's 10.7.4 updates)
-libxml2        	2.8.0
+libxml2        	2.9.3
 libxslt         1.1.26
 libjpeg-turbo   1.4.2
 libpng          1.6.19
