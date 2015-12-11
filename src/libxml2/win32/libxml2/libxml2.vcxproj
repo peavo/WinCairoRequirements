@@ -155,6 +155,7 @@ xcopy /Y /R "$(ProjectDir)..\..\include\libxml\*.h" "$(SolutionDir)include\libxm
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\buf.c" />
     <ClCompile Include="..\..\c14n.c" />
     <ClCompile Include="..\..\catalog.c" />
     <ClCompile Include="..\..\chvalid.c" />
