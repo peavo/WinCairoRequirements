@@ -11,5 +11,5 @@ objc4           493.11
 OpenCFLite      635.21
 OpenSSL         1.0.2d
 Pixman          0.32.8
-SQLite          3.7.7.1
+SQLite          3.10.0
 zlib            1.2.8
