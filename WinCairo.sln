@@ -250,6 +250,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jpeg-static", "src\libjpeg-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cjpeg-static", "src\libjpeg-turbo\cjpeg-static.vcxproj", "{9844CFC0-4C33-4263-9059-D3FFF4919348}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "curl", "src\curl\src\curl\curl.vcxproj", "{1A257E13-CC5F-47EF-8D78-860D537A5318}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Itanium = Debug|Itanium
@@ -2454,6 +2456,46 @@ Global
 		{9844CFC0-4C33-4263-9059-D3FFF4919348}.Template|Win32.ActiveCfg = Release|Win32
 		{9844CFC0-4C33-4263-9059-D3FFF4919348}.Template|Win32.Build.0 = Release|Win32
 		{9844CFC0-4C33-4263-9059-D3FFF4919348}.Template|x64.ActiveCfg = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Debug|Itanium.ActiveCfg = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Debug|Win32.Build.0 = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Debug|x64.ActiveCfg = Debug|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Debug|x64.Build.0 = Debug|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLDebug|Itanium.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLDebug|Itanium.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLDebug|Win32.ActiveCfg = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLDebug|Win32.Build.0 = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLDebug|x64.ActiveCfg = Debug|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLDebug|x64.Build.0 = Debug|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLRelease|Itanium.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLRelease|Itanium.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLRelease|Win32.ActiveCfg = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLRelease|Win32.Build.0 = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLRelease|x64.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.DLLRelease|x64.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Release|Itanium.ActiveCfg = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Release|Win32.ActiveCfg = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Release|Win32.Build.0 = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Release|x64.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Release|x64.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticDebug|Itanium.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticDebug|Itanium.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticDebug|Win32.ActiveCfg = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticDebug|Win32.Build.0 = Debug|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticDebug|x64.ActiveCfg = Debug|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticDebug|x64.Build.0 = Debug|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticRelease|Itanium.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticRelease|Itanium.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticRelease|Win32.ActiveCfg = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticRelease|Win32.Build.0 = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticRelease|x64.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.StaticRelease|x64.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Template|Itanium.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Template|Itanium.Build.0 = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Template|Win32.ActiveCfg = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Template|Win32.Build.0 = Release|Win32
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Template|x64.ActiveCfg = Release|x64
+		{1A257E13-CC5F-47EF-8D78-860D537A5318}.Template|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2524,6 +2566,7 @@ Global
 		{53E75EB5-55C8-47B8-83AD-AB7A07F69818} = {9F2FE80E-BE23-40AA-906C-8094A47E31BF}
 		{87EDBECD-763E-4231-A588-9529F414001E} = {9F2FE80E-BE23-40AA-906C-8094A47E31BF}
 		{9844CFC0-4C33-4263-9059-D3FFF4919348} = {9F2FE80E-BE23-40AA-906C-8094A47E31BF}
+		{1A257E13-CC5F-47EF-8D78-860D537A5318} = {98568407-DDBC-4AD4-B1BC-1175EE1F5781}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
