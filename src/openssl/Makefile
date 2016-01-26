@@ -4,7 +4,7 @@
 ## Makefile for OpenSSL
 ##
 
-VERSION=1.0.2d
+VERSION=1.0.2e
 MAJOR=1
 MINOR=0.2
 SHLIB_VERSION_NUMBER=1.0.0
@@ -12,9 +12,9 @@ SHLIB_VERSION_HISTORY=
 SHLIB_MAJOR=1
 SHLIB_MINOR=0.0
 SHLIB_EXT=
-PLATFORM=VC-WIN32
-OPTIONS= no-ec_nistp_64_gcc_128 no-gmp no-jpake no-krb5 no-libunbound no-md2 no-rc5 no-rfc3779 no-sctp no-shared no-ssl-trace no-store no-unit-test no-zlib no-zlib-dynamic
-CONFIGURE_ARGS=VC-WIN32
+PLATFORM=VC-WIN64A
+OPTIONS=--prefix=c:\openssl no-ec_nistp_64_gcc_128 no-gmp no-jpake no-krb5 no-libunbound no-md2 no-rc5 no-rfc3779 no-sctp no-shared no-ssl-trace no-store no-unit-test no-zlib no-zlib-dynamic
+CONFIGURE_ARGS=VC-WIN64A --prefix=c:\openssl
 SHLIB_TARGET=
 
 # HERE indicates where this Makefile lives.  This can be used to indicate
@@ -26,10 +26,10 @@ HERE=.
 # for, say, /usr/ and yet have everything installed to /tmp/somedir/usr/.
 # Normally it is left empty.
 INSTALL_PREFIX=
-INSTALLTOP=/usr/local/ssl
+INSTALLTOP=c:\openssl
 
 # Do not edit this manually. Use Configure --openssldir=DIR do change this!
-OPENSSLDIR=/usr/local/ssl
+OPENSSLDIR=c:\openssl/ssl
 
 # NO_IDEA - Define to build without the IDEA algorithm
 # NO_RC4  - Define to build without the RC4 algorithm
@@ -60,7 +60,7 @@ OPENSSLDIR=/usr/local/ssl
 # PKCS1_CHECK - pkcs1 tests.
 
 CC= cl
-CFLAG= -DOPENSSL_THREADS  -DDSO_WIN32 -W3 -Gs0 -GF -Gy -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -DOPENSSL_BN_ASM_PART_WORDS -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DRMD160_ASM -DAES_ASM -DVPAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM
+CFLAG= -DOPENSSL_THREADS  -DDSO_WIN32 -W3 -Gs0 -Gy -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -DUNICODE -D_UNICODE -D_CRT_SECURE_NO_DEPRECATE -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_MONT5 -DOPENSSL_BN_ASM_GF2m -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DAES_ASM -DVPAES_ASM -DBSAES_ASM -DWHIRLPOOL_ASM -DGHASH_ASM -DECP_NISTZ256_ASM
 DEPFLAG= -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_JPAKE -DOPENSSL_NO_LIBUNBOUND -DOPENSSL_NO_MD2 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_SCTP -DOPENSSL_NO_SSL_TRACE -DOPENSSL_NO_STORE -DOPENSSL_NO_UNIT_TEST
 PEX_LIBS= 
 EX_LIBS= 
@@ -88,23 +88,23 @@ ASFLAG=$(CFLAG)
 PROCESSOR= 
 
 # CPUID module collects small commonly used assembler snippets
-CPUID_OBJ= x86cpuid.o
-BN_ASM= bn-586.o co-586.o x86-mont.o x86-gf2m.o
-EC_ASM= 
-DES_ENC= des-586.o crypt586.o
-AES_ENC= aes-586.o vpaes-x86.o aesni-x86.o
-BF_ENC= bf-586.o
-CAST_ENC= cast-586.o
-RC4_ENC= rc4-586.o
-RC5_ENC= rc5-586.o
-MD5_ASM_OBJ= md5-586.o
-SHA1_ASM_OBJ= sha1-586.o sha256-586.o sha512-586.o
-RMD160_ASM_OBJ= rmd-586.o
-WP_ASM_OBJ= wp_block.o wp-mmx.o
-CMLL_ENC= cmll-x86.o
-MODES_ASM_OBJ= ghash-x86.o
+CPUID_OBJ= x86_64cpuid.o
+BN_ASM= bn_asm.o x86_64-mont.o x86_64-mont5.o x86_64-gf2m.o rsaz_exp.o rsaz-x86_64.o rsaz-avx2.o
+EC_ASM= ecp_nistz256.o ecp_nistz256-x86_64.o
+DES_ENC= des_enc.o fcrypt_b.o
+AES_ENC= aes-x86_64.o vpaes-x86_64.o bsaes-x86_64.o aesni-x86_64.o aesni-sha1-x86_64.o aesni-sha256-x86_64.o aesni-mb-x86_64.o
+BF_ENC= bf_enc.o
+CAST_ENC= c_enc.o
+RC4_ENC= rc4-x86_64.o rc4-md5-x86_64.o
+RC5_ENC= rc5_enc.o
+MD5_ASM_OBJ= md5-x86_64.o
+SHA1_ASM_OBJ= sha1-x86_64.o sha256-x86_64.o sha512-x86_64.o sha1-mb-x86_64.o sha256-mb-x86_64.o
+RMD160_ASM_OBJ= 
+WP_ASM_OBJ= wp-x86_64.o
+CMLL_ENC= cmll-x86_64.o cmll_misc.o
+MODES_ASM_OBJ= ghash-x86_64.o aesni-gcm-x86_64.o
 ENGINES_ASM_OBJ= 
-PERLASM_SCHEME= win32n
+PERLASM_SCHEME= auto
 
 # KRB5 stuff
 KRB5_INCLUDES=
@@ -205,7 +205,9 @@ CLEARENV=	TOP= && unset TOP $${LIB+LIB} $${LIBS+LIBS}	\
 		$${SHAREDCMD+SHAREDCMD} $${SHAREDFLAGS+SHAREDFLAGS}	\
 		$${SHARED_LIB+SHARED_LIB} $${LIBEXTRAS+LIBEXTRAS}
 
-BUILDENV=	PLATFORM='$(PLATFORM)' PROCESSOR='$(PROCESSOR)' \
+# LC_ALL=C ensures that error [and other] messages are delivered in
+# same language for uniform treatment.
+BUILDENV=	LC_ALL=C PLATFORM='$(PLATFORM)' PROCESSOR='$(PROCESSOR)'\
 		CC='$(CC)' CFLAG='$(CFLAG)' 			\
 		AS='$(CC)' ASFLAG='$(CFLAG) -c'			\
 		AR='$(AR)' NM='$(NM)' RANLIB='$(RANLIB)'	\
@@ -499,25 +501,28 @@ TABLE: Configure
 # would occur. Therefore the list of files is temporarily stored into a file
 # and read directly, requiring GNU-Tar. Call "make TAR=gtar dist" if the normal
 # tar does not support the --files-from option.
-tar:
+TAR_COMMAND=$(TAR) $(TARFLAGS) --files-from ../$(TARFILE).list \
+	                       --owner openssl:0 --group openssl:0 \
+			       --transform 's|^|openssl-$(VERSION)/|' \
+			       -cvf -
+
+../$(TARFILE).list:
+	find * \! -name STATUS \! -name TABLE \! -name '*.o' \! -name '*.a' \
+	       \! -name '*.so' \! -name '*.so.*'  \! -name 'openssl' \
+	       \! -name '*test' \! -name '.#*' \! -name '*~' \
+	    | sort > ../$(TARFILE).list
+
+tar: ../$(TARFILE).list
 	find . -type d -print | xargs chmod 755
 	find . -type f -print | xargs chmod a+r
 	find . -type f -perm -0100 -print | xargs chmod a+x
-	find * \! -path CVS/\* \! -path \*/CVS/\* \! -name CVS \! -name .cvsignore \! -name STATUS \! -name TABLE | sort > ../$(TARFILE).list; \
-	$(TAR) $(TARFLAGS) --files-from ../$(TARFILE).list -cvf - | \
-	tardy --user_number=0  --user_name=openssl \
-	      --group_number=0 --group_name=openssl \
-	      --prefix=openssl-$(VERSION) - |\
-	gzip --best >../$(TARFILE).gz; \
-	rm -f ../$(TARFILE).list; \
+	$(TAR_COMMAND) | gzip --best >../$(TARFILE).gz
+	rm -f ../$(TARFILE).list
 	ls -l ../$(TARFILE).gz
 
-tar-snap:
-	@$(TAR) $(TARFLAGS) -cvf - \
-		`find * \! -path CVS/\* \! -path \*/CVS/\* \! -name CVS \! -name .cvsignore \! -name STATUS \! -name TABLE \! -name '*.o' \! -name '*.a' \! -name '*.so' \! -name '*.so.*'  \! -name 'openssl' \! -name '*test' \! -name '.#*' \! -name '*~' | sort` |\
-	tardy --user_number=0  --user_name=openssl \
-	      --group_number=0 --group_name=openssl \
-	      --prefix=openssl-$(VERSION) - > ../$(TARFILE);\
+tar-snap: ../$(TARFILE).list
+	$(TAR_COMMAND) > ../$(TARFILE)
+	rm -f ../$(TARFILE).list
 	ls -l ../$(TARFILE)
 
 dist:   
