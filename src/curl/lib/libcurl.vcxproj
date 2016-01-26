@@ -107,7 +107,7 @@
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;libeay32.lib;ssleay32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib32/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -134,7 +134,7 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;libeay32.lib;ssleay32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib64/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -162,7 +162,7 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;libeay32.lib;ssleay32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib32/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -192,7 +192,7 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </ClCompile>
     <ResourceCompile />
     <Link>
-      <AdditionalDependencies>ws2_32.lib;wldap32.lib;Advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;wldap32.lib;libeay32.lib;ssleay32.lib;Advapi32.lib</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)lib64/$(TargetName)_imp.lib</ImportLibrary>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
@@ -419,12 +419,6 @@ xcopy /Y /R "$(ProjectDir)..\include\curl\*.h" "$(SolutionDir)include\curl\"</Co
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\openssl\openssl\libeay32.vcxproj">
-      <Project>{94e8b419-53a1-4c01-857e-9744f79a4822}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\openssl\openssl\ssleay32.vcxproj">
-      <Project>{74efb919-63b2-4c01-857e-9744f79a4822}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\zlib\contrib\vstudio\vc10\zlibvc.vcxproj">
       <Project>{8fd826f8-3739-44e6-8cc8-997122e53b8d}</Project>
     </ProjectReference>

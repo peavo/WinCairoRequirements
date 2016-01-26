@@ -119,12 +119,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\openssl\openssl\libeay32.vcxproj">
-      <Project>{94e8b419-53a1-4c01-857e-9744f79a4822}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\openssl\openssl\ssleay32.vcxproj">
-      <Project>{74efb919-63b2-4c01-857e-9744f79a4822}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\lib\libcurl.vcxproj">
       <Project>{69cce97a-88c6-49e2-bb5f-9cec31bec238}</Project>
     </ProjectReference>
