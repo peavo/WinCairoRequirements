@@ -2,14 +2,14 @@ Current versions:
 
 Cairo 	        1.14.4
 cURL            7.45.0
-ICU             4.6.1 (With Apple's 10.7.4 updates)
+ICU             56.1
 libxml2        	2.9.3
 libxslt         1.1.28 (CVE-2015-7995)
 libjpeg-turbo   1.4.2
 libpng          1.6.19
 objc4           493.11
 OpenCFLite      635.21
-OpenSSL         1.0.2d
+OpenSSL         1.0.2e
 Pixman          0.32.8
 SQLite          3.10.0
 zlib            1.2.8
