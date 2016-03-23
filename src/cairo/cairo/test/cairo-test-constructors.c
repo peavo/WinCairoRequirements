@@ -510,6 +510,7 @@ extern void _register_text_pattern (void);
 extern void _register_text_rotate (void);
 extern void _register_text_transform (void);
 extern void _register_text_zero_len (void);
+extern void _register_thin_lines (void);
 extern void _register_tighten_bounds (void);
 extern void _register_tiger (void);
 extern void _register_a1_tiger (void);
@@ -1078,6 +1079,7 @@ _cairo_test_runner_register_tests (void)
     _register_text_rotate ();
     _register_text_transform ();
     _register_text_zero_len ();
+    _register_thin_lines ();
     _register_tighten_bounds ();
     _register_tiger ();
     _register_a1_tiger ();

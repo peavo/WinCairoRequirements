@@ -264,7 +264,7 @@ GLAPI void APIENTRY glActiveTexture(GLenum texture)
 {
     static PFNGLACTIVETEXTUREARBPROC _glActiveTextureARB = NULL;
 
-    if(!_glActiveTextureARB)
+    if (!_glActiveTextureARB)
         _glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress((LPCSTR)"glActiveTextureARB");
 
     if (_glActiveTextureARB)
@@ -275,7 +275,7 @@ GLAPI void APIENTRY glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GL
 {
     static PFNGLBLENDFUNCSEPARATEPROC _glBlendFuncSeparate = NULL;
 
-    if(!_glBlendFuncSeparate)
+    if (!_glBlendFuncSeparate)
         _glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress((LPCSTR)"glBlendFuncSeparate");
 
     if (_glBlendFuncSeparate)

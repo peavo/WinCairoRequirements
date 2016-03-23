@@ -130,6 +130,7 @@ queried for its initial clip extents, and this will be used as the
 size of the cairo surface.  The resulting surface will always be of
 format <a class="link" href="cairo-Image-Surfaces.html#CAIRO-FORMAT-RGB24:CAPS"><code class="literal">CAIRO_FORMAT_RGB24</code></a>; should you need another surface format,
 you will need to create one through
+<code class="function">cairo_win32_surface_create_with_format()</code> or
 <a class="link" href="cairo-Win32-Surfaces.html#cairo-win32-surface-create-with-dib" title="cairo_win32_surface_create_with_dib ()"><code class="function">cairo_win32_surface_create_with_dib()</code></a>.</p>
 <div class="refsect3">
 <a name="id-1.5.9.7.2.5"></a><h4>Parameters</h4>
@@ -148,7 +149,7 @@ you will need to create one through
 </div>
 <div class="refsect3">
 <a name="id-1.5.9.7.2.6"></a><h4>Returns</h4>
-<p> the newly created surface</p>
+<p> the newly created surface, NULL on failure</p>
 <p></p>
 </div>
 <p class="since">Since 1.0</p>
