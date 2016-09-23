@@ -142,7 +142,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib64\iculx.lib;..\..\..\lib64\icule.lib;..\..\..\lib64\icuuc.lib;..\..\..\lib64\icuin.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\x64\iculx.lib;..\..\..\lib\x64\icule.lib;..\..\..\lib\x64\icuuc.lib;..\..\..\lib\x64\icuin.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x64\Release/layout.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\x64\Release/layout.pdb</ProgramDatabaseFile>
@@ -219,7 +219,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib64\iculxd.lib;..\..\..\lib64\iculed.lib;..\..\..\lib64\icuucd.lib;..\..\..\lib64\icuind.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\x64\iculxd.lib;..\..\..\lib\x64\iculed.lib;..\..\..\lib\x64\icuucd.lib;..\..\..\lib\x64\icuind.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x64\Debug/layout.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>

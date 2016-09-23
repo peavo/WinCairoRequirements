@@ -129,7 +129,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib64\icuucd.lib;..\..\..\lib64\icuind.lib;..\..\..\lib64\icutestd.lib;..\..\..\lib64\icutud.lib;..\..\..\lib64\iculed.lib;..\..\..\lib64\iculxd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\x64\icuucd.lib;..\..\..\lib\x64\icuind.lib;..\..\..\lib\x64\icutestd.lib;..\..\..\lib\x64\icutud.lib;..\..\..\lib\x64\iculed.lib;..\..\..\lib\x64\iculxd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -149,7 +149,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\lib64\icuuc.lib;..\..\..\lib64\icuin.lib;..\..\..\lib64\icutest.lib;..\..\..\lib64\icutu.lib;..\..\..\lib64\icule.lib;..\..\..\lib64\iculx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\lib\x64\icuuc.lib;..\..\..\lib\x64\icuin.lib;..\..\..\lib\x64\icutest.lib;..\..\..\lib\x64\icutu.lib;..\..\..\lib\x64\icule.lib;..\..\..\lib\x64\iculx.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

@@ -169,7 +169,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\lib64\iculx.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\lib\x64\iculx.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\include;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -193,10 +193,10 @@
     <Link>
       <OutputFile>..\..\bin64\iculx56.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>.\..\..\lib64\iculx.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\lib\x64\iculx.pdb</ProgramDatabaseFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <BaseAddress>0x4ac80000</BaseAddress>
-      <ImportLibrary>..\..\lib64\iculx.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\iculx.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -206,7 +206,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\lib64\iculxd.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\lib\x64\iculxd.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -234,9 +234,9 @@
       <OutputFile>..\..\bin64\iculx56d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\lib64\iculxd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\lib\x64\iculxd.pdb</ProgramDatabaseFile>
       <BaseAddress>0x4ac80000</BaseAddress>
-      <ImportLibrary>..\..\lib64\iculxd.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\iculxd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

@@ -102,8 +102,8 @@ rm /f $(SolutionDir)bin\testzlib.*
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y "$(SolutionDir)src\icu\bin\*.dll" $(OutDir)
-copy /Y "$(SolutionDir)src\icu\lib\icuin.lib" "$(SolutionDir)lib32\libicuin.lib"
-copy /Y "$(SolutionDir)src\icu\lib\icuuc.lib" "$(SolutionDir)lib32\libicuuc.lib"
+copy /Y "$(SolutionDir)src\icu\lib\icuin.lib" "$(SolutionDir)lib\x86\libicuin.lib"
+copy /Y "$(SolutionDir)src\icu\lib\icuuc.lib" "$(SolutionDir)lib\x86\libicuuc.lib"
 
 del /f "$(OutDir)cal.*"
 del /f "$(OutDir)cintltst.*"
@@ -123,16 +123,16 @@ del /f "$(OutDir)icutu*.*"
 del /f "$(OutDir)testzlib.*"
 del /f "$(OutDir)uconv*.*"
 
-del /f "$(SolutionDir)lib32\ctestfw.*"
-del /f "$(SolutionDir)lib32\gen*.*"
-del /f "$(SolutionDir)lib32\icuio*.*"
-del /f "$(SolutionDir)lib32\icule*.*"
-del /f "$(SolutionDir)lib32\iculx*.*"
-del /f "$(SolutionDir)lib32\icutu*.*"
-del /f "$(SolutionDir)lib32\intltest.*"
-del /f "$(SolutionDir)lib32\letest.*"
-del /f "$(SolutionDir)lib32\pixman-1.*"
-del /f "$(SolutionDir)lib32\uconv*"
+del /f "$(SolutionDir)lib\x86\ctestfw.*"
+del /f "$(SolutionDir)lib\x86\gen*.*"
+del /f "$(SolutionDir)lib\x86\icuio*.*"
+del /f "$(SolutionDir)lib\x86\icule*.*"
+del /f "$(SolutionDir)lib\x86\iculx*.*"
+del /f "$(SolutionDir)lib\x86\icutu*.*"
+del /f "$(SolutionDir)lib\x86\intltest.*"
+del /f "$(SolutionDir)lib\x86\letest.*"
+del /f "$(SolutionDir)lib\x86\pixman-1.*"
+del /f "$(SolutionDir)lib\x86\uconv*"
 
 exit 0</Command>
     </PostBuildEvent>
@@ -165,8 +165,8 @@ rm /f $(SolutionDir)bin\testzlib.*
     </Link>
     <PostBuildEvent>
       <Command>xcopy /Y "$(SolutionDir)src\icu\bin64\*.dll" $(OutDir)
-copy /Y "$(SolutionDir)src\icu\lib64\icuin.lib" "$(SolutionDir)lib64\libicuin.lib"
-copy /Y "$(SolutionDir)src\icu\lib64\icuuc.lib" "$(SolutionDir)lib64\libicuuc.lib"
+copy /Y "$(SolutionDir)src\icu\lib\x64\icuin.lib" "$(SolutionDir)lib\x64\libicuin.lib"
+copy /Y "$(SolutionDir)src\icu\lib\x64\icuuc.lib" "$(SolutionDir)lib\x64\libicuuc.lib"
 
 del /f $(OutDir)cal.*
 del /f $(OutDir)cintltst.*
@@ -186,16 +186,16 @@ del /f $(OutDir)icutu*.*
 del /f $(OutDir)testzlib.*
 del /f $(OutDir)uconv*.*
 
-del /f $(SolutionDir)lib64\ctestfw.*
-del /f $(SolutionDir)lib64\gen*.*
-del /f $(SolutionDir)lib64\icuio*.*
-del /f $(SolutionDir)lib64\icule*.*
-del /f $(SolutionDir)lib64\iculx*.*
-del /f $(SolutionDir)lib64\icutu*.*
-del /f $(SolutionDir)lib64\intltest.*
-del /f $(SolutionDir)lib64\letest.*
-del /f $(SolutionDir)lib64\pixman-1.*
-del /f $(SolutionDir)lib64\uconv*
+del /f $(SolutionDir)lib\x64\ctestfw.*
+del /f $(SolutionDir)lib\x64\gen*.*
+del /f $(SolutionDir)lib\x64\icuio*.*
+del /f $(SolutionDir)lib\x64\icule*.*
+del /f $(SolutionDir)lib\x64\iculx*.*
+del /f $(SolutionDir)lib\x64\icutu*.*
+del /f $(SolutionDir)lib\x64\intltest.*
+del /f $(SolutionDir)lib\x64\letest.*
+del /f $(SolutionDir)lib\x64\pixman-1.*
+del /f $(SolutionDir)lib\x64\uconv*
 
 exit 0</Command>
     </PostBuildEvent>
@@ -203,8 +203,8 @@ exit 0</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PostBuildEvent>
       <Command>xcopy /Y "$(SolutionDir)src\icu\bin\*.dll" $(OutDir)
-copy /Y "$(SolutionDir)src\icu\lib\icuin.lib" "$(SolutionDir)lib32\libicuin.lib"
-copy /Y "$(SolutionDir)src\icu\lib\icuuc.lib" "$(SolutionDir)lib32\libicuuc.lib"
+copy /Y "$(SolutionDir)src\icu\lib\icuin.lib" "$(SolutionDir)lib\x86\libicuin.lib"
+copy /Y "$(SolutionDir)src\icu\lib\icuuc.lib" "$(SolutionDir)lib\x86\libicuuc.lib"
 
 del /f "$(OutDir)cal.*"
 del /f "$(OutDir)cintltst.*"
@@ -224,16 +224,16 @@ del /f "$(OutDir)icutu*.*"
 del /f "$(OutDir)testzlib.*"
 del /f "$(OutDir)uconv*.*"
 
-del /f "$(SolutionDir)lib32\ctestfw.*"
-del /f "$(SolutionDir)lib32\gen*.*"
-del /f "$(SolutionDir)lib32\icuio*.*"
-del /f "$(SolutionDir)lib32\icule*.*"
-del /f "$(SolutionDir)lib32\iculx*.*"
-del /f "$(SolutionDir)lib32\icutu*.*"
-del /f "$(SolutionDir)lib32\intltest.*"
-del /f "$(SolutionDir)lib32\letest.*"
-del /f "$(SolutionDir)lib32\pixman-1.*"
-del /f "$(SolutionDir)lib32\uconv*"
+del /f "$(SolutionDir)lib\x86\ctestfw.*"
+del /f "$(SolutionDir)lib\x86\gen*.*"
+del /f "$(SolutionDir)lib\x86\icuio*.*"
+del /f "$(SolutionDir)lib\x86\icule*.*"
+del /f "$(SolutionDir)lib\x86\iculx*.*"
+del /f "$(SolutionDir)lib\x86\icutu*.*"
+del /f "$(SolutionDir)lib\x86\intltest.*"
+del /f "$(SolutionDir)lib\x86\letest.*"
+del /f "$(SolutionDir)lib\x86\pixman-1.*"
+del /f "$(SolutionDir)lib\x86\uconv*"
 
 exit 0</Command>
     </PostBuildEvent>
@@ -241,8 +241,8 @@ exit 0</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PostBuildEvent>
       <Command>xcopy /Y "$(SolutionDir)src\icu\bin64\*.dll" $(OutDir)
-copy /Y "$(SolutionDir)src\icu\lib64\icuin.lib" "$(SolutionDir)lib64\libicuin.lib"
-copy /Y "$(SolutionDir)src\icu\lib64\icuuc.lib" "$(SolutionDir)lib64\libicuuc.lib"
+copy /Y "$(SolutionDir)src\icu\lib\x64\icuin.lib" "$(SolutionDir)lib\x64\libicuin.lib"
+copy /Y "$(SolutionDir)src\icu\lib\x64\icuuc.lib" "$(SolutionDir)lib\x64\libicuuc.lib"
 
 del /f $(OutDir)cal.*
 del /f $(OutDir)cintltst.*
@@ -262,16 +262,16 @@ del /f $(OutDir)icutu*.*
 del /f $(OutDir)testzlib.*
 del /f $(OutDir)uconv*.*
 
-del /f $(SolutionDir)lib64\ctestfw.*
-del /f $(SolutionDir)lib64\gen*.*
-del /f $(SolutionDir)lib64\icuio*.*
-del /f $(SolutionDir)lib64\icule*.*
-del /f $(SolutionDir)lib64\iculx*.*
-del /f $(SolutionDir)lib64\icutu*.*
-del /f $(SolutionDir)lib64\intltest.*
-del /f $(SolutionDir)lib64\letest.*
-del /f $(SolutionDir)lib64\pixman-1.*
-del /f $(SolutionDir)lib64\uconv*
+del /f $(SolutionDir)lib\x64\ctestfw.*
+del /f $(SolutionDir)lib\x64\gen*.*
+del /f $(SolutionDir)lib\x64\icuio*.*
+del /f $(SolutionDir)lib\x64\icule*.*
+del /f $(SolutionDir)lib\x64\iculx*.*
+del /f $(SolutionDir)lib\x64\icutu*.*
+del /f $(SolutionDir)lib\x64\intltest.*
+del /f $(SolutionDir)lib\x64\letest.*
+del /f $(SolutionDir)lib\x64\pixman-1.*
+del /f $(SolutionDir)lib\x64\uconv*
 
 exit 0</Command>
     </PostBuildEvent>

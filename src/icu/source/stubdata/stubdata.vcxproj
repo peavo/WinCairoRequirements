@@ -219,7 +219,7 @@
       <SetChecksum>true</SetChecksum>
       <BaseAddress>0x4ad00000</BaseAddress>
       <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
-      <ImportLibrary>..\..\lib64\icudt.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\icudt.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -263,7 +263,7 @@
       <SetChecksum>true</SetChecksum>
       <BaseAddress>0x4ad00000</BaseAddress>
       <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
-      <ImportLibrary>..\..\lib64\icudt.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\icudt.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

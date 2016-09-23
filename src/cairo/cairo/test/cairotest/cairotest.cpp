@@ -26,8 +26,8 @@
 #include <windows.h>
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include "cairo/cairo-gl.h"
-#include "cairo/cairo-win32.h"
+#include "cairo-gl.h"
+#include "cairo-win32.h"
 
 #define MAX_LOADSTRING 100
 
