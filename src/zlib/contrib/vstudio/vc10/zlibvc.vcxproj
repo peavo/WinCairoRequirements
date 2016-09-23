@@ -109,14 +109,14 @@
       <SubSystem>Windows</SubSystem>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(SolutionDir)lib32/zdll.lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib\x86/zdll.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include"</Command>
       <Message>Install headers</Message>
     </PostBuildEvent>
     <MASM>
@@ -154,14 +154,14 @@ xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Comma
       <SubSystem>Windows</SubSystem>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <ImportLibrary>$(SolutionDir)lib32/zdll.lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib\x86/zdll.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include"</Command>
       <Message>Install headers</Message>
     </PostBuildEvent>
     <MASM>
@@ -194,15 +194,15 @@ xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Comma
     <Link>
       <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
-      <ImportLibrary>$(SolutionDir)lib64/zdll.lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib\x64/zdll.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
       <Message>Install headers</Message>
-      <Command>mkdir "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -231,15 +231,15 @@ xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Comma
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <ModuleDefinitionFile>.\zlibvc.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
-      <ImportLibrary>$(SolutionDir)lib64/zdll.lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)lib\x64/zdll.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
       <Message>Install headers</Message>
-      <Command>mkdir "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include\zlib"
-xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include\zlib"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zconf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zlib.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\zutil.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\..\..\gzguts.h" "$(SolutionDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

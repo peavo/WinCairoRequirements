@@ -110,10 +110,10 @@ cmd /c ms\do_nasm.bat
 cmd /c nmake -f ms\ntdll.mak
 copy out32dll\libeay32.dll "$(OutDir)"
 copy out32dll\libeay32.pdb "$(OutDir)"
-copy out32dll\libeay32.lib "$(SolutionDir)\lib32"
+copy out32dll\libeay32.lib "$(SolutionDir)\lib\x86"
 copy out32dll\ssleay32.dll "$(OutDir)"
 copy out32dll\ssleay32.pdb "$(OutDir)"
-copy out32dll\ssleay32.lib "$(SolutionDir)\lib32"
+copy out32dll\ssleay32.lib "$(SolutionDir)\lib\x86"
 xcopy /Y "$(SolutionDir)src\openssl\inc32\openssl\*" "$(SolutionDir)include\openssl\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -134,10 +134,10 @@ cmd /c ms\do_win64a.bat
 cmd /c nmake -f ms\ntdll.mak
 copy out32dll\libeay32.dll "$(OutDir)"
 copy out32dll\libeay32.pdb "$(OutDir)"
-copy out32dll\libeay32.lib "$(SolutionDir)\lib64"
+copy out32dll\libeay32.lib "$(SolutionDir)\lib\x64"
 copy out32dll\ssleay32.dll "$(OutDir)"
 copy out32dll\ssleay32.pdb "$(OutDir)"
-copy out32dll\ssleay32.lib "$(SolutionDir)\lib64"
+copy out32dll\ssleay32.lib "$(SolutionDir)\lib\x64"
 xcopy /Y "$(SolutionDir)src\openssl\inc32\openssl\*" "$(SolutionDir)include\openssl\"
 </Command>
     </PostBuildEvent>
@@ -160,10 +160,10 @@ cmd /c ms\do_nasm.bat
 cmd /c nmake -f ms\ntdll.mak
 copy out32dll\libeay32.dll "$(OutDir)"
 copy out32dll\libeay32.pdb "$(OutDir)"
-copy out32dll\libeay32.lib "$(SolutionDir)\lib32"
+copy out32dll\libeay32.lib "$(SolutionDir)\lib\x86"
 copy out32dll\ssleay32.dll "$(OutDir)"
 copy out32dll\ssleay32.pdb "$(OutDir)"
-copy out32dll\ssleay32.lib "$(SolutionDir)\lib32"
+copy out32dll\ssleay32.lib "$(SolutionDir)\lib\x86"
 xcopy /Y "$(SolutionDir)src\openssl\inc32\openssl\*" "$(SolutionDir)include\openssl\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -184,10 +184,10 @@ cmd /c ms\do_win64a.bat
 cmd /c nmake -f ms\ntdll.mak
 copy out32dll\libeay32.dll "$(OutDir)"
 copy out32dll\libeay32.pdb "$(OutDir)"
-copy out32dll\libeay32.lib "$(SolutionDir)\lib64"
+copy out32dll\libeay32.lib "$(SolutionDir)\lib\x64"
 copy out32dll\ssleay32.dll "$(OutDir)"
 copy out32dll\ssleay32.pdb "$(OutDir)"
-copy out32dll\ssleay32.lib "$(SolutionDir)\lib64"
+copy out32dll\ssleay32.lib "$(SolutionDir)\lib\x64"
 xcopy /Y "$(SolutionDir)src\openssl\inc32\openssl\*" "$(SolutionDir)include\openssl\"
 </Command>
     </PostBuildEvent>

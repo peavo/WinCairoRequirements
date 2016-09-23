@@ -146,7 +146,7 @@
       <AdditionalDependencies>icuuc.lib;icuio.lib;icutu.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x64\Release/uresb.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../lib64/;../../tools/toolutil/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../lib\x64/;../../tools/toolutil/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>.\x64\Release/uresb.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -225,7 +225,7 @@
       <AdditionalDependencies>icuucd.lib;icuiod.lib;icutud.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\x64\Debug/uresb.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../../../lib64/;../../tools/toolutil/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../../lib\x64/;../../tools/toolutil/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\x64\Debug/uresb.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>

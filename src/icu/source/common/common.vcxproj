@@ -168,7 +168,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\lib64\icuuc.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\lib\x64\icuuc.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <PreprocessorDefinitions>U_ATTRIBUTE_DEPRECATED=;WIN64;WIN32;NDEBUG;_CRT_SECURE_NO_DEPRECATE;U_COMMON_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -191,10 +191,10 @@
     <Link>
       <OutputFile>..\..\bin64\icuuc56.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>.\..\..\lib64\icuuc.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\lib\x64\icuuc.pdb</ProgramDatabaseFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <BaseAddress>0x4a800000</BaseAddress>
-      <ImportLibrary>..\..\lib64\icuuc.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\icuuc.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent />
@@ -205,7 +205,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\lib64\icuucd.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\lib\x64\icuucd.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -232,9 +232,9 @@
       <OutputFile>..\..\bin64\icuuc56d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\lib64\icuucd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\lib\x64\icuucd.pdb</ProgramDatabaseFile>
       <BaseAddress>0x4a800000</BaseAddress>
-      <ImportLibrary>..\..\lib64\icuucd.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\icuucd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent />

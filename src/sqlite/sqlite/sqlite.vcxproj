@@ -97,9 +97,9 @@
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,9 +118,9 @@ xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Comma
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,9 +141,9 @@ xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Comma
       <AdditionalIncludeDirectories>$(ProjectDir)\..\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -163,9 +163,9 @@ xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Comma
       <AdditionalIncludeDirectories>$(ProjectDir)\..\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include\SQLite"
-xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include\SQLite"</Command>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\sqlite3ext.h" "$(SolutionDir)include"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

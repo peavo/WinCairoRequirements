@@ -180,7 +180,7 @@ xcopy /Y /R "$(ProjectDir)..\..\include\unicode\*.h" "$(SolutionDir)include\unic
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\lib64\icuin.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\lib\x64\icuin.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\include;..\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -206,10 +206,10 @@ xcopy /Y /R "$(ProjectDir)..\..\include\unicode\*.h" "$(SolutionDir)include\unic
     <Link>
       <OutputFile>..\..\bin64\icuin56.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>.\..\..\lib64\icuin.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\lib\x64\icuin.pdb</ProgramDatabaseFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <BaseAddress>0x4a900000</BaseAddress>
-      <ImportLibrary>..\..\lib64\icuin.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\icuin.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -223,7 +223,7 @@ xcopy /Y /R "$(ProjectDir)..\..\include\unicode\*.h" "$(SolutionDir)include\unic
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\lib64\icuind.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\lib\x64\icuind.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -253,9 +253,9 @@ xcopy /Y /R "$(ProjectDir)..\..\include\unicode\*.h" "$(SolutionDir)include\unic
       <OutputFile>..\..\bin64\icuin56d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\lib64\icuind.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\lib\x64\icuind.pdb</ProgramDatabaseFile>
       <BaseAddress>0x4a900000</BaseAddress>
-      <ImportLibrary>..\..\lib64\icuind.lib</ImportLibrary>
+      <ImportLibrary>..\..\lib\x64\icuind.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>

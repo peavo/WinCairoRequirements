@@ -173,6 +173,22 @@ xcopy /Y /R "$(ProjectDir)transupp.h" "$(SolutionDir)include"</Command>
       <PreprocessorDefinitions>WITH_SIMD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jconfig.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jdct.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jerror.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jinclude.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jmemsys.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jmorecfg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jpegint.h " "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jpeglib.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jversion.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cdjpeg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cderror.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)transupp.h" "$(SolutionDir)include"</Command>
+      <Message>Install Headers</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -180,6 +196,22 @@ xcopy /Y /R "$(ProjectDir)transupp.h" "$(SolutionDir)include"</Command>
       <PreprocessorDefinitions>WITH_SIMD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jconfig.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jdct.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jerror.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jinclude.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jmemsys.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jmorecfg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jpegint.h " "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jpeglib.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)jversion.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cdjpeg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cderror.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)transupp.h" "$(SolutionDir)include"</Command>
+      <Message>Install Headers</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include=".\jcapimin.c" />
@@ -433,7 +465,7 @@ xcopy /Y /R "$(ProjectDir)transupp.h" "$(SolutionDir)include"</Command>
     </Object>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:/Development/Projects/WinCairoRequirements/src/libjpeg-turbo/build/simd/simd.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src/libjpeg-turbo/simd/simd.vcxproj">
       <Project>53E75EB5-55C8-47B8-83AD-AB7A07F69818</Project>
     </ProjectReference>
   </ItemGroup>

@@ -170,7 +170,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\..\lib64\testplug.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\..\lib\x64\testplug.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -196,10 +196,10 @@
     <Link>
       <OutputFile>..\..\..\bin64\testplug.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>.\..\..\..\lib64\testplug.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\..\..\lib\x64\testplug.pdb</ProgramDatabaseFile>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <ImportLibrary>.\..\..\..\lib64\testplug.lib</ImportLibrary>
+      <ImportLibrary>.\..\..\..\lib\x64\testplug.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -209,7 +209,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\..\..\..\lib64\testplugd.tlb</TypeLibraryName>
+      <TypeLibraryName>.\..\..\..\lib\x64\testplugd.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -238,8 +238,8 @@
       <OutputFile>..\..\..\bin64\testplug.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\..\..\lib64\testplugd.pdb</ProgramDatabaseFile>
-      <ImportLibrary>.\..\..\..\lib64\testplugd.lib</ImportLibrary>
+      <ProgramDatabaseFile>.\..\..\..\lib\x64\testplugd.pdb</ProgramDatabaseFile>
+      <ImportLibrary>.\..\..\..\lib\x64\testplugd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

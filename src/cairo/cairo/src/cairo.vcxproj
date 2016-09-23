@@ -103,17 +103,17 @@
       <AdditionalDependencies>Msimg32.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include"
 </Command>
       <Message>Install Headers</Message>
     </PostBuildEvent>
@@ -130,17 +130,17 @@ xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
       <AdditionalDependencies>Msimg32.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include"
 </Command>
       <Message>Install Headers</Message>
     </PostBuildEvent>
@@ -158,17 +158,17 @@ xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include"
 </Command>
       <Message>Install Headers</Message>
     </PostBuildEvent>
@@ -185,17 +185,17 @@ xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
       </ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include\cairo"
-xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include\cairo"
+      <Command>mkdir "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)..\cairo-version.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-deprecated.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-features.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-gl.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-pdf.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-ps.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-svg.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-win32.h" "$(SolutionDir)include"
+xcopy /Y /R "$(ProjectDir)cairo-xml.h" "$(SolutionDir)include"
 </Command>
       <Message>Install Headers</Message>
     </PostBuildEvent>
